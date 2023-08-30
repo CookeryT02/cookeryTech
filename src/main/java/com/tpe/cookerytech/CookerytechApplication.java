@@ -11,5 +11,4 @@ public class CookerytechApplication {
 		SpringApplication.run(CookerytechApplication.class, args);
 	}
 
-	// TEST
 }
