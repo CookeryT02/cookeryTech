@@ -22,6 +22,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -312,6 +314,7 @@ public class UserService {
         return newRoles;
     }
 
+    @Transactional
     public void deleteCurrentUser(String password) {
 
         User user = getCurrentUser();
