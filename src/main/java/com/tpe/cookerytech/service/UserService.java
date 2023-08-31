@@ -14,6 +14,7 @@ import com.tpe.cookerytech.exception.PasswordValidator;
 import com.tpe.cookerytech.exception.ResourcesNotFoundException;
 import com.tpe.cookerytech.exception.message.ErrorMessage;
 import com.tpe.cookerytech.mapper.UserMapper;
+import com.tpe.cookerytech.repository.OfferRepository;
 import com.tpe.cookerytech.repository.UserRepository;
 import org.springframework.context.annotation.Lazy;
 import com.tpe.cookerytech.security.SecurityUtils;
@@ -39,6 +40,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
 
     private final UserMapper userMapper;
+
 
 
     public UserService(UserRepository userRepository, RoleService roleService, @Lazy PasswordEncoder passwordEncoder, UserMapper userMapper) {
@@ -334,5 +336,60 @@ public class UserService {
         // SecurityContextHolder.clearContext(); (oturumu kapatmak için)
 
     }
+
+    @Transactional
+    public UserResponse deleteUser(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourcesNotFoundException(String.format(ErrorMessage.PRINCIPAL_FOUND_MESSAGE)));
+
+        if (OfferRepository.existByUser(user)) {
+            throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
+        }
+
+        if (user.getBuiltIn()) {
+            throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
+        }
+
+        User currentUser = getCurrentUser();
+        Set<Role> currentUserRole = currentUser.getRoles();
+        // Check if the current user has the necessary role or permission to delete the target user.
+        currentUserRole.forEach(r -> {
+            if (r.getType().equals(RoleType.ROLE_ADMIN)) {
+                userRepository.delete(user);
+
+            } else if (r.getType().equals(RoleType.ROLE_SALES_MANAGER)) {
+                user.getRoles().forEach(role -> {
+                    if (role.getType().equals(RoleType.ROLE_ADMIN) ||
+                    role.getType().equals(RoleType.ROLE_PRODUCT_MANAGER)) {
+                        throw new BadRequestException(String.format(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE));
+
+                    } else if (role.getType().equals(RoleType.ROLE_SALES_SPECIALIST) ||
+                    role.getType().equals(RoleType.ROLE_CUSTOMER)) {
+                        userRepository.delete(user);
+                    }
+                });
+            } else if (r.getType().equals(RoleType.ROLE_SALES_SPECIALIST)) {
+                user.getRoles().forEach(role -> {
+                    if (role.getType().equals(RoleType.ROLE_ADMIN) ||
+                    role.getType().equals(RoleType.ROLE_PRODUCT_MANAGER) ||
+                    role.getType().equals(RoleType.ROLE_SALES_MANAGER)) {
+                        throw new BadRequestException(String.format(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE));
+
+                    } else if (role.getType().equals(RoleType.ROLE_SALES_SPECIALIST)
+                            || role.getType().equals(RoleType.ROLE_CUSTOMER)) {
+                        userRepository.delete(user);
+                    }
+                });
+            } else {
+                throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
+
+            }
+        });
+
+        return userMapper.userToUserResponse(user);
+    }
+
+
+
 }
 
