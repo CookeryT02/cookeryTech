@@ -22,13 +22,13 @@ public class Category {
 
     @Column(nullable = false)
     @Size(min = 2, max = 80, message = "Title must be between 2 and 80 characters")
-    private char title;
+    private String title;
 
     @Column(nullable = false)
     private byte status;
 
     @Column(nullable = false)
-    private char description;
+    private String description;
 
     private Boolean built_in;
 
@@ -37,15 +37,15 @@ public class Category {
 
     @Column(nullable = false)
     @Size(min = 5, max = 200, message = "Slag mast be between 5 and 200")
-    private char slag;
+    private String slag;
 
     @Column(nullable = false)
     private  Boolean isActive = true;
 
     @Column(nullable = false)
-    private LocalDateTime create_at;
+    private LocalDateTime createAt;
 
-    private LocalDateTime update_at;
+    private LocalDateTime updateAt;
 
 
 
