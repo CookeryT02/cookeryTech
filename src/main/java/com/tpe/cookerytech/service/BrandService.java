@@ -3,6 +3,8 @@ package com.tpe.cookerytech.service;
 import com.tpe.cookerytech.domain.Brand;
 import com.tpe.cookerytech.dto.request.BrandRequest;
 import com.tpe.cookerytech.dto.response.BrandResponse;
+import com.tpe.cookerytech.exception.ResourcesNotFoundException;
+import com.tpe.cookerytech.exception.message.ErrorMessage;
 import com.tpe.cookerytech.mapper.BrandMapper;
 import com.tpe.cookerytech.repository.BrandRepository;
 import org.springframework.stereotype.Service;
@@ -32,5 +34,13 @@ public class BrandService {
 
        return brandMapper.brandToBrandResponse(brand);
 
+    }
+
+    public BrandResponse getBrandById(Long id) {
+
+        Brand brand = brandRepository.findById(id).orElseThrow(()->
+                new ResourcesNotFoundException(ErrorMessage.BRAND_NOT_FOUND_EXCEPTION));
+
+        return brandMapper.brandToBrandResponse(brand);
     }
 }
