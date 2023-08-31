@@ -1,2 +1,1 @@
 # cookeryTech
-# deneme1
