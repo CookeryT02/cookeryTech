@@ -31,15 +31,15 @@ public class MyRunner {
     @Bean
     public CommandLineRunner init(UserRepository userRepository) {
         return args -> {
-//            createAdminUser(userRepository);
+ //           createAdminUser(userRepository);
         };
     }
     public void createAdminUser(UserRepository userRepository) {
         User adminUser = new User();
-        adminUser.setFirstName("John Admin");
-        adminUser.setLastName("Doe");
-        adminUser.setEmail("johnadmin@example.com");
-        adminUser.setPhone("1234567890");
+        adminUser.setFirstName("Admin1");
+        adminUser.setLastName("Admin");
+        adminUser.setEmail("admin1@gmail.com");
+        adminUser.setPhone("123456789");
         adminUser.setAddress("123 Main St");
         adminUser.setBuiltIn(true);
         adminUser.setCity("New York");
@@ -49,7 +49,7 @@ public class MyRunner {
         adminUser.setCreateAt(LocalDateTime.now());
         adminUser.setUpdateAt(null);
         adminUser.setStatus((byte) 0);
-        adminUser.setPasswordHash(passwordEncoder.encode("Admin123*"));
+        adminUser.setPasswordHash(passwordEncoder.encode("Pass*123"));
 
         Role role = roleService.findByType(RoleType.ROLE_ADMIN);
         Set<Role> roles = new HashSet<>();
