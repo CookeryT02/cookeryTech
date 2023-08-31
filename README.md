@@ -1,4 +1,1 @@
-
 # cookeryTech
-
-hello seyma 

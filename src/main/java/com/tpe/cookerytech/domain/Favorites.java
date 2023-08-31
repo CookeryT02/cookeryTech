@@ -18,8 +18,8 @@ public class Favorites {
     private Long Id;
 
     @ManyToOne
-    @JoinColumn(name = "product_id", referencedColumnName = "id")
-    private Product product;
+    @JoinColumn(name = "model_id", referencedColumnName = "id")
+    private Model model;
 
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
