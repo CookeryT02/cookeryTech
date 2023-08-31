@@ -5,20 +5,12 @@ import com.tpe.cookerytech.dto.response.BrandResponse;
 import com.tpe.cookerytech.service.BrandService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-
 import org.springframework.web.bind.annotation.*;
-
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping("/brands")
-
+@RequestMapping("brands")
 public class BrandController {
 
     private final BrandService brandService;
@@ -42,7 +34,7 @@ public class BrandController {
 
         BrandResponse brandResponse = brandService.getBrandById(id);
 
-       return ResponseEntity.ok(brandResponse);
+        return ResponseEntity.ok(brandResponse);
 
     }
 }
