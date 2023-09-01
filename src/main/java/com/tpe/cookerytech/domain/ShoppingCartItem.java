@@ -1,4 +1,4 @@
-package com.tpe.cookerytech.dto.domain;
+package com.tpe.cookerytech.domain;
 
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;

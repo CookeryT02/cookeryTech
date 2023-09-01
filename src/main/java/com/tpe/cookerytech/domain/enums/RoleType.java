@@ -1,4 +1,4 @@
-package com.tpe.cookerytech.dto.domain.enums;
+package com.tpe.cookerytech.domain.enums;
 
 import lombok.Data;
 import lombok.Getter;

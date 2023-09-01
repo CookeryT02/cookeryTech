@@ -1,8 +1,8 @@
-package com.tpe.cookerytech.dto.domain;
+package com.tpe.cookerytech.domain;
 
 import javax.persistence.*;
 
-import com.tpe.cookerytech.dto.domain.enums.RoleType;
+import com.tpe.cookerytech.domain.enums.RoleType;
 import lombok.*;
 
 @Getter

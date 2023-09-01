@@ -1,6 +1,6 @@
 package com.tpe.cookerytech.service;
 
-import com.tpe.cookerytech.dto.domain.User;
+import com.tpe.cookerytech.domain.User;
 import com.tpe.cookerytech.exception.BadRequestException;
 import com.tpe.cookerytech.exception.ResourceNotFoundException;
 import com.tpe.cookerytech.exception.message.ErrorMessage;

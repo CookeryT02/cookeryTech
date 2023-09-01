@@ -1,6 +1,6 @@
 package com.tpe.cookerytech.security.service;
 
-import com.tpe.cookerytech.dto.domain.User;
+import com.tpe.cookerytech.domain.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
