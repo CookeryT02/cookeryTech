@@ -1,6 +1,6 @@
 package com.tpe.cookerytech.repository;
 
-import com.tpe.cookerytech.dto.domain.Category;
+import com.tpe.cookerytech.domain.Category;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

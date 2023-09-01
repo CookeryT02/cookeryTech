@@ -1,8 +1,8 @@
 package com.tpe.cookerytech.service;
 
 
-import com.tpe.cookerytech.dto.domain.Role;
-import com.tpe.cookerytech.dto.domain.enums.RoleType;
+import com.tpe.cookerytech.domain.Role;
+import com.tpe.cookerytech.domain.enums.RoleType;
 import com.tpe.cookerytech.exception.ResourcesNotFoundException;
 import com.tpe.cookerytech.exception.message.ErrorMessage;
 import com.tpe.cookerytech.repository.RoleRepository;

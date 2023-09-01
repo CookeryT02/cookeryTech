@@ -1,6 +1,6 @@
 package com.tpe.cookerytech.security.service;
 
-import com.tpe.cookerytech.dto.domain.User;
+import com.tpe.cookerytech.domain.User;
 import com.tpe.cookerytech.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;

@@ -1,6 +1,6 @@
 package com.tpe.cookerytech.repository;
 
-import com.tpe.cookerytech.dto.domain.User;
+import com.tpe.cookerytech.domain.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;

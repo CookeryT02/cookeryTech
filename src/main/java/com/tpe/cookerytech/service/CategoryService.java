@@ -1,6 +1,6 @@
 package com.tpe.cookerytech.service;
 
-import com.tpe.cookerytech.dto.domain.Category;
+import com.tpe.cookerytech.domain.Category;
 import com.tpe.cookerytech.dto.request.CategoryRequest;
 import com.tpe.cookerytech.dto.response.CategoryResponse;
 import com.tpe.cookerytech.exception.ConflictException;
