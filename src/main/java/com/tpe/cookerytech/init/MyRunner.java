@@ -31,7 +31,7 @@ public class MyRunner {
     @Bean
     public CommandLineRunner init(UserRepository userRepository) {
         return args -> {
- //           createAdminUser(userRepository);
+         //   createAdminUser(userRepository);
         };
     }
     public void createAdminUser(UserRepository userRepository) {
