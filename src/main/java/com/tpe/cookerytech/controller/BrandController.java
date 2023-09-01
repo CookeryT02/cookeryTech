@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping("brands")
+@RequestMapping("/brands")
 public class BrandController {
 
     private final BrandService brandService;
@@ -37,4 +37,17 @@ public class BrandController {
         return ResponseEntity.ok(brandResponse);
 
     }
+
+
+    //DELETE
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PRODUCT_MANAGER')")
+    public ResponseEntity<BrandResponse> deleteBrandById(@PathVariable Long id){
+
+        BrandResponse brandResponse = brandService.deleteBrandById(id);
+
+        return ResponseEntity.ok(brandResponse);
+
+    }
+
 }

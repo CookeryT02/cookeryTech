@@ -1,12 +1,15 @@
 package com.tpe.cookerytech.service;
 
 import com.tpe.cookerytech.domain.Brand;
+import com.tpe.cookerytech.domain.Product;
 import com.tpe.cookerytech.dto.request.BrandRequest;
 import com.tpe.cookerytech.dto.response.BrandResponse;
+import com.tpe.cookerytech.exception.BadRequestException;
 import com.tpe.cookerytech.exception.ResourcesNotFoundException;
 import com.tpe.cookerytech.exception.message.ErrorMessage;
 import com.tpe.cookerytech.mapper.BrandMapper;
 import com.tpe.cookerytech.repository.BrandRepository;
+import com.tpe.cookerytech.repository.ProductRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -18,9 +21,12 @@ public class BrandService {
 
     private final BrandMapper brandMapper;
 
-    public BrandService(BrandRepository brandRepository, BrandMapper brandMapper) {
+    private final ProductRepository productRepository;
+
+    public BrandService(BrandRepository brandRepository, BrandMapper brandMapper, ProductRepository productRepository) {
         this.brandRepository = brandRepository;
         this.brandMapper = brandMapper;
+        this.productRepository = productRepository;
     }
 
     public BrandResponse createBrand(BrandRequest brandRequest) {
@@ -42,5 +48,29 @@ public class BrandService {
                 new ResourcesNotFoundException(ErrorMessage.BRAND_NOT_FOUND_EXCEPTION));
 
         return brandMapper.brandToBrandResponse(brand);
+    }
+
+    public BrandResponse deleteBrandById(Long id) {
+
+        Brand brand = brandRepository.findById(id).orElseThrow(()->
+                new ResourcesNotFoundException(ErrorMessage.BRAND_NOT_FOUND_EXCEPTION));
+
+        if (brand.getBuiltIn()){
+            throw  new BadRequestException(String.format(ErrorMessage.BRAND_CANNOT_DELETE_EXCEPTION,id));
+        }
+
+        ///////Checking Products///////
+//        Product product= productRepository.findByBrandId(id);
+//
+//         if(product.getBrand().getId()==null){
+//           brandRepository.deleteBrandById(brand);
+//         } else {
+//             throw new BadRequestException(String.format(ErrorMessage.BRAND_CANNOT_DELETE_EXCEPTION,id));
+//         }
+
+        brandRepository.deleteById(id);
+
+        return brandMapper.brandToBrandResponse(brand);
+
     }
 }
