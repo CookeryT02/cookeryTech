@@ -1,6 +1,6 @@
 package com.tpe.cookerytech.service;
 
-import com.tpe.cookerytech.dto.domain.Category;
+import com.tpe.cookerytech.domain.Category;
 import com.tpe.cookerytech.dto.request.CategoryRequest;
 import com.tpe.cookerytech.dto.response.CategoryResponse;
 import com.tpe.cookerytech.exception.BadRequestException;
@@ -28,6 +28,8 @@ public class CategoryService {
     }
 
     public CategoryResponse createCategory(CategoryRequest categoryRequest) {
+
+
         Category category = categoryMapper.categoryRequestToCategory(categoryRequest);
 
         if(isTitleUnique(category.getTitle())){
@@ -67,7 +69,7 @@ public class CategoryService {
 
         //Built-in
         if (category.getBuilt_in()) {
-            throw new ResourcesNotFoundException(String.format(ErrorMessage.CATEGORY_NOT_FOUND_EXCEPTION, id));
+            throw new ResourceNotFoundException(String.format(ErrorMessage.CATEGORY_NOT_FOUND_EXCEPTION, id));
         }
 
         // Category product var mı kontrol et !!!
@@ -114,7 +116,7 @@ public class CategoryService {
         category.setTitle(categoryResponse.getTitle());
         category.setDescription(categoryResponse.getDescription());
         category.setSeq(categoryResponse.getSeq());
-        category.setSlag(categoryResponse.getSlag());
+        category.setSlug(categoryResponse.getSlug());
         category.setIsActive(categoryResponse.getIsActive());
 
 
@@ -135,7 +137,7 @@ public class CategoryService {
 //        return categoryRepository.existsBy(categoryName);
 //
 //    }
-}
+
 
     private String removeTurkishCharacters(String input) {
         if (input == null) {
@@ -153,7 +155,7 @@ public class CategoryService {
     }
     public Category findCategoryById(Long id) {
 
-        Category category = categoryRepository.findById(id).orElseThrow(() -> new ResourcesNotFoundException(String.format(ErrorMessage.CATEGORY_NOT_FOUND_EXCEPTION, id)));
+        Category category = categoryRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMessage.CATEGORY_NOT_FOUND_EXCEPTION, id)));
 
         return category;
     }
