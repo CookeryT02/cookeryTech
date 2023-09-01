@@ -30,7 +30,7 @@ public class CategoryRequest {
     private int seq=0;
 
     @Size(min = 5, max = 200, message = "Slag mast be between 5 and 200")
-    @NotNull(message = "Please provide category slug")
+    //@NotNull(message = "Please provide category slug")
     private String slag;
 
     private  Boolean isActive = true;

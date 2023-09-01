@@ -1,6 +1,8 @@
 package com.tpe.cookerytech.exception.message;
 
 public class ErrorMessage {
+    public final static String CATEGORY_NOT_FOUND_EXCEPTION = "Category is not found";
+
     public final static String PASSWORD_NOT_MATCHED_MESSAGE = "Your passwords are not matched";
 
     public final static String NOT_PERMITTED_METHOD_MESSAGE = "You don't have any permission to change this data";
