@@ -11,7 +11,7 @@ import com.tpe.cookerytech.dto.response.UserResponse;
 import com.tpe.cookerytech.exception.BadRequestException;
 import com.tpe.cookerytech.exception.ConflictException;
 import com.tpe.cookerytech.exception.PasswordValidator;
-import com.tpe.cookerytech.exception.ResourcesNotFoundException;
+import com.tpe.cookerytech.exception.ResourceNotFoundException;
 import com.tpe.cookerytech.exception.message.ErrorMessage;
 import com.tpe.cookerytech.mapper.UserMapper;
 import com.tpe.cookerytech.repository.OfferRepository;
@@ -52,7 +52,7 @@ public class UserService {
 
     public User getUserByEmail(String email) {
         User user = userRepository.findByEmail(email).orElseThrow(() ->
-                new ResourcesNotFoundException(
+                new ResourceNotFoundException(
                         String.format(ErrorMessage.USER_NOT_FOUND_EXCEPTION, email)));
 
         return user;
@@ -171,9 +171,9 @@ public class UserService {
     }
 
     //*****************************Yardimci Methodlar***************************************
-    private User getCurrentUser() {
+    public User getCurrentUser() {
         String email = SecurityUtils.getCurrentUserLogin().orElseThrow(()->
-                new ResourcesNotFoundException(ErrorMessage.PRINCIPAL_FOUND_MESSAGE));
+                new ResourceNotFoundException(ErrorMessage.PRINCIPAL_FOUND_MESSAGE));
         User user = getUserByEmail(email);
         return user;
     }
@@ -185,7 +185,7 @@ public class UserService {
     public UserResponse getUserById(Long id) {
 
         User user = userRepository.findById(id).orElseThrow(
-                () -> new ResourcesNotFoundException(String.format(ErrorMessage.RESOURCE_NOT_FOUND_EXCEPTION, id)));
+                () -> new ResourceNotFoundException(String.format(ErrorMessage.RESOURCE_NOT_FOUND_EXCEPTION, id)));
 
         return userMapper.userToUserResponse(user);
 
@@ -193,7 +193,7 @@ public class UserService {
     public User getUserEntityById(Long id) {
 
         User user = userRepository.findById(id).orElseThrow(
-                () -> new ResourcesNotFoundException(String.format(ErrorMessage.RESOURCE_NOT_FOUND_EXCEPTION, id)));
+                () -> new ResourceNotFoundException(String.format(ErrorMessage.RESOURCE_NOT_FOUND_EXCEPTION, id)));
 
         return user;
 
@@ -340,7 +340,7 @@ public class UserService {
     @Transactional
     public UserResponse deleteUser(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourcesNotFoundException(String.format(ErrorMessage.PRINCIPAL_FOUND_MESSAGE)));
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMessage.PRINCIPAL_FOUND_MESSAGE)));
 
         if (OfferRepository.existByUser(user)) {
             throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);

@@ -1,8 +1,8 @@
 package com.tpe.cookerytech.init;
 
-import com.tpe.cookerytech.dto.domain.Role;
-import com.tpe.cookerytech.dto.domain.User;
-import com.tpe.cookerytech.dto.domain.enums.RoleType;
+import com.tpe.cookerytech.domain.Role;
+import com.tpe.cookerytech.domain.User;
+import com.tpe.cookerytech.domain.enums.RoleType;
 import com.tpe.cookerytech.repository.UserRepository;
 import com.tpe.cookerytech.service.RoleService;
 import org.springframework.boot.CommandLineRunner;
@@ -31,7 +31,7 @@ public class MyRunner {
     @Bean
     public CommandLineRunner init(UserRepository userRepository) {
         return args -> {
-        //   createAdminUser(userRepository);
+ //           createAdminUser(userRepository);
         };
     }
     public void createAdminUser(UserRepository userRepository) {

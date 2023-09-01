@@ -3,14 +3,16 @@ package com.tpe.cookerytech.service;
 import com.tpe.cookerytech.dto.domain.Category;
 import com.tpe.cookerytech.dto.request.CategoryRequest;
 import com.tpe.cookerytech.dto.response.CategoryResponse;
+import com.tpe.cookerytech.exception.BadRequestException;
 import com.tpe.cookerytech.exception.ConflictException;
-import com.tpe.cookerytech.exception.ResourcesNotFoundException;
+import com.tpe.cookerytech.exception.ResourceNotFoundException;
 import com.tpe.cookerytech.exception.message.ErrorMessage;
 import com.tpe.cookerytech.mapper.CategoryMapper;
 import com.tpe.cookerytech.repository.CategoryRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class CategoryService {
@@ -43,6 +45,13 @@ public class CategoryService {
 
         return categoryMapper.categoryToCategoryResponse(category);
     }
+
+
+
+
+
+
+
 
     public boolean isTitleUnique(String title) {
         return categoryRepository.existsByTitle(title);
@@ -88,6 +97,45 @@ public class CategoryService {
 
         return slug.toLowerCase();
     }
+
+
+
+
+    public void updateCategory(Long id, CategoryResponse categoryResponse) {
+
+        Category category = getCategory(id);
+
+        if(category.getBuilt_in()){
+            throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
+        }
+
+
+        category.setId(categoryResponse.getId());
+        category.setTitle(categoryResponse.getTitle());
+        category.setDescription(categoryResponse.getDescription());
+        category.setSeq(categoryResponse.getSeq());
+        category.setSlag(categoryResponse.getSlag());
+        category.setIsActive(categoryResponse.getIsActive());
+
+
+        categoryRepository.save(category);
+
+    }
+
+    private Category getCategory(Long id) {
+
+        Category category = categoryRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException(String.format(ErrorMessage.RESOURCE_NOT_FOUND_EXCEPTION,id)));
+
+        return category;
+
+    }
+//    private boolean isCategoryExist(String categoryName) {
+//
+//        return categoryRepository.existsBy(categoryName);
+//
+//    }
+}
 
     private String removeTurkishCharacters(String input) {
         if (input == null) {

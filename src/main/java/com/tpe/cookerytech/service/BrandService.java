@@ -26,14 +26,14 @@ public class BrandService {
 
     public BrandResponse createBrand(BrandRequest brandRequest) {
 
-       Brand brand = brandMapper.brandRequestToBrand(brandRequest);
+        Brand brand = brandMapper.brandRequestToBrand(brandRequest);
 
-       brand.setCreateAt(LocalDateTime.now());
-       brand.setUpdateAt(null);
+        brand.setCreateAt(LocalDateTime.now());
+        brand.setUpdateAt(null);
 
-       brandRepository.save(brand);
+        brandRepository.save(brand);
 
-       return brandMapper.brandToBrandResponse(brand);
+        return brandMapper.brandToBrandResponse(brand);
 
     }
 

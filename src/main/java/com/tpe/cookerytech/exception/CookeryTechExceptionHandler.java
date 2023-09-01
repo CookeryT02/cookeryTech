@@ -27,9 +27,9 @@ public class CookeryTechExceptionHandler extends ResponseEntityExceptionHandler 
         return new ResponseEntity<>(error,error.getStatus());
     }
 
-    @ExceptionHandler(ResourcesNotFoundException.class)
+    @ExceptionHandler(ResourceNotFoundException.class)
     protected ResponseEntity<Object> handleResourceNotFoundException(
-            ResourcesNotFoundException ex, WebRequest request
+            ResourceNotFoundException ex, WebRequest request
     ){
         ApiResponseError error = new ApiResponseError(HttpStatus.NOT_FOUND,
                                                       ex.getMessage(),
