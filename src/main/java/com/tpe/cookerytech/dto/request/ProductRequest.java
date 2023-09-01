@@ -1,4 +1,4 @@
-package com.tpe.cookerytech.dto.response;
+package com.tpe.cookerytech.dto.request;
 
 import com.tpe.cookerytech.domain.Brand;
 import com.tpe.cookerytech.domain.Category;
@@ -7,17 +7,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
-import java.time.LocalDateTime;
 import java.util.Set;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProductResponse {
-
-
-    private Long id;
+public class ProductRequest {
 
     private String title;
 
@@ -25,30 +20,19 @@ public class ProductResponse {
 
     private String longDescription;
 
-    private String slug;
-
-    private int sequence = 0;
+    private boolean isFeatured = false;
 
     private boolean isNew = false;
 
-    private boolean isFeatured = false;
-
     private boolean isActive = true;
-
-    private Set<ImageFile> image;
-
-
-    private boolean builtIn = false;
 
     private Brand brand;
 
     private Category category;
 
-    private LocalDateTime createdAt;
+    private Set<ImageFile> image;
 
-    private LocalDateTime updatedAt;
-
-
+    private int sequence = 0;
 
 
 }
