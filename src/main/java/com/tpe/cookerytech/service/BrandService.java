@@ -3,6 +3,7 @@ package com.tpe.cookerytech.service;
 import com.tpe.cookerytech.domain.Brand;
 import com.tpe.cookerytech.dto.request.BrandRequest;
 import com.tpe.cookerytech.dto.response.BrandResponse;
+import com.tpe.cookerytech.exception.BadRequestException;
 import com.tpe.cookerytech.exception.ResourcesNotFoundException;
 import com.tpe.cookerytech.exception.message.ErrorMessage;
 import com.tpe.cookerytech.mapper.BrandMapper;
@@ -40,6 +41,26 @@ public class BrandService {
 
         Brand brand = brandRepository.findById(id).orElseThrow(()->
                 new ResourcesNotFoundException(ErrorMessage.BRAND_NOT_FOUND_EXCEPTION));
+
+        return brandMapper.brandToBrandResponse(brand);
+    }
+
+    public BrandResponse updateBrandById(Long id, BrandRequest brandRequest) {
+
+        Brand brand = brandRepository.findById(id).orElseThrow(() ->
+                new ResourcesNotFoundException(ErrorMessage.BRAND_NOT_FOUND_EXCEPTION));
+
+        if (brand.getBuiltIn()) {
+            throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
+        }
+
+        brand.setName(brandRequest.getName());
+        brand.setProfitRate(brandRequest.getProfitRate());
+        brand.setUpdateAt(LocalDateTime.now());
+        brand.setIsActive(brandRequest.getIsActive());
+        brand.setBuiltIn(brandRequest.getBuiltIn());
+
+        brandRepository.save(brand);
 
         return brandMapper.brandToBrandResponse(brand);
     }
