@@ -12,7 +12,6 @@ import com.tpe.cookerytech.repository.CategoryRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Service
 public class CategoryService {
@@ -103,7 +102,7 @@ public class CategoryService {
 
 
 
-    public void updateCategory(Long id, CategoryResponse categoryResponse) {
+    public CategoryResponse updateCategory(Long id, CategoryRequest categoryRequest) {
 
         Category category = getCategory(id);
 
@@ -112,16 +111,18 @@ public class CategoryService {
         }
 
 
-        category.setId(categoryResponse.getId());
-        category.setTitle(categoryResponse.getTitle());
-        category.setDescription(categoryResponse.getDescription());
-        category.setSeq(categoryResponse.getSeq());
-        category.setSlug(categoryResponse.getSlug());
-        category.setIsActive(categoryResponse.getIsActive());
+        category.setTitle(categoryRequest.getTitle());
+        category.setDescription(categoryRequest.getDescription());
+        category.setSeq(categoryRequest.getSeq());
+        category.setSlug(categoryRequest.getSlug());
+        category.setIsActive(categoryRequest.getIsActive());
+        category.setUpdateAt(LocalDateTime.now());
 
+        CategoryResponse categoryResponse = categoryMapper.categoryToCategoryResponse(category);
 
         categoryRepository.save(category);
 
+        return categoryResponse;
     }
 
     private Category getCategory(Long id) {

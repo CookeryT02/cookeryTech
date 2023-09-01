@@ -49,11 +49,11 @@ public class CategoryController {
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('PRODUCT_MANAGER')")
     public ResponseEntity<CategoryResponse> updateCategory( @PathVariable Long id,
-                                                      @Valid @RequestBody CategoryResponse categoryResponse ){
+                                                      @Valid @RequestBody CategoryRequest categoryRequest ){
 
-        categoryService.updateCategory( id, categoryResponse);
+        CategoryResponse categoryResponse = categoryService.updateCategory( id, categoryRequest);
 
-        CkResponse response = new CkResponse(ResponseMessage.CATEGORY_UPDATED_RESPONSE_MESSAGE,true);
+       // CkResponse response = new CkResponse(ResponseMessage.CATEGORY_UPDATED_RESPONSE_MESSAGE,true);
 
         return  ResponseEntity.ok(categoryResponse);
 
