@@ -1,6 +1,8 @@
 package com.tpe.cookerytech.exception.message;
 
 public class ErrorMessage {
+    public final static String CATEGORY_ALREADY_EXIST_EXCEPTION = "This category is already exist";
+
     public final static String CATEGORY_NOT_FOUND_EXCEPTION = "Category is not found";
 
     public final static String PASSWORD_NOT_MATCHED_MESSAGE = "Your passwords are not matched";

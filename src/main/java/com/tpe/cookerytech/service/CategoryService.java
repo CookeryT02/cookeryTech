@@ -1,6 +1,6 @@
 package com.tpe.cookerytech.service;
 
-import com.tpe.cookerytech.domain.Category;
+import com.tpe.cookerytech.dto.domain.Category;
 import com.tpe.cookerytech.dto.request.CategoryRequest;
 import com.tpe.cookerytech.dto.response.CategoryResponse;
 import com.tpe.cookerytech.exception.ConflictException;
@@ -10,7 +10,6 @@ import com.tpe.cookerytech.mapper.CategoryMapper;
 import com.tpe.cookerytech.repository.CategoryRepository;
 import org.springframework.stereotype.Service;
 
-import java.text.Normalizer;
 import java.time.LocalDateTime;
 
 @Service
@@ -29,12 +28,13 @@ public class CategoryService {
     public CategoryResponse createCategory(CategoryRequest categoryRequest) {
         Category category = categoryMapper.categoryRequestToCategory(categoryRequest);
 
-//        if (isCategoryExist(categoryRequest.getTitle())) {
-//            throw new ConflictException(String.format(ErrorMessage.CATEGORY_ALREADY_EXIST_EXCEPTION, category.getName()));
-//        }
+        if(isTitleUnique(category.getTitle())){
+                     throw new ConflictException(String.format(ErrorMessage.CATEGORY_ALREADY_EXIST_EXCEPTION, category.getTitle()));
+        }
+
         String title=category.getTitle();
         String slug=  generateSlugFromTitle(title);
-        category.setSlag(slug);
+        category.setSlug(slug);
         category.setCreateAt(LocalDateTime.now());
         category.setUpdateAt(null);
         categoryRepository.save(category);
@@ -43,11 +43,11 @@ public class CategoryService {
 
         return categoryMapper.categoryToCategoryResponse(category);
     }
-//    private boolean isCategoryExist(String categoryName) {
-//
-//        return categoryRepository.existsBy(categoryName);
-//
-//    }
+
+    public boolean isTitleUnique(String title) {
+        return categoryRepository.existsByTitle(title);
+    }
+
 
 
 

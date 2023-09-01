@@ -1,8 +1,8 @@
 package com.tpe.cookerytech.service;
 
-import com.tpe.cookerytech.domain.Role;
-import com.tpe.cookerytech.domain.User;
-import com.tpe.cookerytech.domain.enums.RoleType;
+import com.tpe.cookerytech.dto.domain.Role;
+import com.tpe.cookerytech.dto.domain.User;
+import com.tpe.cookerytech.dto.domain.enums.RoleType;
 import com.tpe.cookerytech.dto.request.AdminUserUpdateRequest;
 import com.tpe.cookerytech.dto.request.RegisterRequest;
 import com.tpe.cookerytech.dto.request.UpdatePasswordRequest;

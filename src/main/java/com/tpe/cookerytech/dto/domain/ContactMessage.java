@@ -1,4 +1,4 @@
-package com.tpe.cookerytech.domain;
+package com.tpe.cookerytech.dto.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -1,6 +1,6 @@
 package com.tpe.cookerytech.mapper;
 
-import com.tpe.cookerytech.domain.Brand;
+import com.tpe.cookerytech.dto.domain.Brand;
 import com.tpe.cookerytech.dto.request.BrandRequest;
 import com.tpe.cookerytech.dto.response.BrandResponse;
 import org.mapstruct.Mapper;

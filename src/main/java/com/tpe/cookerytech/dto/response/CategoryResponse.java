@@ -24,7 +24,7 @@ public class CategoryResponse {
 
     private int seq;
 
-    private String slag;
+    private String slug;
 
     private  Boolean isActive = true;
 
