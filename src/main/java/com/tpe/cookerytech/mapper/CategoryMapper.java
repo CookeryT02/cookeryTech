@@ -1,7 +1,7 @@
 package com.tpe.cookerytech.mapper;
 
 
-import com.tpe.cookerytech.domain.Category;
+import com.tpe.cookerytech.dto.domain.Category;
 import com.tpe.cookerytech.dto.request.CategoryRequest;
 import com.tpe.cookerytech.dto.response.CategoryResponse;
 import org.mapstruct.Mapper;

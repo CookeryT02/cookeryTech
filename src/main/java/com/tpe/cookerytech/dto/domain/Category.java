@@ -1,4 +1,4 @@
-package com.tpe.cookerytech.domain;
+package com.tpe.cookerytech.dto.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -36,8 +36,8 @@ public class Category {
     private int seq;
 
     @Column(nullable = false)
-    @Size(min = 5, max = 200, message = "Slag mast be between 5 and 200")
-    private String slag;
+    @Size(min = 5, max = 200, message = "Slug mast be between 5 and 200")
+    private String slug;
 
     @Column(nullable = false)
     private  Boolean isActive = true;
