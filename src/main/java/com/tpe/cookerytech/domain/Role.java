@@ -1,8 +1,6 @@
 package com.tpe.cookerytech.domain;
 
 import javax.persistence.*;
-import java.util.HashSet;
-import java.util.Set;
 
 import com.tpe.cookerytech.domain.enums.RoleType;
 import lombok.*;

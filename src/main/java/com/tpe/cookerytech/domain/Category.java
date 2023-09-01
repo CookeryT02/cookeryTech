@@ -30,14 +30,14 @@ public class Category {
     @Column(nullable = false)
     private String description;
 
-    private Boolean built_in;
+    private Boolean built_in=false;
 
     @Column(nullable = false)
     private int seq;
 
     @Column(nullable = false)
-    @Size(min = 5, max = 200, message = "Slag mast be between 5 and 200")
-    private String slag;
+    @Size(min = 5, max = 200, message = "Slug mast be between 5 and 200")
+    private String slug;
 
     @Column(nullable = false)
     private  Boolean isActive = true;
@@ -47,9 +47,16 @@ public class Category {
 
     private LocalDateTime updateAt;
 
+//    @OneToMany(mappedBy = "category")
+//    private List<Product> productList;
+//
+//    @OneToMany(orphanRemoval = true)
+//    @JoinColumn(name="category_id")
+//    private Set<Product> product;
 
-
-
-
-
+    public Category(Long id, String title, Boolean built_in) {
+        this.id = id;
+        this.title = title;
+        this.built_in = built_in;
+    }
 }
