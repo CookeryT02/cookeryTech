@@ -30,7 +30,7 @@ public class Category {
     @Column(nullable = false)
     private String description;
 
-    private Boolean built_in;
+    private Boolean built_in=false;
 
     @Column(nullable = false)
     private int seq;
@@ -47,9 +47,16 @@ public class Category {
 
     private LocalDateTime updateAt;
 
+//    @OneToMany(mappedBy = "category")
+//    private List<Product> productList;
+//
+//    @OneToMany(orphanRemoval = true)
+//    @JoinColumn(name="category_id")
+//    private Set<Product> product;
 
-
-
-
-
+    public Category(Long id, String title, Boolean built_in) {
+        this.id = id;
+        this.title = title;
+        this.built_in = built_in;
+    }
 }

@@ -3,8 +3,9 @@ package com.tpe.cookerytech.service;
 import com.tpe.cookerytech.domain.Category;
 import com.tpe.cookerytech.dto.request.CategoryRequest;
 import com.tpe.cookerytech.dto.response.CategoryResponse;
+import com.tpe.cookerytech.exception.BadRequestException;
 import com.tpe.cookerytech.exception.ConflictException;
-import com.tpe.cookerytech.exception.ResourcesNotFoundException;
+import com.tpe.cookerytech.exception.ResourceNotFoundException;
 import com.tpe.cookerytech.exception.message.ErrorMessage;
 import com.tpe.cookerytech.mapper.CategoryMapper;
 import com.tpe.cookerytech.repository.CategoryRepository;
@@ -26,6 +27,8 @@ public class CategoryService {
     }
 
     public CategoryResponse createCategory(CategoryRequest categoryRequest) {
+
+
         Category category = categoryMapper.categoryRequestToCategory(categoryRequest);
 
         if(isTitleUnique(category.getTitle())){
@@ -44,6 +47,13 @@ public class CategoryService {
         return categoryMapper.categoryToCategoryResponse(category);
     }
 
+
+
+
+
+
+
+
     public boolean isTitleUnique(String title) {
         return categoryRepository.existsByTitle(title);
     }
@@ -58,7 +68,7 @@ public class CategoryService {
 
         //Built-in
         if (category.getBuilt_in()) {
-            throw new ResourcesNotFoundException(String.format(ErrorMessage.CATEGORY_NOT_FOUND_EXCEPTION, id));
+            throw new ResourceNotFoundException(String.format(ErrorMessage.CATEGORY_NOT_FOUND_EXCEPTION, id));
         }
 
         // Category product var mı kontrol et !!!
@@ -89,6 +99,47 @@ public class CategoryService {
         return slug.toLowerCase();
     }
 
+
+
+
+    public CategoryResponse updateCategory(Long id, CategoryRequest categoryRequest) {
+
+        Category category = getCategory(id);
+
+        if(category.getBuilt_in()){
+            throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
+        }
+
+
+        category.setTitle(categoryRequest.getTitle());
+        category.setDescription(categoryRequest.getDescription());
+        category.setSeq(categoryRequest.getSeq());
+        category.setSlug(categoryRequest.getSlug());
+        category.setIsActive(categoryRequest.getIsActive());
+        category.setUpdateAt(LocalDateTime.now());
+
+        CategoryResponse categoryResponse = categoryMapper.categoryToCategoryResponse(category);
+
+        categoryRepository.save(category);
+
+        return categoryResponse;
+    }
+
+    private Category getCategory(Long id) {
+
+        Category category = categoryRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException(String.format(ErrorMessage.RESOURCE_NOT_FOUND_EXCEPTION,id)));
+
+        return category;
+
+    }
+//    private boolean isCategoryExist(String categoryName) {
+//
+//        return categoryRepository.existsBy(categoryName);
+//
+//    }
+
+
     private String removeTurkishCharacters(String input) {
         if (input == null) {
             return null;
@@ -105,7 +156,7 @@ public class CategoryService {
     }
     public Category findCategoryById(Long id) {
 
-        Category category = categoryRepository.findById(id).orElseThrow(() -> new ResourcesNotFoundException(String.format(ErrorMessage.CATEGORY_NOT_FOUND_EXCEPTION, id)));
+        Category category = categoryRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMessage.CATEGORY_NOT_FOUND_EXCEPTION, id)));
 
         return category;
     }

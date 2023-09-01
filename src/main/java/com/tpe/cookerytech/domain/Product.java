@@ -62,7 +62,7 @@ public class Product {
     private Category category;
 
     @Column(name = "create_at", nullable = false)
-    private LocalDateTime createdAt; //
+    private LocalDateTime createdAt;
 
     @Column(name = "update_at")
     private LocalDateTime updatedAt;

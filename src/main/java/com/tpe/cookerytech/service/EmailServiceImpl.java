@@ -2,7 +2,7 @@ package com.tpe.cookerytech.service;
 
 import com.tpe.cookerytech.domain.User;
 import com.tpe.cookerytech.exception.BadRequestException;
-import com.tpe.cookerytech.exception.ResourcesNotFoundException;
+import com.tpe.cookerytech.exception.ResourceNotFoundException;
 import com.tpe.cookerytech.exception.message.ErrorMessage;
 import com.tpe.cookerytech.repository.UserRepository;
 import net.bytebuddy.utility.RandomString;
@@ -42,7 +42,7 @@ public class EmailServiceImpl implements EmailService{
     public String sendSimpleMail(String email) {
 
         User user = userRepository.findByEmail(email).orElseThrow(()-> new
-                ResourcesNotFoundException(ErrorMessage.USER_NOT_FOUND_EXCEPTION));
+                ResourceNotFoundException(ErrorMessage.USER_NOT_FOUND_EXCEPTION));
 
         try {
 
@@ -88,7 +88,7 @@ public class EmailServiceImpl implements EmailService{
     public void resetPasswordMessage(String resetPasswordCode, String newPassword) {
         // String encodeResetCode = passwordEncoder.encode(code);
         User user = userRepository.findByResetPasswordCode(resetPasswordCode).orElseThrow(()->
-                new ResourcesNotFoundException(ErrorMessage.USER_NOT_FOUND_EXCEPTION));
+                new ResourceNotFoundException(ErrorMessage.USER_NOT_FOUND_EXCEPTION));
 
         if (!userService.isPasswordValid(newPassword)) {
             throw new BadRequestException(String.format(ErrorMessage.USER_PASSWORD_CONTROL));
