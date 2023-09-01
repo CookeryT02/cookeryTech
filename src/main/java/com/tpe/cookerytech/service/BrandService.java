@@ -10,6 +10,8 @@ import com.tpe.cookerytech.exception.message.ErrorMessage;
 import com.tpe.cookerytech.mapper.BrandMapper;
 import com.tpe.cookerytech.repository.BrandRepository;
 import com.tpe.cookerytech.repository.ProductRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -91,6 +93,14 @@ public class BrandService {
         brandRepository.deleteById(id);
 
         return brandMapper.brandToBrandResponse(brand);
+
+    }
+
+    public Page<BrandResponse> findAllWithPage(Pageable pageable) {
+
+        Page<Brand> brandPage= brandRepository.findAll(pageable);
+
+        return brandPage.map(brandMapper::brandToBrandResponse);
 
     }
 }
