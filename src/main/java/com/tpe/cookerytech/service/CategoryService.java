@@ -1,41 +1,42 @@
 package com.tpe.cookerytech.service;
 
-import com.tpe.cookerytech.domain.Brand;
-import com.tpe.cookerytech.domain.Category;
-import com.tpe.cookerytech.domain.Role;
-import com.tpe.cookerytech.domain.User;
-import com.tpe.cookerytech.domain.enums.RoleType;
+import com.tpe.cookerytech.domain.*;
 import com.tpe.cookerytech.dto.request.CategoryRequest;
 import com.tpe.cookerytech.dto.response.CategoryResponse;
-import com.tpe.cookerytech.exception.ResourceNotFoundException;
-import com.tpe.cookerytech.exception.message.ErrorMessage;
+import com.tpe.cookerytech.dto.response.ProductResponse;
 import com.tpe.cookerytech.exception.BadRequestException;
 import com.tpe.cookerytech.exception.ConflictException;
 import com.tpe.cookerytech.exception.ResourceNotFoundException;
 import com.tpe.cookerytech.exception.message.ErrorMessage;
 import com.tpe.cookerytech.mapper.CategoryMapper;
+import com.tpe.cookerytech.mapper.ProductMapper;
 import com.tpe.cookerytech.repository.CategoryRepository;
+import com.tpe.cookerytech.repository.ProductRepository;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Set;
+
 
 @Service
 public class CategoryService {
     private final CategoryMapper categoryMapper;
 
-
     private final CategoryRepository categoryRepository;
+
+    private final ProductMapper productMapper;
+
+    private final ProductRepository productRepository;
 
     private final UserService userService;
 
 
-    public CategoryService(CategoryMapper categoryMapper, CategoryRepository categoryRepository, UserService userService) {
+    public CategoryService(CategoryMapper categoryMapper, CategoryRepository categoryRepository, ProductMapper productMapper, ProductRepository productRepository, UserService userService) {
         this.categoryMapper = categoryMapper;
         this.categoryRepository = categoryRepository;
+        this.productMapper = productMapper;
+        this.productRepository = productRepository;
         this.userService = userService;
     }
 
@@ -45,7 +46,7 @@ public class CategoryService {
         Category category = categoryMapper.categoryRequestToCategory(categoryRequest);
 
         if(isTitleUnique(category.getTitle())){
-                     throw new ConflictException(String.format(ErrorMessage.CATEGORY_ALREADY_EXIST_EXCEPTION, category.getTitle()));
+            throw new ConflictException(String.format(ErrorMessage.CATEGORY_ALREADY_EXIST_EXCEPTION, category.getTitle()));
         }
 
         String title=category.getTitle();
@@ -61,19 +62,9 @@ public class CategoryService {
     }
 
 
-
-
-
-
-
-
-
-
     public boolean isTitleUnique(String title) {
         return categoryRepository.existsByTitle(title);
     }
-
-
 
 
     public CategoryResponse removeCategoryById(Long id) {
@@ -205,5 +196,13 @@ public class CategoryService {
     }
 
 
+    public List<ProductResponse> getActiveProductsByCategoryId(Long id) {
+
+        List<Product> productIdCategory = productRepository.findByCategoryIdAndIsActiveTrue(id);
+
+        return productMapper.productsToProductResponses(productIdCategory);
+
+
+    }
 }
 

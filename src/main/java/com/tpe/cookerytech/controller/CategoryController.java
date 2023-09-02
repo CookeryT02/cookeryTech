@@ -1,9 +1,11 @@
 package com.tpe.cookerytech.controller;
 
+import com.tpe.cookerytech.domain.Product;
 import com.tpe.cookerytech.dto.request.CategoryRequest;
 import com.tpe.cookerytech.dto.response.CategoryResponse;
-import com.tpe.cookerytech.dto.response.UserResponse;
+import com.tpe.cookerytech.dto.response.ProductResponse;
 import com.tpe.cookerytech.service.CategoryService;
+import com.tpe.cookerytech.service.ProductService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -18,9 +20,12 @@ public class CategoryController {
 
     private final CategoryService categoryService;
 
+    private final ProductService productService;
 
-    public CategoryController(CategoryService categoryService) {
+
+    public CategoryController(CategoryService categoryService, ProductService productService) {
         this.categoryService = categoryService;
+        this.productService = productService;
     }
 
 
@@ -33,14 +38,6 @@ public class CategoryController {
         return ResponseEntity.ok(categoryResponse);
     }
 
-    @GetMapping
-    @PreAuthorize("hasRole('ADMIN') or hasRole('PRODUCT_MANAGER')")
-    public ResponseEntity<List<CategoryResponse>> getAllCategory(){
-
-        List<CategoryResponse> allCategory = categoryService.getAllCategory();
-
-        return ResponseEntity.ok(allCategory);
-    }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('PRODUCT_MANAGER')")
@@ -53,8 +50,6 @@ public class CategoryController {
     }
 
 
-
-
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('PRODUCT_MANAGER')")
     public ResponseEntity<CategoryResponse> updateCategory( @PathVariable Long id,
@@ -62,11 +57,30 @@ public class CategoryController {
 
         CategoryResponse categoryResponse = categoryService.updateCategory( id, categoryRequest);
 
+       // CkResponse response = new CkResponse(ResponseMessage.CATEGORY_UPDATED_RESPONSE_MESSAGE,true);
+
         return  ResponseEntity.ok(categoryResponse);
 
 
     }
 
+
+    @GetMapping
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PRODUCT_MANAGER')")
+    public ResponseEntity<List<CategoryResponse>> getAllCategory(){
+
+        List<CategoryResponse> allCategory = categoryService.getAllCategory();
+
+        return ResponseEntity.ok(allCategory);
+    }
+
+
+    @GetMapping("/{id}/products")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER') or hasRole('CUSTOMER')")
+    public ResponseEntity<List<ProductResponse>> getActiveProductsByCategoryId(@PathVariable Long id) {
+        List<ProductResponse> activeProducts = categoryService.getActiveProductsByCategoryId(id);
+        return ResponseEntity.ok(activeProducts);
+    }
 
 
 }
