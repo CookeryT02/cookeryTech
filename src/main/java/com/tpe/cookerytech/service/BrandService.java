@@ -9,6 +9,8 @@ import com.tpe.cookerytech.exception.ResourceNotFoundException;
 import com.tpe.cookerytech.exception.message.ErrorMessage;
 import com.tpe.cookerytech.mapper.BrandMapper;
 import com.tpe.cookerytech.repository.BrandRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import com.tpe.cookerytech.repository.ProductRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -107,9 +109,13 @@ public class BrandService {
     public Brand findBrandById(Long brandId) {
 
         Brand brand = brandRepository.findById(brandId).orElseThrow(()->
-                new ResourcesNotFoundException(ErrorMessage.BRAND_NOT_FOUND_EXCEPTION));
+                new ResourceNotFoundException(ErrorMessage.BRAND_NOT_FOUND_EXCEPTION));
 
         return brand;
 
     }
+
+
+
+
 }

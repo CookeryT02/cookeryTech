@@ -1,5 +1,6 @@
 package com.tpe.cookerytech.controller;
 
+import com.tpe.cookerytech.dto.request.ProductRequest;
 import com.tpe.cookerytech.domain.Brand;
 import com.tpe.cookerytech.dto.request.ProductRequest;
 import com.tpe.cookerytech.dto.response.ProductResponse;
@@ -36,8 +37,6 @@ public class ProductController {
         return ResponseEntity.ok(productResponse);
 
     }
-
-
 
 
 }
