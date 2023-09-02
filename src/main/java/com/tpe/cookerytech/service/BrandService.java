@@ -43,4 +43,13 @@ public class BrandService {
 
         return brandMapper.brandToBrandResponse(brand);
     }
+
+    public Brand findBrandById(Long brandId) {
+
+        Brand brand = brandRepository.findById(brandId).orElseThrow(()->
+                new ResourcesNotFoundException(ErrorMessage.BRAND_NOT_FOUND_EXCEPTION));
+
+        return brand;
+
+    }
 }

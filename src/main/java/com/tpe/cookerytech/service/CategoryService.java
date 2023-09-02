@@ -1,11 +1,14 @@
 package com.tpe.cookerytech.service;
 
+import com.tpe.cookerytech.domain.Brand;
 import com.tpe.cookerytech.domain.Category;
 import com.tpe.cookerytech.domain.Role;
 import com.tpe.cookerytech.domain.User;
 import com.tpe.cookerytech.domain.enums.RoleType;
 import com.tpe.cookerytech.dto.request.CategoryRequest;
 import com.tpe.cookerytech.dto.response.CategoryResponse;
+import com.tpe.cookerytech.exception.ResourcesNotFoundException;
+import com.tpe.cookerytech.exception.message.ErrorMessage;
 import com.tpe.cookerytech.mapper.CategoryMapper;
 import com.tpe.cookerytech.repository.CategoryRepository;
 import org.springframework.security.core.Authentication;
@@ -79,5 +82,11 @@ public class CategoryService {
 
     }
 
+    public Category findCategoryById(Long categoryId) {
 
+        Category category = categoryRepository.findById(categoryId).orElseThrow(()->
+                new ResourcesNotFoundException(ErrorMessage.CATEGORY_NOT_FOUND_EXCEPTION));
+
+        return category;
+    }
 }

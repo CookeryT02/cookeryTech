@@ -16,4 +16,5 @@ public class ErrorMessage {
     public static final String RESOURCE_NOT_FOUND_EXCEPTION = "Resource with id %s not found";
     public static final String WRONG_PASSWORD_EXCEPTION = "Wrong Password";
     public static final String BRAND_NOT_FOUND_EXCEPTION = "Brand with id: %s not found";
+    public static final String CATEGORY_NOT_FOUND_EXCEPTION = "Category with id: %s not found";
 }

@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -19,29 +20,26 @@ public class ProductResponse {
 
     private Long id;
 
+    @NotNull(message = "Please provide product title")
     private String title;
 
     private String shortDescription;
 
     private String longDescription;
 
-    private String slug;
-
-    private int sequence = 0;
+    private boolean isFeatured = false;
 
     private boolean isNew = false;
 
-    private boolean isFeatured = false;
-
     private boolean isActive = true;
 
-    private Set<ImageFile> image;
+    private Long brandId;
 
-    private boolean builtIn = false;
+    private Long categoryId;
 
-    private Brand brand;
+//    private Set<ImageFile> image;
 
-    private Category category;
+    private int sequence = 0;
 
     private LocalDateTime createdAt;
 
