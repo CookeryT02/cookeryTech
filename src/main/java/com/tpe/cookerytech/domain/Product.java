@@ -54,15 +54,15 @@ public class Product {
     private boolean builtIn = false;
 
     @ManyToOne
-    @JoinColumn(name = "brand_id", nullable = false)
+    @JoinColumn(name = "brandId", referencedColumnName = "id", nullable = false)
     private Brand brand;
 
     @ManyToOne
-    @JoinColumn(name = "category_id", nullable = false)
+    @JoinColumn(name = "categoryId", referencedColumnName = "id", nullable = false)
     private Category category;
 
     @Column(name = "create_at", nullable = false)
-    private LocalDateTime createdAt; //
+    private LocalDateTime createdAt;
 
     @Column(name = "update_at")
     private LocalDateTime updatedAt;
