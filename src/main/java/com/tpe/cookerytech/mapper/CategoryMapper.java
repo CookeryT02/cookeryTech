@@ -7,6 +7,8 @@ import com.tpe.cookerytech.dto.response.CategoryResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring")
 public interface CategoryMapper {
 
@@ -15,4 +17,7 @@ public interface CategoryMapper {
     Category categoryRequestToCategory(CategoryRequest categoryRequest);
 
     CategoryResponse categoryToCategoryResponse(Category category);
+
+    List<CategoryResponse> map(List<Category> categories);
+
 }

@@ -1,25 +1,16 @@
-package com.tpe.cookerytech.dto.response;
+package com.tpe.cookerytech.dto.request;
 
-import com.tpe.cookerytech.domain.Brand;
-import com.tpe.cookerytech.domain.Category;
-import com.tpe.cookerytech.domain.ImageFile;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-import java.time.LocalDateTime;
-import java.util.Set;
 
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProductResponse {
-
-    private Long id;
+public class ProductRequest {
 
     @NotNull(message = "Please provide product title")
     private String title;
@@ -27,23 +18,24 @@ public class ProductResponse {
     private String shortDescription;
 
     private String longDescription;
-
+    @NotNull(message = "Please provide product featured")
     private boolean isFeatured = false;
-
+    @NotNull(message = "Please provide product isnew")
     private boolean isNew = false;
-
+    @NotNull(message = "Please provide product isActive")
     private boolean isActive = true;
-
+//    @NotNull(message = "Please provide product brand id")
     private Long brandId;
-
+//    @NotNull(message = "Please provide product category id")
     private Long categoryId;
 
 //    private Set<ImageFile> image;
 
+    @NotNull(message = "Please provide product sequence")
     private int sequence = 0;
 
-    private LocalDateTime createdAt;
+    private boolean builtIn = false;
 
-    private LocalDateTime updatedAt;
+
 
 }
