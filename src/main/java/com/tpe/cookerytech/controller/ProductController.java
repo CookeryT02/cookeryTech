@@ -1,5 +1,6 @@
 package com.tpe.cookerytech.controller;
 
+import com.tpe.cookerytech.dto.request.ProductRequest;
 import com.tpe.cookerytech.dto.response.ProductResponse;
 import com.tpe.cookerytech.service.BrandService;
 import com.tpe.cookerytech.service.CategoryService;

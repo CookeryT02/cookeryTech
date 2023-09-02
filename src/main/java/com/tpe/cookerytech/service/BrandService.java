@@ -8,6 +8,8 @@ import com.tpe.cookerytech.exception.ResourceNotFoundException;
 import com.tpe.cookerytech.exception.message.ErrorMessage;
 import com.tpe.cookerytech.mapper.BrandMapper;
 import com.tpe.cookerytech.repository.BrandRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -71,6 +73,38 @@ public class BrandService {
                 new ResourceNotFoundException(ErrorMessage.BRAND_NOT_FOUND_EXCEPTION));
 
         return brand;
+
+    }
+
+    public BrandResponse deleteBrandById(Long id) {
+
+        Brand brand = brandRepository.findById(id).orElseThrow(()->
+                new ResourceNotFoundException(ErrorMessage.BRAND_NOT_FOUND_EXCEPTION));
+
+        if (brand.getBuiltIn()){
+            throw  new BadRequestException(String.format(ErrorMessage.BRAND_CANNOT_DELETE_EXCEPTION,id));
+        }
+
+        ///////Checking Products///////
+//        Product product= productRepository.findByBrandId(id);
+//
+//         if(product.getBrand().getId()==null){
+//           brandRepository.deleteBrandById(brand);
+//         } else {
+//             throw new BadRequestException(String.format(ErrorMessage.BRAND_CANNOT_DELETE_EXCEPTION,id));
+//         }
+
+        brandRepository.deleteById(id);
+
+        return brandMapper.brandToBrandResponse(brand);
+
+    }
+
+    public Page<BrandResponse> findAllWithPage(Pageable pageable) {
+
+        Page<Brand> brandPage= brandRepository.findAll(pageable);
+
+        return brandPage.map(brandMapper::brandToBrandResponse);
 
     }
 }
