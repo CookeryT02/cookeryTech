@@ -2,8 +2,9 @@ package com.tpe.cookerytech.controller;
 
 import com.tpe.cookerytech.dto.request.CategoryRequest;
 import com.tpe.cookerytech.dto.response.CategoryResponse;
-import com.tpe.cookerytech.dto.response.UserResponse;
+import com.tpe.cookerytech.dto.response.ProductResponse;
 import com.tpe.cookerytech.service.CategoryService;
+import com.tpe.cookerytech.service.ProductService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -18,9 +19,11 @@ public class CategoryController {
 
     private final CategoryService categoryService;
 
+    private final ProductService productService;
 
-    public CategoryController(CategoryService categoryService) {
+    public CategoryController(CategoryService categoryService, ProductService productService) {
         this.categoryService = categoryService;
+        this.productService = productService;
     }
 
 
