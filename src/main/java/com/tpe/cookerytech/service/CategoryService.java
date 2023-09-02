@@ -1,11 +1,14 @@
 package com.tpe.cookerytech.service;
 
+import com.tpe.cookerytech.domain.Brand;
 import com.tpe.cookerytech.domain.Category;
 import com.tpe.cookerytech.domain.Role;
 import com.tpe.cookerytech.domain.User;
 import com.tpe.cookerytech.domain.enums.RoleType;
 import com.tpe.cookerytech.dto.request.CategoryRequest;
 import com.tpe.cookerytech.dto.response.CategoryResponse;
+import com.tpe.cookerytech.exception.ResourceNotFoundException;
+import com.tpe.cookerytech.exception.message.ErrorMessage;
 import com.tpe.cookerytech.exception.BadRequestException;
 import com.tpe.cookerytech.exception.ConflictException;
 import com.tpe.cookerytech.exception.ResourceNotFoundException;
@@ -175,7 +178,13 @@ public class CategoryService {
 
     }
 
+    public Category findCategoryById(Long categoryId) {
 
+        Category category = categoryRepository.findById(categoryId).orElseThrow(()->
+                new ResourceNotFoundException(ErrorMessage.CATEGORY_NOT_FOUND_EXCEPTION));
+
+        return category;
+    }
 
 
     private String removeTurkishCharacters(String input) {

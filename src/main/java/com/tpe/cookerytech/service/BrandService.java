@@ -103,4 +103,13 @@ public class BrandService {
         return brandPage.map(brandMapper::brandToBrandResponse);
 
     }
+
+    public Brand findBrandById(Long brandId) {
+
+        Brand brand = brandRepository.findById(brandId).orElseThrow(()->
+                new ResourcesNotFoundException(ErrorMessage.BRAND_NOT_FOUND_EXCEPTION));
+
+        return brand;
+
+    }
 }
