@@ -1,5 +1,6 @@
 package com.tpe.cookerytech.domain;
 
+import com.tpe.cookerytech.dto.response.ProductResponse;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -7,6 +8,8 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -47,16 +50,11 @@ public class Category {
 
     private LocalDateTime updateAt;
 
-//    @OneToMany(mappedBy = "category")
-//    private List<Product> productList;
-//
-//    @OneToMany(orphanRemoval = true)
-//    @JoinColumn(name="category_id")
-//    private Set<Product> product;
 
     public Category(Long id, String title, Boolean built_in) {
         this.id = id;
         this.title = title;
         this.built_in = built_in;
     }
+
 }

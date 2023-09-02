@@ -38,6 +38,7 @@ public class ProductService {
 
         Category category = categoryService.findCategoryById(productRequest.getCategoryId());
 
+
         Product product = productMapper.productRequestToProduct(productRequest);
 
         product.setBrand(brand);
