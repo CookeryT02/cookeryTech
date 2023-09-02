@@ -20,6 +20,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Set;
 
 @Service
 public class CategoryService {
@@ -201,11 +203,7 @@ public class CategoryService {
 
         return input;
     }
-    public Category findCategoryById(Long id) {
 
-        Category category = categoryRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMessage.CATEGORY_NOT_FOUND_EXCEPTION, id)));
 
-        return category;
-    }
 }
 

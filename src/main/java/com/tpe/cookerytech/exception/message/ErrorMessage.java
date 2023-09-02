@@ -4,11 +4,8 @@ public class ErrorMessage {
     public final static String CATEGORY_ALREADY_EXIST_EXCEPTION = "This category is already exist";
 
     public final static String PASSWORD_NOT_MATCHED_MESSAGE = "Your passwords are not matched";
-
     public final static String NOT_PERMITTED_METHOD_MESSAGE = "You don't have any permission to change this data";
-
     public final static String PRINCIPAL_FOUND_MESSAGE = "User not found";
-
     public final static String JWTTOKEN_ERROR_MESSAGE = "JWT Token Validation Error: %s";
     public static final String USER_NOT_FOUND_EXCEPTION = "User with email : %s not found";
     public static final String EMAIL_ALREADY_EXIST_MESSAGE = "Email: %s already exist";
@@ -18,7 +15,7 @@ public class ErrorMessage {
     public static final String RESOURCE_NOT_FOUND_EXCEPTION = "Resource with id %s not found";
     public static final String WRONG_PASSWORD_EXCEPTION = "Wrong Password";
     public static final String BRAND_NOT_FOUND_EXCEPTION = "Brand with id: %s not found";
-    public static final String CATEGORY_NOT_FOUND_EXCEPTION = "Category with id: %s not found";
     public static final String BRAND_CANNOT_DELETE_EXCEPTION = "Brand with this id %s cannot updatable";
     public static final String PRODUCT_USED_MESSAGE = "Product is used by another category";
+    public static final String CATEGORY_NOT_FOUND_EXCEPTION = "Category with id: %s not found";
 }

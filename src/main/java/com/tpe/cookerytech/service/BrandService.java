@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import com.tpe.cookerytech.repository.ProductRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -98,13 +99,7 @@ public class BrandService {
 
     }
 
-    public Page<BrandResponse> findAllWithPage(Pageable pageable) {
 
-        Page<Brand> brandPage= brandRepository.findAll(pageable);
-
-        return brandPage.map(brandMapper::brandToBrandResponse);
-
-    }
 
     public Brand findBrandById(Long brandId) {
 
@@ -117,5 +112,11 @@ public class BrandService {
 
 
 
+    public Page<BrandResponse> findAllWithPage(Pageable pageable) {
 
+        Page<Brand> brandPage= brandRepository.findAll(pageable);
+
+        return brandPage.map(brandMapper::brandToBrandResponse);
+
+    }
 }

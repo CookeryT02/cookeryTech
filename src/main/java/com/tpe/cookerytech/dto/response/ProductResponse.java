@@ -38,7 +38,7 @@ public class ProductResponse {
 
     private Long categoryId;
 
-    private boolean builtIn = false;
+//    private Set<ImageFile> image;
 
 //    private Set<ImageFile> image;
 
