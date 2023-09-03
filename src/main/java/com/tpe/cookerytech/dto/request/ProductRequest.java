@@ -18,15 +18,20 @@ public class ProductRequest {
     private String shortDescription;
 
     private String longDescription;
+
     @NotNull(message = "Please provide product featured")
     private boolean isFeatured = false;
-    @NotNull(message = "Please provide product isnew")
+
+    @NotNull(message = "Please provide product is new")
     private boolean isNew = false;
+
     @NotNull(message = "Please provide product isActive")
     private boolean isActive = true;
-//    @NotNull(message = "Please provide product brand id")
+
+    @NotNull(message = "Please provide product brand id")
     private Long brandId;
-//    @NotNull(message = "Please provide product category id")
+
+    @NotNull(message = "Please provide product category id")
     private Long categoryId;
 
 //    private Set<ImageFile> image;

@@ -18,4 +18,5 @@ public class ErrorMessage {
     public static final String BRAND_CANNOT_DELETE_EXCEPTION = "Brand with this id %s cannot updatable";
     public static final String PRODUCT_USED_MESSAGE = "Product is used by another category";
     public static final String CATEGORY_NOT_FOUND_EXCEPTION = "Category with id: %s not found";
+    public static final String PRODUCT_NOT_FOUND_EXCEPTION = "Product with id: %s not found";
 }

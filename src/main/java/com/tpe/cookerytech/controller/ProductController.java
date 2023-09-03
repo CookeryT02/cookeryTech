@@ -1,23 +1,24 @@
 package com.tpe.cookerytech.controller;
 
+import com.tpe.cookerytech.dto.request.BrandRequest;
+import com.tpe.cookerytech.dto.request.ProductPropertyKeyRequest;
 import com.tpe.cookerytech.dto.request.ProductRequest;
 import com.tpe.cookerytech.domain.Brand;
 import com.tpe.cookerytech.dto.request.ProductRequest;
+import com.tpe.cookerytech.dto.response.BrandResponse;
+import com.tpe.cookerytech.dto.response.ProductPropertyKeyResponse;
 import com.tpe.cookerytech.dto.response.ProductResponse;
 import com.tpe.cookerytech.service.BrandService;
 import com.tpe.cookerytech.service.CategoryService;
 import com.tpe.cookerytech.service.ProductService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping("products")
+@RequestMapping("/products")
 public class ProductController {
 
     private final ProductService productService;
@@ -30,7 +31,7 @@ public class ProductController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('PRODUCT_MANAGER')")
-    public ResponseEntity<ProductResponse> createProduct(@Valid @RequestBody ProductRequest productRequest){
+    public ResponseEntity<ProductResponse> createProduct(@Valid @RequestBody ProductRequest productRequest) {
 
         ProductResponse productResponse = productService.createProducts(productRequest);
 
@@ -38,7 +39,24 @@ public class ProductController {
 
     }
 
+    @PutMapping("/{id}/admin")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PRODUCT_MANAGER')")
+    public ResponseEntity<ProductResponse> updateProduct(@PathVariable Long id,
+                                                         @Valid @RequestBody ProductRequest productRequest) {
 
+        ProductResponse productResponse = productService.updateProductById(id, productRequest);
+
+        return ResponseEntity.ok(productResponse);
+    }
+
+    @PostMapping("/properties")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PRODUCT_MANAGER')")
+    public ResponseEntity<ProductPropertyKeyResponse> createPPKey(@Valid @RequestBody ProductPropertyKeyRequest productPropertyKeyRequest){
+
+        ProductPropertyKeyResponse productPropertyKeyResponse = productService.createPPKey(productPropertyKeyRequest);
+
+        return ResponseEntity.ok(productPropertyKeyResponse);
+    }
 
     //A02
 }
