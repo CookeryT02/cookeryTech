@@ -5,6 +5,9 @@ import com.tpe.cookerytech.domain.Category;
 import com.tpe.cookerytech.domain.Product;
 import com.tpe.cookerytech.dto.request.ProductRequest;
 import com.tpe.cookerytech.dto.response.ProductResponse;
+import com.tpe.cookerytech.exception.BadRequestException;
+import com.tpe.cookerytech.exception.ResourceNotFoundException;
+import com.tpe.cookerytech.exception.message.ErrorMessage;
 import com.tpe.cookerytech.mapper.ProductMapper;
 import com.tpe.cookerytech.repository.ProductRepository;
 import org.springframework.stereotype.Service;
@@ -50,6 +53,25 @@ public class ProductService {
         productRepository.save(product);
 
         return productMapper.productToProductResponse(product);
+
+    }
+
+    public ProductResponse deleteProductById(Long id) {
+
+        Product product = productRepository.findById(id).orElseThrow(()->
+                new ResourceNotFoundException(ErrorMessage.PRODUCT_NOT_FOUND_EXCEPTION));
+
+
+        if (product.getBuiltIn()){
+            throw new BadRequestException(String.format(ErrorMessage.PRODUCT_CANNOT_DELETE_EXCEPTION,id));
+        }
+
+        //TODO: Offer_Item Ürün varmı yoksa exp.
+
+        productRepository.deleteById(id);
+
+        return productMapper.productToProductResponse(product);
+
 
     }
 }

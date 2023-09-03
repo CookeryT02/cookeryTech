@@ -7,10 +7,7 @@ import com.tpe.cookerytech.service.CategoryService;
 import com.tpe.cookerytech.service.ProductService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
@@ -31,6 +28,16 @@ public class ProductController {
     public ResponseEntity<ProductResponse> createProduct(@Valid @RequestBody ProductRequest productRequest){
 
         ProductResponse productResponse = productService.createProducts(productRequest);
+
+        return ResponseEntity.ok(productResponse);
+
+    }
+
+    @DeleteMapping("/{id}/admin")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PRODUCT_MANAGER')")
+    public ResponseEntity<ProductResponse> deleteProductById(@PathVariable Long id){
+
+        ProductResponse productResponse = productService.deleteProductById(id);
 
         return ResponseEntity.ok(productResponse);
 

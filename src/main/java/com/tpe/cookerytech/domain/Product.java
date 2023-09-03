@@ -51,7 +51,7 @@ public class Product {
     private Set<ImageFile> image;
 
     @Column(name = "built_in", nullable = false)
-    private boolean builtIn = false;
+    private Boolean builtIn = false;
 
     @ManyToOne
     @JoinColumn(name = "brandId", referencedColumnName = "id", nullable = false)
@@ -66,6 +66,5 @@ public class Product {
 
     @Column(name = "update_at")
     private LocalDateTime updatedAt;
-
 
 }

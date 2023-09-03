@@ -24,9 +24,10 @@ public class ProductRequest {
     private boolean isNew = false;
     @NotNull(message = "Please provide product isActive")
     private boolean isActive = true;
-//    @NotNull(message = "Please provide product brand id")
+
+    @NotNull(message = "Please provide product brand id")
     private Long brandId;
-//    @NotNull(message = "Please provide product category id")
+    @NotNull(message = "Please provide product category id")
     private Long categoryId;
 
 //    private Set<ImageFile> image;
@@ -35,7 +36,6 @@ public class ProductRequest {
     private int sequence = 0;
 
     private boolean builtIn = false;
-
 
 
 }
