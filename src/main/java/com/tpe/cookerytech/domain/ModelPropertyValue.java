@@ -28,6 +28,6 @@ public class ModelPropertyValue {
     private Model model;
 
     @OneToOne
-    @JoinColumn(name = "model_property_key_id", referencedColumnName = "id")
+    @JoinColumn(name = "product_property_key_id", referencedColumnName = "id")
     private ProductPropertyKey productPropertyKey;
 }
