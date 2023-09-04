@@ -85,5 +85,14 @@ public class ProductController {
 
     }
 
+    @DeleteMapping("/properties/{id}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PRODUCT_MANAGER')")
+    public ResponseEntity<ProductPropertyKeyResponse> deletePPK(@PathVariable Long id){
+
+        ProductPropertyKeyResponse productPropertyKeyResponse = productService.deletePPKById(id);
+
+        return ResponseEntity.ok(productPropertyKeyResponse);
+    }
+
     //A02
 }
