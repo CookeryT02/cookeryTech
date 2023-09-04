@@ -40,15 +40,10 @@ public class ProductResponse {
 
 //    private Set<ImageFile> image;
 
-//    private Set<ImageFile> image;
-
     private int sequence = 0;
 
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
-
-
-
 
 }

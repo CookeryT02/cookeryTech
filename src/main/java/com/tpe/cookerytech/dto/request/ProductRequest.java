@@ -42,5 +42,4 @@ public class ProductRequest {
     private Boolean builtIn = false;
 
 
-
 }

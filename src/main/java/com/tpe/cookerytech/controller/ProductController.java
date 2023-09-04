@@ -40,6 +40,16 @@ public class ProductController {
 
     }
 
+    @DeleteMapping("/{id}/admin")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PRODUCT_MANAGER')")
+    public ResponseEntity<ProductResponse> deleteProductById(@PathVariable Long id){
+
+        ProductResponse productResponse = productService.deleteProductById(id);
+
+        return ResponseEntity.ok(productResponse);
+
+    }
+
     @PutMapping("/{id}/admin")
     @PreAuthorize("hasRole('ADMIN') or hasRole('PRODUCT_MANAGER')")
     public ResponseEntity<ProductResponse> updateProduct(@PathVariable Long id,
