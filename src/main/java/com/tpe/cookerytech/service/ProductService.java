@@ -1,27 +1,28 @@
 package com.tpe.cookerytech.service;
 
 import com.tpe.cookerytech.domain.*;
-import com.tpe.cookerytech.domain.enums.RoleType;
+import com.tpe.cookerytech.dto.request.ModelRequest;
 import com.tpe.cookerytech.dto.request.ProductPropertyKeyRequest;
 import com.tpe.cookerytech.dto.request.ProductRequest;
+import com.tpe.cookerytech.dto.response.ModelResponse;
 import com.tpe.cookerytech.dto.response.ProductPropertyKeyResponse;
 import com.tpe.cookerytech.dto.response.ProductResponse;
 import com.tpe.cookerytech.exception.BadRequestException;
 import com.tpe.cookerytech.exception.ResourceNotFoundException;
 import com.tpe.cookerytech.exception.message.ErrorMessage;
+import com.tpe.cookerytech.mapper.ModelMapper;
 import com.tpe.cookerytech.mapper.ProductMapper;
 import com.tpe.cookerytech.mapper.ProductPropertyKeyMapper;
+import com.tpe.cookerytech.repository.CurrencyRepository;
+import com.tpe.cookerytech.repository.ModelRepository;
 import com.tpe.cookerytech.repository.ProductPropertyKeyRepository;
 import com.tpe.cookerytech.repository.ProductRepository;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 
@@ -35,22 +36,25 @@ public class ProductService {
     private final BrandService brandService;
 
     private final CategoryService categoryService;
+    private final CurrencyRepository currencyRepository;
+    private final ModelMapper modelMapper;
 
     private final ProductPropertyKeyMapper productPropertyKeyMapper;
 
     private final ProductPropertyKeyRepository productPropertyKeyRepository;
+    private final ModelRepository modelRepository;
 
-    private final UserService userService;
 
-
-    public ProductService(ProductRepository productRepository, ProductMapper productMapper, BrandService brandService, CategoryService categoryService, ProductPropertyKeyMapper productPropertyKeyMapper, ProductPropertyKeyRepository productPropertyKeyRepository, UserService userService) {
+    public ProductService(ProductRepository productRepository, ProductMapper productMapper, BrandService brandService, CategoryService categoryService, CurrencyService currencyService, CurrencyRepository currencyRepository, ModelMapper modelMapper, ProductPropertyKeyMapper productPropertyKeyMapper, ProductPropertyKeyRepository productPropertyKeyRepository, ModelRepository modelRepository) {
         this.productRepository = productRepository;
         this.productMapper = productMapper;
         this.brandService = brandService;
         this.categoryService = categoryService;
+        this.currencyRepository = currencyRepository;
+        this.modelMapper = modelMapper;
         this.productPropertyKeyMapper = productPropertyKeyMapper;
         this.productPropertyKeyRepository = productPropertyKeyRepository;
-        this.userService = userService;
+        this.modelRepository = modelRepository;
     }
 
     public ProductResponse createProducts(ProductRequest productRequest) {
@@ -144,8 +148,13 @@ public class ProductService {
         } else {
 
             List<Product> productList = (productRepository.findByIsActive(true));
-            List<Product> filteredProducts = productList.stream()
-                    .filter(p -> p.getBrand().getIsActive() && p.getCategory().getIsActive())
+            List<Product> filteredProducts =productList.stream()
+                    .filter(p -> {
+                        Brand brand = p.getBrand();
+                        Category category = p.getCategory();
+                        System.out.println(p.getCategory().getIsActive());
+                        return p.getIsFeatured() && brand != null && category != null && brand.getIsActive() && category.getIsActive();
+                    })
                     .collect(Collectors.toList());
 
             return productMapper.productsToProductResponses(filteredProducts);
@@ -174,42 +183,41 @@ public class ProductService {
     }
 
 
-    public Page<ProductResponse> allProducts(String q, Long brandId, Long categoryId, Pageable pageable) {
 
 
-        User user = userService.getUserForRoleAuthUser();
-        // user null ise admin mi degil mi bakiyor -- admin degil ise kullanici null
-        Boolean isAdmin = false;
-        if (user != null) {
-            Set<Role> roles = user.getRoles();
-            isAdmin = roles.stream().anyMatch(r->r.getType() == RoleType.ROLE_ADMIN);
+
+    public ProductPropertyKeyResponse deletePPKById(Long id) {
+        ProductPropertyKey productPropertyKey = productPropertyKeyRepository.findById(id).orElseThrow(()->
+                new ResourceNotFoundException(ErrorMessage.PRODUCT_PROPERTY_KEY_NOT_FOUND));
+
+        if (productPropertyKey.getBuiltIn()){
+            throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
+        } //else if () {
+            //model value degeri varsa silinemez eklenecek
+      //  }
+        else {
+            productPropertyKeyRepository.deleteById(id);
         }
+        return productPropertyKeyMapper.productPropertyKeyToProductPropertyKeyResponce(productPropertyKey);
+    }
 
-        Page<Product> productPage = null;
+    public ModelResponse createProductModels(ModelRequest modelRequest) {
 
-        productPage = productRepository.findProductsByCriteria(pageable,q,categoryId,brandId);
+        Product product= productRepository.findById(modelRequest.getProductId()).orElseThrow(()->
+                new ResourceNotFoundException(ErrorMessage.PRODUCT_NOT_FOUND_EXCEPTION));
 
-        Page<ProductResponse> productResponsePage = productPage.map(product -> {
+        Currency currency = currencyRepository.findById(modelRequest.getCurrencyId()).orElseThrow(()->
+                new ResourceNotFoundException(ErrorMessage.PRODUCT_NOT_FOUND_EXCEPTION));
 
-            ProductResponse productResponse = new ProductResponse();
-            productResponse.setId(product.getId());
-            productResponse.setTitle(product.getTitle());
-            productResponse.setShortDescription(product.getShortDescription());
-            productResponse.setLongDescription(product.getLongDescription());
-            productResponse.setIsFeatured(product.getIsFeatured());
-            productResponse.setIsNew(product.getIsNew());
-            productResponse.setIsActive(product.getIsActive());
-            productResponse.setBrandId(product.getBrand().getId());
-            productResponse.setCategoryId(product.getCategory().getId());
-            productResponse.setSequence(product.getSequence());
-            productResponse.setCreatedAt(product.getCreatedAt());
-            productResponse.setUpdatedAt(product.getUpdatedAt());
+        Model model = modelMapper.modelRequestToModel(modelRequest);
 
-            return productResponse;
-
-        });
-        return productResponsePage;
-
+        model.setProduct(product);
+        model.setCurrency(currency);
+        model.setCreate_at(LocalDateTime.now());
+        modelRepository.save(model);
+        ModelResponse modelResponse=modelMapper.modelToModelResponse(model);
+        modelResponse.setProductId(product.getId());
+        modelResponse.setCurrencyId(currency.getId());
+        return modelResponse;
     }
 }
-

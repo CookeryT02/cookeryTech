@@ -2,7 +2,6 @@ package com.tpe.cookerytech.service;
 
 import com.tpe.cookerytech.domain.*;
 import com.tpe.cookerytech.domain.enums.RoleType;
-import com.tpe.cookerytech.domain.*;
 import com.tpe.cookerytech.dto.request.CategoryRequest;
 import com.tpe.cookerytech.dto.response.CategoryResponse;
 import com.tpe.cookerytech.dto.response.ProductResponse;
@@ -18,6 +17,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 
