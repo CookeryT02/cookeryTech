@@ -20,13 +20,13 @@ public class ProductRequest {
     private String longDescription;
 
     @NotNull(message = "Please provide product featured")
-    private boolean isFeatured = false;
+    private Boolean isFeatured = false;
 
     @NotNull(message = "Please provide product is new")
-    private boolean isNew = false;
+    private Boolean isNew = false;
 
     @NotNull(message = "Please provide product isActive")
-    private boolean isActive = true;
+    private Boolean isActive = true;
 
     @NotNull(message = "Please provide product brand id")
     private Long brandId;
@@ -39,7 +39,7 @@ public class ProductRequest {
     @NotNull(message = "Please provide product sequence")
     private int sequence = 0;
 
-    private boolean builtIn = false;
+    private Boolean builtIn = false;
 
 
 

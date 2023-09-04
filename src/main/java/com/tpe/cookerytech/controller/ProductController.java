@@ -16,6 +16,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("/products")
@@ -58,5 +59,10 @@ public class ProductController {
         return ResponseEntity.ok(productPropertyKeyResponse);
     }
 
-    //A02
+    @GetMapping("/featured")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER') or hasRole('CUSTOMER')")
+    public ResponseEntity<List<ProductResponse>> getAllProducts() {
+        List<ProductResponse> allProducts = productService.getAllProducts();
+        return ResponseEntity.ok(allProducts);
+    }
 }

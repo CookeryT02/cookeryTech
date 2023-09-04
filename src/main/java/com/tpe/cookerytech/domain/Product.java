@@ -38,20 +38,20 @@ public class Product {
     private int sequence = 0;
 
     @Column(name = "is_new", nullable = false)
-    private boolean isNew = false;
+    private Boolean isNew = false;
 
     @Column(name = "is_featured", nullable = false)
-    private boolean isFeatured = false;
+    private Boolean isFeatured = false;
 
     @Column(name = "is_active", nullable = false)
-    private boolean isActive = true;
+    private Boolean isActive = true;
 
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")
     private Set<ImageFile> image;
 
     @Column(name = "built_in", nullable = false)
-    private boolean builtIn = false;
+    private Boolean builtIn = false;
 
     @ManyToOne
     @JoinColumn(name = "brandId", referencedColumnName = "id", nullable = false)
@@ -66,5 +66,6 @@ public class Product {
 
     @Column(name = "update_at")
     private LocalDateTime updatedAt;
+
 
 }
