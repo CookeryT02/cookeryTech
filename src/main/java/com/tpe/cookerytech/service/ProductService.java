@@ -140,8 +140,13 @@ public class ProductService {
         } else {
 
             List<Product> productList = (productRepository.findByIsActive(true));
-            List<Product> filteredProducts = productList.stream()
-                    .filter(p -> p.getBrand().getIsActive() && p.getCategory().getIsActive())
+            List<Product> filteredProducts =productList.stream()
+                    .filter(p -> {
+                        Brand brand = p.getBrand();
+                        Category category = p.getCategory();
+                        System.out.println(p.getCategory().getIsActive());
+                        return p.getIsFeatured() && brand != null && category != null && brand.getIsActive() && category.getIsActive();
+                    })
                     .collect(Collectors.toList());
 
             return productMapper.productsToProductResponses(filteredProducts);
