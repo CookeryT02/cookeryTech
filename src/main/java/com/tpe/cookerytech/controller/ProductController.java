@@ -58,5 +58,15 @@ public class ProductController {
         return ResponseEntity.ok(productPropertyKeyResponse);
     }
 
+    @GetMapping
+    @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER') or hasRole('CUSTOMER')")
+    public ResponseEntity<ProductResponse> getProductById(@PathVariable Long id){
+
+        ProductResponse productResponse=productService.getProductById(id);
+
+        return ResponseEntity.ok(productResponse);
+
+    }
+
     //A02
 }
