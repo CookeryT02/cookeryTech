@@ -1,5 +1,6 @@
 package com.tpe.cookerytech.mapper;
 
+import com.tpe.cookerytech.domain.Brand;
 import com.tpe.cookerytech.domain.Product;
 import com.tpe.cookerytech.dto.request.ProductRequest;
 import com.tpe.cookerytech.dto.response.ProductResponse;
@@ -10,7 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Mapper(componentModel = "spring")
-public interface ProductMapper {
+public interface ProductMapper{
+
 
     Product productRequestToProduct(ProductRequest productRequest);
 
@@ -20,6 +22,7 @@ public interface ProductMapper {
 //    List<ProductResponse> productsToProductResponses(List<Product> filteredProducts);
 
     default List<ProductResponse> productsToProductResponses(List<Product> products) {
+        Brand getBrand = new Brand();
         List<ProductResponse> productResponses = new ArrayList<>();
         for (Product product : products) {
             ProductResponse response = new ProductResponse();
