@@ -202,7 +202,6 @@ public class CategoryService {
 
         return productMapper.productsToProductResponses(productIdCategory);
 
-
     }
 }
 
