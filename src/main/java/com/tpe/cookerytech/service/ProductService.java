@@ -1,18 +1,20 @@
 package com.tpe.cookerytech.service;
 
-import com.tpe.cookerytech.domain.Brand;
-import com.tpe.cookerytech.domain.Category;
-import com.tpe.cookerytech.domain.Product;
-import com.tpe.cookerytech.domain.ProductPropertyKey;
+import com.tpe.cookerytech.domain.*;
+import com.tpe.cookerytech.dto.request.ModelRequest;
 import com.tpe.cookerytech.dto.request.ProductPropertyKeyRequest;
 import com.tpe.cookerytech.dto.request.ProductRequest;
+import com.tpe.cookerytech.dto.response.ModelResponse;
 import com.tpe.cookerytech.dto.response.ProductPropertyKeyResponse;
 import com.tpe.cookerytech.dto.response.ProductResponse;
 import com.tpe.cookerytech.exception.BadRequestException;
 import com.tpe.cookerytech.exception.ResourceNotFoundException;
 import com.tpe.cookerytech.exception.message.ErrorMessage;
+import com.tpe.cookerytech.mapper.ModelMapper;
 import com.tpe.cookerytech.mapper.ProductMapper;
 import com.tpe.cookerytech.mapper.ProductPropertyKeyMapper;
+import com.tpe.cookerytech.repository.CurrencyRepository;
+import com.tpe.cookerytech.repository.ModelRepository;
 import com.tpe.cookerytech.repository.ProductPropertyKeyRepository;
 import com.tpe.cookerytech.repository.ProductRepository;
 import org.springframework.security.core.Authentication;
@@ -34,19 +36,25 @@ public class ProductService {
     private final BrandService brandService;
 
     private final CategoryService categoryService;
+    private final CurrencyRepository currencyRepository;
+    private final ModelMapper modelMapper;
 
     private final ProductPropertyKeyMapper productPropertyKeyMapper;
 
     private final ProductPropertyKeyRepository productPropertyKeyRepository;
+    private final ModelRepository modelRepository;
 
 
-    public ProductService(ProductRepository productRepository, ProductMapper productMapper, BrandService brandService, CategoryService categoryService, ProductPropertyKeyMapper productPropertyKeyMapper, ProductPropertyKeyRepository productPropertyKeyRepository) {
+    public ProductService(ProductRepository productRepository, ProductMapper productMapper, BrandService brandService, CategoryService categoryService, CurrencyService currencyService, CurrencyRepository currencyRepository, ModelMapper modelMapper, ProductPropertyKeyMapper productPropertyKeyMapper, ProductPropertyKeyRepository productPropertyKeyRepository, ModelRepository modelRepository) {
         this.productRepository = productRepository;
         this.productMapper = productMapper;
         this.brandService = brandService;
         this.categoryService = categoryService;
+        this.currencyRepository = currencyRepository;
+        this.modelMapper = modelMapper;
         this.productPropertyKeyMapper = productPropertyKeyMapper;
         this.productPropertyKeyRepository = productPropertyKeyRepository;
+        this.modelRepository = modelRepository;
     }
 
     public ProductResponse createProducts(ProductRequest productRequest) {
@@ -191,5 +199,25 @@ public class ProductService {
             productPropertyKeyRepository.deleteById(id);
         }
         return productPropertyKeyMapper.productPropertyKeyToProductPropertyKeyResponce(productPropertyKey);
+    }
+
+    public ModelResponse createProductModels(ModelRequest modelRequest) {
+
+        Product product= productRepository.findById(modelRequest.getProductId()).orElseThrow(()->
+                new ResourceNotFoundException(ErrorMessage.PRODUCT_NOT_FOUND_EXCEPTION));
+
+        Currency currency = currencyRepository.findById(modelRequest.getCurrencyId()).orElseThrow(()->
+                new ResourceNotFoundException(ErrorMessage.PRODUCT_NOT_FOUND_EXCEPTION));
+
+        Model model = modelMapper.modelRequestToModel(modelRequest);
+
+        model.setProduct(product);
+        model.setCurrency(currency);
+        model.setCreate_at(LocalDateTime.now());
+        modelRepository.save(model);
+        ModelResponse modelResponse=modelMapper.modelToModelResponse(model);
+        modelResponse.setProductId(product.getId());
+        modelResponse.setCurrencyId(currency.getId());
+        return modelResponse;
     }
 }

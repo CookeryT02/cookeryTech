@@ -1,28 +1,23 @@
-package com.tpe.cookerytech.domain;
+package com.tpe.cookerytech.dto.request;
 
-
+import com.tpe.cookerytech.domain.Currency;
+import com.tpe.cookerytech.domain.ImageFile;
+import com.tpe.cookerytech.domain.Product;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 import java.util.Set;
 
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
+public class ModelRequest {
 
-@Entity
-@Table(name="t_model")
-public class Model {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
-    @Column(nullable = false)
     @Size(min = 5, max = 150, message = "Title must be between 5 and 150 characters")
     private String title;
 
@@ -38,9 +33,9 @@ public class Model {
     @Column(nullable = false)
     private int seq=0;
 
-    @OneToMany(orphanRemoval = true)
-    @JoinColumn(name="model_id")
-    private Set<ImageFile> image;
+//    @OneToMany(orphanRemoval = true)
+//    @JoinColumn(name="model_id")
+//    private Set<ImageFile> image;
 
     @Column(nullable = false)
     private double buying_price; //decimal
@@ -54,18 +49,13 @@ public class Model {
     @Column(nullable = false)
     private Boolean built_in=false;  //default 0 diyor
 
-    @OneToOne
-    @JoinColumn(name = "currency_id", referencedColumnName = "id")
-    private Currency currency;
+    private Long currencyId;
 
-    @ManyToOne
-    @JoinColumn(name = "product_id",referencedColumnName = "id")
-    private Product product;
+    private Long productId;
 
     @Column(nullable = false)
     private LocalDateTime create_at;
 
     @Column(nullable = true)
     private LocalDateTime update_at;
-
 }

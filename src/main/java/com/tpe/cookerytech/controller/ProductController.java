@@ -1,11 +1,10 @@
 package com.tpe.cookerytech.controller;
 
-import com.tpe.cookerytech.dto.request.BrandRequest;
-import com.tpe.cookerytech.dto.request.ProductPropertyKeyRequest;
-import com.tpe.cookerytech.dto.request.ProductRequest;
+import com.tpe.cookerytech.dto.request.*;
 import com.tpe.cookerytech.domain.Brand;
 import com.tpe.cookerytech.dto.request.ProductRequest;
 import com.tpe.cookerytech.dto.response.BrandResponse;
+import com.tpe.cookerytech.dto.response.ModelResponse;
 import com.tpe.cookerytech.dto.response.ProductPropertyKeyResponse;
 import com.tpe.cookerytech.dto.response.ProductResponse;
 import com.tpe.cookerytech.service.BrandService;
@@ -94,5 +93,15 @@ public class ProductController {
         return ResponseEntity.ok(productPropertyKeyResponse);
     }
 
-    //A02
+
+    @PostMapping("/models")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PRODUCT_MANAGER')")
+    public ResponseEntity<ModelResponse> createProductModel(@Valid @RequestBody ModelRequest modelRequest) {
+
+        ModelResponse modelResponse = productService.createProductModels(modelRequest);
+
+        return ResponseEntity.ok(modelResponse);
+
+    }
+
 }
