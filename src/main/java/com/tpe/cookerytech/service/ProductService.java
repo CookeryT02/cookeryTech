@@ -15,9 +15,13 @@ import com.tpe.cookerytech.mapper.ProductMapper;
 import com.tpe.cookerytech.mapper.ProductPropertyKeyMapper;
 import com.tpe.cookerytech.repository.ProductPropertyKeyRepository;
 import com.tpe.cookerytech.repository.ProductRepository;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -65,7 +69,10 @@ public class ProductService {
 
         productRepository.save(product);
 
-        return productMapper.productToProductResponse(product);
+        ProductResponse productResponse = productMapper.productToProductResponse(product);
+        productResponse.setBrandId(product.getBrand().getId());
+        productResponse.setCategoryId(product.getCategory().getId());
+        return productResponse;
 
     }
 
@@ -74,22 +81,22 @@ public class ProductService {
         Product product = productRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.PRODUCT_NOT_FOUND_EXCEPTION));
 
 
-        if (product.isBuiltIn()) {
+        if (product.getBuiltIn()) {
             throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
         }
 
         product.setTitle(productRequest.getTitle());
         product.setShortDescription(productRequest.getShortDescription());
         product.setLongDescription(productRequest.getLongDescription());
-        product.setFeatured(productRequest.isFeatured());
-        product.setNew(productRequest.isNew());
-        product.setActive(productRequest.isActive());
+        product.setIsFeatured(productRequest.getIsFeatured());
+        product.setIsNew(productRequest.getIsNew());
+        product.setIsActive(productRequest.getIsActive());
         product.setBrand(brandService.findBrandById(productRequest.getBrandId()));
         product.setCategory(categoryService.findCategoryById(productRequest.getCategoryId()));
         // product.setImage(productRequest.getImage());
         product.setUpdatedAt(LocalDateTime.now());
         product.setSequence(productRequest.getSequence());
-        product.setBuiltIn(productRequest.isBuiltIn());
+        product.setBuiltIn(productRequest.getBuiltIn());
 
         productRepository.save(product);
 
@@ -122,4 +129,27 @@ public class ProductService {
             return productMapper.productToProductResponse(product);
 
     }
+
+    public List<ProductResponse> getAllProducts() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication != null && authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
+
+            List<Product> productList = productRepository.findAll();
+
+            return productMapper.productsToProductResponses(productList);
+
+        } else {
+
+            List<Product> productList = (productRepository.findByIsActive(true));
+            List<Product> filteredProducts = productList.stream()
+                    .filter(p -> p.getBrand().getIsActive() && p.getCategory().getIsActive())
+                    .collect(Collectors.toList());
+
+            return productMapper.productsToProductResponses(filteredProducts);
+
+
+        }
+    }
+
 }

@@ -28,11 +28,11 @@ public class ProductResponse {
 
     private String longDescription;
 
-    private boolean isFeatured = false;
+    private Boolean isFeatured = false;
 
-    private boolean isNew = false;
+    private Boolean isNew = false;
 
-    private boolean isActive = true;
+    private Boolean isActive = true;
 
     private Long brandId;
 
