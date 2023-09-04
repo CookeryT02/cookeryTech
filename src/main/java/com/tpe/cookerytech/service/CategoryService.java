@@ -25,185 +25,175 @@ import java.util.Set;
 
 @Service
 public class CategoryService {
-    private final CategoryMapper categoryMapper;
+	private final CategoryMapper categoryMapper;
 
+	private final CategoryRepository categoryRepository;
 
-    private final CategoryRepository categoryRepository;
+	private final UserService userService;
 
-    private final UserService userService;
+	public CategoryService(CategoryMapper categoryMapper, CategoryRepository categoryRepository,
+			UserService userService) {
+		this.categoryMapper = categoryMapper;
+		this.categoryRepository = categoryRepository;
+		this.userService = userService;
+	}
 
+	public CategoryResponse createCategory(CategoryRequest categoryRequest) {
 
-    public CategoryService(CategoryMapper categoryMapper, CategoryRepository categoryRepository, UserService userService) {
-        this.categoryMapper = categoryMapper;
-        this.categoryRepository = categoryRepository;
-        this.userService = userService;
-    }
+		Category category = categoryMapper.categoryRequestToCategory(categoryRequest);
 
-    public CategoryResponse createCategory(CategoryRequest categoryRequest) {
+		if (isTitleUnique(category.getTitle())) {
+			throw new ConflictException(
+					String.format(ErrorMessage.CATEGORY_ALREADY_EXIST_EXCEPTION, category.getTitle()));
+		}
 
+		String title = category.getTitle();
+		String slug = generateSlugFromTitle(title);
+		category.setSlug(slug);
+		category.setCreateAt(LocalDateTime.now());
+		category.setUpdateAt(null);
+		categoryRepository.save(category);
 
-        Category category = categoryMapper.categoryRequestToCategory(categoryRequest);
+		return categoryMapper.categoryToCategoryResponse(category);
+	}
 
-        if(isTitleUnique(category.getTitle())){
-                     throw new ConflictException(String.format(ErrorMessage.CATEGORY_ALREADY_EXIST_EXCEPTION, category.getTitle()));
-        }
+	public boolean isTitleUnique(String title) {
+		return categoryRepository.existsByTitle(title);
+	}
 
-        String title=category.getTitle();
-        String slug=  generateSlugFromTitle(title);
-        category.setSlug(slug);
-        category.setCreateAt(LocalDateTime.now());
-        category.setUpdateAt(null);
-        categoryRepository.save(category);
+	public CategoryResponse removeCategoryById(Long id) {
 
+		Category category = findCategoryById(id);
+		CategoryResponse categoryResponse = categoryMapper.categoryToCategoryResponse(category);
 
+		// Built-in
+		if (category.getBuilt_in()) {
+			throw new ResourceNotFoundException(String.format(ErrorMessage.CATEGORY_NOT_FOUND_EXCEPTION, id));
+		}
 
-        return categoryMapper.categoryToCategoryResponse(category);
-    }
-
-
-
-
-
-
-
-
-
-
-    public boolean isTitleUnique(String title) {
-        return categoryRepository.existsByTitle(title);
-    }
-
-
-
-
-    public CategoryResponse removeCategoryById(Long id) {
-
-        Category category = findCategoryById(id);
-        CategoryResponse categoryResponse = categoryMapper.categoryToCategoryResponse(category);
-
-        //Built-in
-        if (category.getBuilt_in()) {
-            throw new ResourceNotFoundException(String.format(ErrorMessage.CATEGORY_NOT_FOUND_EXCEPTION, id));
-        }
-
-        // Category product var mı kontrol et !!!
+		// Category product var mı kontrol et !!!
 
 //        if (!(category.getProductList().size() == 0)) {
 //            throw new BadRequestException(String.format(ErrorMessage.CATEGORY_CANNOT_DELETE_EXCEPTION, id));
 //        }
 
+		categoryRepository.delete(category);
 
-        categoryRepository.delete(category);
+		return categoryResponse;
+	}
 
-        return categoryResponse;
-    }
+	// YARDIMCI METHEDLAR
+	private String generateSlugFromTitle(String title) {
+		// Türkçe karakterleri çıkartma işlemi
+		String normalizedTitle = removeTurkishCharacters(title);
 
+		// Diğer özel karakterleri çıkartma işlemi
+		String cleanedText = normalizedTitle.replaceAll("[^a-zA-Z0-9 -]", "");
 
+		// Boşlukları '-' ile değiştirme
+		String slug = cleanedText.replaceAll(" ", "-");
 
-    // YARDIMCI METHEDLAR
-    private String generateSlugFromTitle(String title) {
-        // Türkçe karakterleri çıkartma işlemi
-        String normalizedTitle = removeTurkishCharacters(title);
+		return slug.toLowerCase();
+	}
 
-        // Diğer özel karakterleri çıkartma işlemi
-        String cleanedText = normalizedTitle.replaceAll("[^a-zA-Z0-9 -]", "");
+	public CategoryResponse updateCategory(Long id, CategoryRequest categoryRequest) {
 
-        // Boşlukları '-' ile değiştirme
-        String slug = cleanedText.replaceAll(" ", "-");
+		Category category = getCategory(id);
 
-        return slug.toLowerCase();
-    }
+		if (category.getBuilt_in()) {
+			throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
+		}
 
+		category.setTitle(categoryRequest.getTitle());
+		category.setDescription(categoryRequest.getDescription());
+		category.setSeq(categoryRequest.getSeq());
+		category.setSlug(categoryRequest.getSlug());
+		category.setIsActive(categoryRequest.getIsActive());
+		category.setUpdateAt(LocalDateTime.now());
 
+		CategoryResponse categoryResponse = categoryMapper.categoryToCategoryResponse(category);
 
+		categoryRepository.save(category);
 
-    public CategoryResponse updateCategory(Long id, CategoryRequest categoryRequest) {
+		return categoryResponse;
+	}
 
-        Category category = getCategory(id);
+	private Category getCategory(Long id) {
 
-        if(category.getBuilt_in()){
-            throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
-        }
+		Category category = categoryRepository.findById(id).orElseThrow(
+				() -> new ResourceNotFoundException(String.format(ErrorMessage.RESOURCE_NOT_FOUND_EXCEPTION, id)));
 
+		return category;
 
-        category.setTitle(categoryRequest.getTitle());
-        category.setDescription(categoryRequest.getDescription());
-        category.setSeq(categoryRequest.getSeq());
-        category.setSlug(categoryRequest.getSlug());
-        category.setIsActive(categoryRequest.getIsActive());
-        category.setUpdateAt(LocalDateTime.now());
-
-        CategoryResponse categoryResponse = categoryMapper.categoryToCategoryResponse(category);
-
-        categoryRepository.save(category);
-
-        return categoryResponse;
-    }
-
-    private Category getCategory(Long id) {
-
-        Category category = categoryRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException(String.format(ErrorMessage.RESOURCE_NOT_FOUND_EXCEPTION,id)));
-
-        return category;
-
-    }
+	}
 //    private boolean isCategoryExist(String categoryName) {
 //
 //        return categoryRepository.existsBy(categoryName);
 //
 //    }
 
+	public List<CategoryResponse> getAllCategory() {
 
-    public List<CategoryResponse> getAllCategory() {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		if (authentication != null
+				&& authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
 
-        if (authentication != null && authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
+			List<Category> categories = categoryRepository.findAll();
 
-            List<Category> categories = categoryRepository.findAll();
+			List<CategoryResponse> categoryResponses = categoryMapper.map(categories);
 
-            List<CategoryResponse> categoryResponses = categoryMapper.map(categories);
+			return categoryResponses;
 
-            return categoryResponses;
+		} else {
 
-        } else {
+			List<Category> categories = categoryRepository.findByIsActive(true);
 
-            List<Category> categories = categoryRepository.findByIsActive(true);
+			List<CategoryResponse> categoryResponses = categoryMapper.map(categories);
 
-            List<CategoryResponse> categoryResponses = categoryMapper.map(categories);
+			return categoryResponses;
 
-            return categoryResponses;
+		}
 
+	}
 
-        }
+	// get category as response
+	public CategoryResponse getOneCategory(Long categoryId) {
 
-    }
+		Category category = findCategoryById(categoryId);
 
-    public Category findCategoryById(Long categoryId) {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        Category category = categoryRepository.findById(categoryId).orElseThrow(()->
-                new ResourceNotFoundException(ErrorMessage.CATEGORY_NOT_FOUND_EXCEPTION));
+		boolean isAdmin = authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+		boolean isProductManager = authentication.getAuthorities().stream()
+				.anyMatch(a -> a.getAuthority().equals("ROLE_PRODUCT_MANAGER"));
 
-        return category;
-    }
+		if (!isAdmin && !category.getIsActive()) {
+			throw new ResourceNotFoundException(String.format(ErrorMessage.CATEGORY_NOT_FOUND_EXCEPTION, categoryId));
+		}
 
+		return categoryMapper.categoryToCategoryResponse(category);
 
-    private String removeTurkishCharacters(String input) {
-        if (input == null) {
-            return null;
-        }
+	}
 
-        input = input.replaceAll("ı", "i").replaceAll("İ", "I")
-                .replaceAll("ğ", "g").replaceAll("Ğ", "G")
-                .replaceAll("ş", "s").replaceAll("Ş", "S")
-                .replaceAll("ç", "c").replaceAll("Ç", "C")
-                .replaceAll("ö", "o").replaceAll("Ö", "O")
-                .replaceAll("ü", "u").replaceAll("Ü", "U");
+	public Category findCategoryById(Long categoryId) {
 
-        return input;
-    }
+		Category category = categoryRepository.findById(categoryId)
+				.orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.CATEGORY_NOT_FOUND_EXCEPTION));
 
+		return category;
+	}
+
+	private String removeTurkishCharacters(String input) {
+		if (input == null) {
+			return null;
+		}
+
+		input = input.replaceAll("ı", "i").replaceAll("İ", "I").replaceAll("ğ", "g").replaceAll("Ğ", "G")
+				.replaceAll("ş", "s").replaceAll("Ş", "S").replaceAll("ç", "c").replaceAll("Ç", "C")
+				.replaceAll("ö", "o").replaceAll("Ö", "O").replaceAll("ü", "u").replaceAll("Ü", "U");
+
+		return input;
+	}
 
 }
-

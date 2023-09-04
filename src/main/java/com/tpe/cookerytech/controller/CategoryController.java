@@ -41,6 +41,16 @@ public class CategoryController {
 
         return ResponseEntity.ok(allCategory);
     }
+    
+    @GetMapping("{id}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PRODUCT_MANAGER')")
+    public ResponseEntity<CategoryResponse> getOneCategory(Long id){
+
+        CategoryResponse  Category = categoryService.getOneCategory(id);
+
+        return ResponseEntity.ok(Category);
+    }
+    
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('PRODUCT_MANAGER')")
