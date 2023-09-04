@@ -1,16 +1,16 @@
 package com.tpe.cookerytech.controller;
 
-import com.tpe.cookerytech.dto.request.BrandRequest;
 import com.tpe.cookerytech.dto.request.ProductPropertyKeyRequest;
 import com.tpe.cookerytech.dto.request.ProductRequest;
-import com.tpe.cookerytech.domain.Brand;
-import com.tpe.cookerytech.dto.request.ProductRequest;
-import com.tpe.cookerytech.dto.response.BrandResponse;
 import com.tpe.cookerytech.dto.response.ProductPropertyKeyResponse;
 import com.tpe.cookerytech.dto.response.ProductResponse;
 import com.tpe.cookerytech.service.BrandService;
 import com.tpe.cookerytech.service.CategoryService;
 import com.tpe.cookerytech.service.ProductService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -24,10 +24,16 @@ public class ProductController {
 
     private final ProductService productService;
 
+    private final BrandService brandService;
 
-    public ProductController(ProductService productService, BrandService brandService, CategoryService categoryService) {
+    private final CategoryService categoryService;
+
+    public ProductController(ProductService productService, BrandService brandService, CategoryService categoryService, BrandService brandService1, CategoryService categoryService1) {
         this.productService = productService;
+        this.brandService = brandService1;
+        this.categoryService = categoryService1;
     }
+
 
 
     @PostMapping
@@ -84,6 +90,29 @@ public class ProductController {
         return ResponseEntity.ok(productResponse);
 
     }
+
+    @GetMapping
+    @PreAuthorize("hasRole('CUSTOMER') or hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER')")
+    public ResponseEntity<Page<ProductResponse>> getAllProductsWithPage(
+            @RequestParam(required = false,defaultValue = "",name = "q") String q,
+            @RequestParam(required = false,defaultValue = "brandId") Long brandId,
+            @RequestParam(required = false,defaultValue = "categoryId") Long categoryId,
+            @RequestParam(required = false,defaultValue = "0",name = "page") int page,
+            @RequestParam(required = false,defaultValue = "20",name = "size") int size,
+            @RequestParam(required = false,defaultValue = "create_at",name = "sort") String sort,
+            @RequestParam(required = false,defaultValue = "DESC",name = "type") String type){
+
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.valueOf(type), sort));
+
+        Page<ProductResponse> productResponse = productService.allProducts(q,brandId,categoryId,pageable);
+
+        return ResponseEntity.ok(productResponse);
+
+
+
+    }
+
 
     //A02
 }

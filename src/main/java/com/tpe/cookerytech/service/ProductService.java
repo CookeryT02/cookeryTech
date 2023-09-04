@@ -1,9 +1,7 @@
 package com.tpe.cookerytech.service;
 
-import com.tpe.cookerytech.domain.Brand;
-import com.tpe.cookerytech.domain.Category;
-import com.tpe.cookerytech.domain.Product;
-import com.tpe.cookerytech.domain.ProductPropertyKey;
+import com.tpe.cookerytech.domain.*;
+import com.tpe.cookerytech.domain.enums.RoleType;
 import com.tpe.cookerytech.dto.request.ProductPropertyKeyRequest;
 import com.tpe.cookerytech.dto.request.ProductRequest;
 import com.tpe.cookerytech.dto.response.ProductPropertyKeyResponse;
@@ -15,12 +13,15 @@ import com.tpe.cookerytech.mapper.ProductMapper;
 import com.tpe.cookerytech.mapper.ProductPropertyKeyMapper;
 import com.tpe.cookerytech.repository.ProductPropertyKeyRepository;
 import com.tpe.cookerytech.repository.ProductRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 
@@ -39,14 +40,17 @@ public class ProductService {
 
     private final ProductPropertyKeyRepository productPropertyKeyRepository;
 
+    private final UserService userService;
 
-    public ProductService(ProductRepository productRepository, ProductMapper productMapper, BrandService brandService, CategoryService categoryService, ProductPropertyKeyMapper productPropertyKeyMapper, ProductPropertyKeyRepository productPropertyKeyRepository) {
+
+    public ProductService(ProductRepository productRepository, ProductMapper productMapper, BrandService brandService, CategoryService categoryService, ProductPropertyKeyMapper productPropertyKeyMapper, ProductPropertyKeyRepository productPropertyKeyRepository, UserService userService) {
         this.productRepository = productRepository;
         this.productMapper = productMapper;
         this.brandService = brandService;
         this.categoryService = categoryService;
         this.productPropertyKeyMapper = productPropertyKeyMapper;
         this.productPropertyKeyRepository = productPropertyKeyRepository;
+        this.userService = userService;
     }
 
     public ProductResponse createProducts(ProductRequest productRequest) {
@@ -170,6 +174,42 @@ public class ProductService {
     }
 
 
+    public Page<ProductResponse> allProducts(String q, Long brandId, Long categoryId, Pageable pageable) {
 
+
+        User user = userService.getUserForRoleAuthUser();
+        // user null ise admin mi degil mi bakiyor -- admin degil ise kullanici null
+        Boolean isAdmin = false;
+        if (user != null) {
+            Set<Role> roles = user.getRoles();
+            isAdmin = roles.stream().anyMatch(r->r.getType() == RoleType.ROLE_ADMIN);
+        }
+
+        Page<Product> productPage = null;
+
+        productPage = productRepository.findProductsByCriteria(pageable,q,categoryId,brandId);
+
+        Page<ProductResponse> productResponsePage = productPage.map(product -> {
+
+            ProductResponse productResponse = new ProductResponse();
+            productResponse.setId(product.getId());
+            productResponse.setTitle(product.getTitle());
+            productResponse.setShortDescription(product.getShortDescription());
+            productResponse.setLongDescription(product.getLongDescription());
+            productResponse.setIsFeatured(product.getIsFeatured());
+            productResponse.setIsNew(product.getIsNew());
+            productResponse.setIsActive(product.getIsActive());
+            productResponse.setBrandId(product.getBrand().getId());
+            productResponse.setCategoryId(product.getCategory().getId());
+            productResponse.setSequence(product.getSequence());
+            productResponse.setCreatedAt(product.getCreatedAt());
+            productResponse.setUpdatedAt(product.getUpdatedAt());
+
+            return productResponse;
+
+        });
+        return productResponsePage;
+
+    }
 }
 

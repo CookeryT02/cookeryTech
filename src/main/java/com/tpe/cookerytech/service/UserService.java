@@ -390,6 +390,22 @@ public class UserService {
     }
 
 
+    public User getUserForRoleAuthUser() {
 
+        String email = SecurityUtils.getCurrentUserLogin().orElse(null);
+
+        if (email.equals("anonymousUser")) {
+            return null;
+        }
+
+        User user = getUserByEmail(email);
+        if ( user == null ) {
+            throw new ResourceNotFoundException(ErrorMessage.PRINCIPAL_FOUND_MESSAGE);
+        }
+
+        return user;
+
+
+    }
 }
 
