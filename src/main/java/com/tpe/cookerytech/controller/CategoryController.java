@@ -22,7 +22,6 @@ public class CategoryController {
 
     private final ProductService productService;
 
-
     public CategoryController(CategoryService categoryService, ProductService productService) {
         this.categoryService = categoryService;
         this.productService = productService;
@@ -50,6 +49,8 @@ public class CategoryController {
     }
 
 
+
+
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('PRODUCT_MANAGER')")
     public ResponseEntity<CategoryResponse> updateCategory( @PathVariable Long id,
@@ -57,22 +58,13 @@ public class CategoryController {
 
         CategoryResponse categoryResponse = categoryService.updateCategory( id, categoryRequest);
 
-       // CkResponse response = new CkResponse(ResponseMessage.CATEGORY_UPDATED_RESPONSE_MESSAGE,true);
-
         return  ResponseEntity.ok(categoryResponse);
 
 
     }
 
 
-    @GetMapping
-    @PreAuthorize("hasRole('ADMIN') or hasRole('PRODUCT_MANAGER')")
-    public ResponseEntity<List<CategoryResponse>> getAllCategory(){
 
-        List<CategoryResponse> allCategory = categoryService.getAllCategory();
-
-        return ResponseEntity.ok(allCategory);
-    }
 
 
     @GetMapping("/{id}/products")

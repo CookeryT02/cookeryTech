@@ -1,6 +1,9 @@
 package com.tpe.cookerytech.service;
 
-import com.tpe.cookerytech.domain.*;
+import com.tpe.cookerytech.domain.Brand;
+import com.tpe.cookerytech.domain.Category;
+import com.tpe.cookerytech.domain.Product;
+import com.tpe.cookerytech.domain.ProductPropertyKey;
 import com.tpe.cookerytech.dto.request.ProductPropertyKeyRequest;
 import com.tpe.cookerytech.dto.request.ProductRequest;
 import com.tpe.cookerytech.dto.response.ProductPropertyKeyResponse;
@@ -36,17 +39,14 @@ public class ProductService {
 
     private final ProductPropertyKeyRepository productPropertyKeyRepository;
 
-    private final ModelPropertyValue modelPropertyValue;
 
-
-    public ProductService(ProductRepository productRepository, ProductMapper productMapper, BrandService brandService, CategoryService categoryService, ProductPropertyKeyMapper productPropertyKeyMapper, ProductPropertyKeyRepository productPropertyKeyRepository, ModelPropertyValue modelPropertyValue) {
+    public ProductService(ProductRepository productRepository, ProductMapper productMapper, BrandService brandService, CategoryService categoryService, ProductPropertyKeyMapper productPropertyKeyMapper, ProductPropertyKeyRepository productPropertyKeyRepository) {
         this.productRepository = productRepository;
         this.productMapper = productMapper;
         this.brandService = brandService;
         this.categoryService = categoryService;
         this.productPropertyKeyMapper = productPropertyKeyMapper;
         this.productPropertyKeyRepository = productPropertyKeyRepository;
-        this.modelPropertyValue = modelPropertyValue;
     }
 
     public ProductResponse createProducts(ProductRequest productRequest) {
@@ -167,8 +167,11 @@ public class ProductService {
 
             return productMapper.productToProductResponse(product);
 
+    }
 
-        }
+
+
+
 
     public ProductPropertyKeyResponse deletePPKById(Long id) {
         ProductPropertyKey productPropertyKey = productPropertyKeyRepository.findById(id).orElseThrow(()->
