@@ -6,7 +6,6 @@ import com.tpe.cookerytech.domain.Product;
 import com.tpe.cookerytech.domain.ProductPropertyKey;
 import com.tpe.cookerytech.dto.request.ProductPropertyKeyRequest;
 import com.tpe.cookerytech.dto.request.ProductRequest;
-import com.tpe.cookerytech.dto.response.BrandResponse;
 import com.tpe.cookerytech.dto.response.ProductPropertyKeyResponse;
 import com.tpe.cookerytech.dto.response.ProductResponse;
 import com.tpe.cookerytech.exception.BadRequestException;
