@@ -40,8 +40,6 @@ public class ProductService {
     private final ProductPropertyKeyRepository productPropertyKeyRepository;
 
 
-
-
     public ProductService(ProductRepository productRepository, ProductMapper productMapper, BrandService brandService, CategoryService categoryService, ProductPropertyKeyMapper productPropertyKeyMapper, ProductPropertyKeyRepository productPropertyKeyRepository) {
         this.productRepository = productRepository;
         this.productMapper = productMapper;
@@ -115,7 +113,7 @@ public class ProductService {
         productPropertyKey.setProduct(product);
         productPropertyKeyRepository.save(productPropertyKey);
 
-        ProductPropertyKeyResponse productPropertyKeyResponse =productPropertyKeyMapper.productPropertyKeyToProductPropertyKeyResponce(productPropertyKey);
+        ProductPropertyKeyResponse productPropertyKeyResponse = productPropertyKeyMapper.productPropertyKeyToProductPropertyKeyResponce(productPropertyKey);
         productPropertyKeyResponse.setProductId(product.getId());
 
         return productPropertyKeyResponse;
@@ -141,6 +139,25 @@ public class ProductService {
 
 
         }
+
     }
 
-}
+        public ProductResponse deleteProductById (Long id){
+
+            Product product = productRepository.findById(id).orElseThrow(() ->
+                    new ResourceNotFoundException(ErrorMessage.PRODUCT_NOT_FOUND_EXCEPTION));
+
+
+            if (product.getBuiltIn()) {
+                throw new BadRequestException(String.format(ErrorMessage.PRODUCT_CANNOT_DELETE_EXCEPTION, id));
+            }
+
+            //TODO: Offer_Item Ürün varmı yoksa exp.
+
+            productRepository.deleteById(id);
+
+            return productMapper.productToProductResponse(product);
+
+
+        }
+    }
