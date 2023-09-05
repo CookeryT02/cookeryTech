@@ -64,6 +64,14 @@ public class CategoryController {
     }
 
 
+    @GetMapping("{id}")
+  @PreAuthorize("hasRole('ADMIN') or hasRole('PRODUCT_MANAGER')")
+  public ResponseEntity<CategoryResponse> getOneCategory(@PathVariable Long id){
+
+      CategoryResponse  Category = categoryService.getOneCategory(id);
+
+      return ResponseEntity.ok(Category);
+  }
 
 
 

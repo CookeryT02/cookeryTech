@@ -172,6 +172,26 @@ public class CategoryService {
         }
 
     }
+    
+ // get category as response
+    public CategoryResponse getOneCategory(Long categoryId) {
+
+        Category category = findCategoryById(categoryId);
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        boolean isAdmin = authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+        boolean isProductManager = authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_PRODUCT_MANAGER"));
+
+        if (!isAdmin && !category.getIsActive()) {
+            throw new ResourceNotFoundException(String.format(ErrorMessage.CATEGORY_NOT_FOUND_EXCEPTION, categoryId));
+        }
+
+        return categoryMapper.categoryToCategoryResponse(category);
+
+    }
+    
 
     public Category findCategoryById(Long categoryId) {
 
