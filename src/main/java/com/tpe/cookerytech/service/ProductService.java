@@ -17,10 +17,12 @@ import com.tpe.cookerytech.repository.CurrencyRepository;
 import com.tpe.cookerytech.repository.ModelRepository;
 import com.tpe.cookerytech.repository.ProductPropertyKeyRepository;
 import com.tpe.cookerytech.repository.ProductRepository;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityManager;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,6 +30,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class ProductService {
+
 
     private final ProductRepository productRepository;
 
@@ -43,9 +46,10 @@ public class ProductService {
 
     private final ProductPropertyKeyRepository productPropertyKeyRepository;
     private final ModelRepository modelRepository;
+    private final EntityManager entityManager;
 
 
-    public ProductService(ProductRepository productRepository, ProductMapper productMapper, BrandService brandService, CategoryService categoryService, CurrencyService currencyService, CurrencyRepository currencyRepository, ModelMapper modelMapper, ProductPropertyKeyMapper productPropertyKeyMapper, ProductPropertyKeyRepository productPropertyKeyRepository, ModelRepository modelRepository) {
+    public ProductService(ProductRepository productRepository, ProductMapper productMapper, BrandService brandService, CategoryService categoryService, CurrencyService currencyService, CurrencyRepository currencyRepository, ModelMapper modelMapper, ProductPropertyKeyMapper productPropertyKeyMapper, ProductPropertyKeyRepository productPropertyKeyRepository, ModelRepository modelRepository, EntityManager entityManager) {
         this.productRepository = productRepository;
         this.productMapper = productMapper;
         this.brandService = brandService;
@@ -55,6 +59,7 @@ public class ProductService {
         this.productPropertyKeyMapper = productPropertyKeyMapper;
         this.productPropertyKeyRepository = productPropertyKeyRepository;
         this.modelRepository = modelRepository;
+        this.entityManager = entityManager;
     }
 
     public ProductResponse createProducts(ProductRequest productRequest) {
@@ -121,7 +126,7 @@ public class ProductService {
         productPropertyKey.setProduct(product);
         productPropertyKeyRepository.save(productPropertyKey);
 
-        ProductPropertyKeyResponse productPropertyKeyResponse = productPropertyKeyMapper.productPropertyKeyToProductPropertyKeyResponce(productPropertyKey);
+        ProductPropertyKeyResponse productPropertyKeyResponse = productPropertyKeyMapper.productPropertyKeyToProductPropertyKeyResponse(productPropertyKey);
         productPropertyKeyResponse.setProductId(product.getId());
 
         return productPropertyKeyResponse;
@@ -129,10 +134,10 @@ public class ProductService {
 
     public ProductResponse getProductById(Long id) {
 
-            Product product = productRepository.findById(id).orElseThrow(()->
-                    new ResourceNotFoundException(ErrorMessage.PRODUCT_NOT_FOUND_EXCEPTION));
+        Product product = productRepository.findById(id).orElseThrow(() ->
+                new ResourceNotFoundException(ErrorMessage.PRODUCT_NOT_FOUND_EXCEPTION));
 
-            return productMapper.productToProductResponse(product);
+        return productMapper.productToProductResponse(product);
 
     }
 
@@ -148,7 +153,7 @@ public class ProductService {
         } else {
 
             List<Product> productList = (productRepository.findByIsActive(true));
-            List<Product> filteredProducts =productList.stream()
+            List<Product> filteredProducts = productList.stream()
                     .filter(p -> {
                         Brand brand = p.getBrand();
                         Category category = p.getCategory();
@@ -164,46 +169,46 @@ public class ProductService {
 
     }
 
-        public ProductResponse deleteProductById (Long id){
+    public ProductResponse deleteProductById(Long id) {
 
-            Product product = productRepository.findById(id).orElseThrow(() ->
-                    new ResourceNotFoundException(ErrorMessage.PRODUCT_NOT_FOUND_EXCEPTION));
+        Product product = productRepository.findById(id).orElseThrow(() ->
+                new ResourceNotFoundException(ErrorMessage.PRODUCT_NOT_FOUND_EXCEPTION));
 
 
-            if (product.getBuiltIn()) {
-                throw new BadRequestException(String.format(ErrorMessage.PRODUCT_CANNOT_DELETE_EXCEPTION, id));
-            }
+        if (product.getBuiltIn()) {
+            throw new BadRequestException(String.format(ErrorMessage.PRODUCT_CANNOT_DELETE_EXCEPTION, id));
+        }
 
-            //TODO: Offer_Item Ürün varmı yokmu varsa exp
+        //TODO: Offer_Item Ürün varmı yokmu varsa exp
 
-            productRepository.deleteById(id);
+        productRepository.deleteById(id);
 
-            return productMapper.productToProductResponse(product);
+        return productMapper.productToProductResponse(product);
 
     }
 
 
     public ProductPropertyKeyResponse deletePPKById(Long id) {
-        ProductPropertyKey productPropertyKey = productPropertyKeyRepository.findById(id).orElseThrow(()->
+        ProductPropertyKey productPropertyKey = productPropertyKeyRepository.findById(id).orElseThrow(() ->
                 new ResourceNotFoundException(ErrorMessage.PRODUCT_PROPERTY_KEY_NOT_FOUND));
 
-        if (productPropertyKey.getBuiltIn()){
+        if (productPropertyKey.getBuiltIn()) {
             throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
         } //else if () {
-            //model value degeri varsa silinemez eklenecek
-      //  }
+        //model value degeri varsa silinemez eklenecek
+        //  }
         else {
             productPropertyKeyRepository.deleteById(id);
         }
-        return productPropertyKeyMapper.productPropertyKeyToProductPropertyKeyResponce(productPropertyKey);
+        return productPropertyKeyMapper.productPropertyKeyToProductPropertyKeyResponse(productPropertyKey);
     }
 
     public ModelResponse createProductModels(ModelRequest modelRequest) {
 
-        Product product= productRepository.findById(modelRequest.getProductId()).orElseThrow(()->
+        Product product = productRepository.findById(modelRequest.getProductId()).orElseThrow(() ->
                 new ResourceNotFoundException(ErrorMessage.PRODUCT_NOT_FOUND_EXCEPTION));
 
-        Currency currency = currencyRepository.findById(modelRequest.getCurrencyId()).orElseThrow(()->
+        Currency currency = currencyRepository.findById(modelRequest.getCurrencyId()).orElseThrow(() ->
                 new ResourceNotFoundException(ErrorMessage.CURRENCY_NOT_FOUND_EXCEPTION));
 
         Model model = modelMapper.modelRequestToModel(modelRequest);
@@ -212,7 +217,7 @@ public class ProductService {
         model.setCurrency(currency);
         model.setCreate_at(LocalDateTime.now());
         modelRepository.save(model);
-        ModelResponse modelResponse=modelMapper.modelToModelResponse(model);
+        ModelResponse modelResponse = modelMapper.modelToModelResponse(model);
         modelResponse.setProductId(product.getId());
         modelResponse.setCurrencyId(currency.getId());
         return modelResponse;
@@ -220,16 +225,16 @@ public class ProductService {
 
     public ModelResponse updateProductModelById(Long id, ModelRequest modelRequest) {
 
-        Model model = modelRepository.findById(id).orElseThrow(()->
+        Model model = modelRepository.findById(id).orElseThrow(() ->
                 new ResourceNotFoundException(String.format(ErrorMessage.MODEL_NOT_FOUND_EXCEPTION, id)));
 
-        Product product= productRepository.findById(modelRequest.getProductId()).orElseThrow(()->
+        Product product = productRepository.findById(modelRequest.getProductId()).orElseThrow(() ->
                 new ResourceNotFoundException(ErrorMessage.PRODUCT_NOT_FOUND_EXCEPTION));
 
-        Currency currency = currencyRepository.findById(modelRequest.getCurrencyId()).orElseThrow(()->
+        Currency currency = currencyRepository.findById(modelRequest.getCurrencyId()).orElseThrow(() ->
                 new ResourceNotFoundException(ErrorMessage.CURRENCY_NOT_FOUND_EXCEPTION));
 
-        if(model.getBuilt_in()){
+        if (model.getBuilt_in()) {
             throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
         }
 
@@ -248,7 +253,7 @@ public class ProductService {
 
         modelRepository.save(model);
 
-        ModelResponse modelResponse=modelMapper.modelToModelResponse(model);
+        ModelResponse modelResponse = modelMapper.modelToModelResponse(model);
         modelResponse.setProductId(product.getId());
         modelResponse.setCurrencyId(currency.getId());
         return modelResponse;
@@ -257,11 +262,11 @@ public class ProductService {
 
     public ProductPropertyKeyResponse updatePPKeyById(Long id, ProductPropertyKeyRequest productPropertyKeyRequest) {
 
-        ProductPropertyKey productPropertyKey = productPropertyKeyRepository.findById(id).orElseThrow(()->
+        ProductPropertyKey productPropertyKey = productPropertyKeyRepository.findById(id).orElseThrow(() ->
                 new ResourceNotFoundException(ErrorMessage.PRODUCT_PROPERTY_KEY_NOT_FOUND));
 
 
-        if (productPropertyKey.getBuiltIn()){
+        if (productPropertyKey.getBuiltIn()) {
             throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
         }
 
@@ -270,7 +275,7 @@ public class ProductService {
 
         productPropertyKeyRepository.save(productPropertyKey);
 
-        ProductPropertyKeyResponse productPropertyKeyResponse = productPropertyKeyMapper.productPropertyKeyToProductPropertyKeyResponce(productPropertyKey);
+        ProductPropertyKeyResponse productPropertyKeyResponse = productPropertyKeyMapper.productPropertyKeyToProductPropertyKeyResponse(productPropertyKey);
         productPropertyKeyResponse.setProductId(productPropertyKey.getProduct().getId());
 
         return productPropertyKeyResponse;
@@ -279,9 +284,9 @@ public class ProductService {
 
     public ModelResponse deleteModelById(Long id) {
 
-        Model model=modelRepository.findById(id).orElseThrow(()->
-            new ResourceNotFoundException(ErrorMessage.MODEL_NOT_FOUND_EXCEPTION));
-        if(model.getBuilt_in()){
+        Model model = modelRepository.findById(id).orElseThrow(() ->
+                new ResourceNotFoundException(ErrorMessage.MODEL_NOT_FOUND_EXCEPTION));
+        if (model.getBuilt_in()) {
             throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
         } //else if () {
         //If any model is deleted, related records in model_property_values,, cart_items should be deleted
@@ -292,4 +297,15 @@ public class ProductService {
         }
         return modelMapper.modelToModelResponse(model);
     }
+
+    public List<ProductPropertyKeyResponse> listPPKeysByProductId(Long id) {
+
+        productRepository.findById(id).orElseThrow(() ->
+                new ResourceNotFoundException(ErrorMessage.PRODUCT_NOT_FOUND_EXCEPTION));
+
+
+        return productPropertyKeyMapper.ppkListToPPKResponseList(
+                productPropertyKeyRepository.findByProductId(id));
+    }
+
 }

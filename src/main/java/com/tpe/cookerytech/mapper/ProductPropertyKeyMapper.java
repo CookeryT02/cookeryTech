@@ -5,6 +5,8 @@ import com.tpe.cookerytech.dto.request.ProductPropertyKeyRequest;
 import com.tpe.cookerytech.dto.response.ProductPropertyKeyResponse;
 import org.mapstruct.Mapper;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Mapper(componentModel = "spring")
@@ -13,5 +15,15 @@ public interface ProductPropertyKeyMapper {
 
     ProductPropertyKey productPropertyKeyRequestToProductPropertyKey(ProductPropertyKeyRequest productPropertyKeyRequest);
 
-    ProductPropertyKeyResponse productPropertyKeyToProductPropertyKeyResponce(ProductPropertyKey productPropertyKey);
+    ProductPropertyKeyResponse productPropertyKeyToProductPropertyKeyResponse(ProductPropertyKey productPropertyKey);
+
+    default List<ProductPropertyKeyResponse> ppkListToPPKResponseList(List<ProductPropertyKey> ppkList){
+        List<ProductPropertyKeyResponse> ppkResponseList = new ArrayList<>();
+        for (ProductPropertyKey ppk : ppkList){
+            ProductPropertyKeyResponse ppkResponse = productPropertyKeyToProductPropertyKeyResponse(ppk);
+            ppkResponse.setProductId(ppk.getProduct().getId());
+            ppkResponseList.add(ppkResponse);
+        }
+        return ppkResponseList;
+    }
 }

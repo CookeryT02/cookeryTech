@@ -16,6 +16,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.lang.reflect.Array;
 import java.util.List;
 
 @RestController
@@ -134,6 +135,16 @@ public class ProductController {
 
         return ResponseEntity.ok(productPropertyKeyResponse);
 
+    }
+
+    @GetMapping("/{id}/properties")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PRODUCT_MANAGER')")
+    public ResponseEntity<List<ProductPropertyKeyResponse>> getPPKByProductId(@PathVariable Long id){
+
+
+         List<ProductPropertyKeyResponse> ppkResponseList = productService.listPPKeysByProductId(id);
+
+        return ResponseEntity.ok(ppkResponseList);
     }
 
 }
