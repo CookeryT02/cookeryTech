@@ -13,7 +13,6 @@ public interface UserMapper {
 
     User userRequestToUser(RegisterRequest registerRequest);
 
-
     User userUpdateRequestToUser(UserUpdateRequest userUpdateRequest);
 
 
