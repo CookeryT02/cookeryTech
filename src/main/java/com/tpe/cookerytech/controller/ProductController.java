@@ -1,12 +1,10 @@
 package com.tpe.cookerytech.controller;
 
+import com.tpe.cookerytech.domain.Model;
 import com.tpe.cookerytech.dto.request.*;
 import com.tpe.cookerytech.domain.Brand;
 import com.tpe.cookerytech.dto.request.ProductRequest;
-import com.tpe.cookerytech.dto.response.BrandResponse;
-import com.tpe.cookerytech.dto.response.ModelResponse;
-import com.tpe.cookerytech.dto.response.ProductPropertyKeyResponse;
-import com.tpe.cookerytech.dto.response.ProductResponse;
+import com.tpe.cookerytech.dto.response.*;
 import com.tpe.cookerytech.service.BrandService;
 import com.tpe.cookerytech.service.CategoryService;
 import com.tpe.cookerytech.service.ProductService;
@@ -19,6 +17,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.lang.reflect.Array;
 import java.util.List;
 
 @RestController
@@ -74,8 +73,8 @@ public class ProductController {
 
     @GetMapping("/featured")
     @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER') or hasRole('CUSTOMER')")
-    public ResponseEntity<List<ProductResponse>> getAllProducts() {
-        List<ProductResponse> allProducts = productService.getAllProducts();
+    public ResponseEntity<List<ProductObjectResponse>> getAllProducts() {
+        List<ProductObjectResponse> allProducts = productService.getAllProducts();
         return ResponseEntity.ok(allProducts);
     }
     @GetMapping("/{id}")
@@ -103,6 +102,17 @@ public class ProductController {
     public ResponseEntity<ModelResponse> createProductModel(@Valid @RequestBody ModelRequest modelRequest) {
 
         ModelResponse modelResponse = productService.createProductModels(modelRequest);
+
+        return ResponseEntity.ok(modelResponse);
+
+    }
+
+    @PutMapping("/models/{id}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PRODUCT_MANAGER')")
+    public ResponseEntity<ModelResponse> updateProductModel(@PathVariable Long id,
+                                                            @Valid @RequestBody ModelRequest modelRequest){
+
+        ModelResponse modelResponse = productService.updateProductModelById(id,modelRequest);
 
         return ResponseEntity.ok(modelResponse);
 
@@ -148,6 +158,16 @@ public class ProductController {
 
 
 
+    }
+
+    @GetMapping("/{id}/properties")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PRODUCT_MANAGER')")
+    public ResponseEntity<List<ProductPropertyKeyResponse>> getPPKByProductId(@PathVariable Long id){
+
+
+         List<ProductPropertyKeyResponse> ppkResponseList = productService.listPPKeysByProductId(id);
+
+        return ResponseEntity.ok(ppkResponseList);
     }
 
 }

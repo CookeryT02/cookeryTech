@@ -28,9 +28,9 @@ public class ProductObjectResponse {
 
     private Boolean isActive = true;
 
-    private BrandResponse brandId;
+    private BrandResponse brand;
 
-    private CategoryResponse categoryId;
+    private CategoryResponse category;
 
 //    private Set<ImageFile> image;
 
