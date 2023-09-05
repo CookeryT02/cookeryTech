@@ -68,4 +68,5 @@ public class Model {
     @Column(nullable = true)
     private LocalDateTime update_at;
 
+
 }
