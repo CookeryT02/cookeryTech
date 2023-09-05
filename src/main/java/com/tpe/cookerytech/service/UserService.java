@@ -419,19 +419,12 @@ public class UserService {
     }
 
     public User getAllUsers() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication != null && authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
-
-            List<Product> productList = productRepository.findAll();
-
-            return productMapper.productsToProductResponse(productList);
-
-        } else {
-
-            throw new ResourceNotFoundException(ErrorMessage.PRINCIPAL_FOUND_MESSAGE);
-
-        }
+        String email = SecurityUtils.getCurrentUserLogin().orElseThrow(()->
+                new ResourceNotFoundException(ErrorMessage.PRINCIPAL_FOUND_MESSAGE));
+        User user = getUserByEmail(email);
+        return user;
     }
+
+
 }
 

@@ -19,8 +19,8 @@ public interface ProductRepository extends JpaRepository<Product,Long> {
     List<Product> findByCategoryIdAndIsActiveTrue(Long categoryId);
 
 
-    @Query("SELECT p FROM Product p WHERE " +
-            "(LOWER(p.title) LIKE CONCAT('%', LOWER(:q), '%') OR LOWER(p.short_desc) LIKE CONCAT('%', LOWER(:q), '%') OR LOWER(p.long_desc) LIKE CONCAT('%', LOWER(:q), '%')) " +
+    @Query("SELECT p FROM Product p WHERE  p.title LIKE %:query%" +
+//            "(LOWER(p.title) LIKE CONCAT('%', LOWER(:q), '%') OR LOWER(p.short_desc) LIKE CONCAT('%', LOWER(:q), '%') OR LOWER(p.long_desc) LIKE CONCAT('%', LOWER(:q), '%')) " +
             "AND (:cId IS NULL OR p.category.id = :cId) " +
             "AND (:bId IS NULL OR p.brand.id = :bId) " )
     Page<Product> findProductsByCriteria( Pageable pageable,
