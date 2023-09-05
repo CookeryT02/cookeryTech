@@ -222,6 +222,27 @@ public class ProductService {
         return modelResponse;
     }
 
+    public ProductPropertyKeyResponse updatePPKeyById(Long id, ProductPropertyKeyRequest productPropertyKeyRequest) {
+
+        ProductPropertyKey productPropertyKey = productPropertyKeyRepository.findById(id).orElseThrow(()->
+                new ResourceNotFoundException(ErrorMessage.PRODUCT_PROPERTY_KEY_NOT_FOUND));
+
+
+        if (productPropertyKey.getBuiltIn()){
+            throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
+        }
+
+        productPropertyKey.setName(productPropertyKeyRequest.getName());
+        productPropertyKey.setSeq(productPropertyKeyRequest.getSeq());
+
+        productPropertyKeyRepository.save(productPropertyKey);
+
+        ProductPropertyKeyResponse productPropertyKeyResponse = productPropertyKeyMapper.productPropertyKeyToProductPropertyKeyResponce(productPropertyKey);
+        productPropertyKeyResponse.setProductId(productPropertyKey.getProduct().getId());
+
+        return productPropertyKeyResponse;
+    }
+
 
     public ModelResponse deleteModelById(Long id) {
 

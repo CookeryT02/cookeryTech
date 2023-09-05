@@ -113,4 +113,15 @@ public class ProductController {
         return ResponseEntity.ok(modelResponse);
     }
 
+    @PutMapping("/properties/{id}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PRODUCT_MANAGER')")
+    public ResponseEntity<ProductPropertyKeyResponse> updatePPKeyById(@PathVariable Long id,
+                                                                      @Valid @RequestBody ProductPropertyKeyRequest productPropertyKeyRequest){
+
+        ProductPropertyKeyResponse productPropertyKeyResponse = productService.updatePPKeyById(id, productPropertyKeyRequest);
+
+        return ResponseEntity.ok(productPropertyKeyResponse);
+
+    }
+
 }
