@@ -1,5 +1,6 @@
 package com.tpe.cookerytech.controller;
 
+import com.tpe.cookerytech.domain.Model;
 import com.tpe.cookerytech.dto.request.*;
 import com.tpe.cookerytech.domain.Brand;
 import com.tpe.cookerytech.dto.request.ProductRequest;
@@ -12,6 +13,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.lang.reflect.Array;
 import java.util.List;
 
 @RestController
@@ -99,6 +101,47 @@ public class ProductController {
 
         return ResponseEntity.ok(modelResponse);
 
+    }
+
+    @PutMapping("/models/{id}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PRODUCT_MANAGER')")
+    public ResponseEntity<ModelResponse> updateProductModel(@PathVariable Long id,
+                                                            @Valid @RequestBody ModelRequest modelRequest){
+
+        ModelResponse modelResponse = productService.updateProductModelById(id,modelRequest);
+
+        return ResponseEntity.ok(modelResponse);
+
+    }
+
+    @DeleteMapping("/models/{id}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PRODUCT_MANAGER')")
+    public ResponseEntity<ModelResponse> deleteProductModel(@PathVariable Long id){
+
+        ModelResponse modelResponse = productService.deleteModelById(id);
+
+        return ResponseEntity.ok(modelResponse);
+    }
+
+    @PutMapping("/properties/{id}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PRODUCT_MANAGER')")
+    public ResponseEntity<ProductPropertyKeyResponse> updatePPKeyById(@PathVariable Long id,
+                                                                      @Valid @RequestBody ProductPropertyKeyRequest productPropertyKeyRequest){
+
+        ProductPropertyKeyResponse productPropertyKeyResponse = productService.updatePPKeyById(id, productPropertyKeyRequest);
+
+        return ResponseEntity.ok(productPropertyKeyResponse);
+
+    }
+
+    @GetMapping("/{id}/properties")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PRODUCT_MANAGER')")
+    public ResponseEntity<List<ProductPropertyKeyResponse>> getPPKByProductId(@PathVariable Long id){
+
+
+         List<ProductPropertyKeyResponse> ppkResponseList = productService.listPPKeysByProductId(id);
+
+        return ResponseEntity.ok(ppkResponseList);
     }
 
 }

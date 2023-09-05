@@ -1,6 +1,7 @@
 package com.tpe.cookerytech.repository;
 
 import com.tpe.cookerytech.domain.Product;
+import com.tpe.cookerytech.domain.ProductPropertyKey;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -13,9 +14,7 @@ public interface ProductRepository extends JpaRepository<Product,Long> {
 
     List<Product> findByCategoryIdAndIsActiveTrue(Long categoryId);
 
-
-
-//    Product findByBrandId(Long id);
+ //    Product findByBrandId(Long id);
 
 
 }
