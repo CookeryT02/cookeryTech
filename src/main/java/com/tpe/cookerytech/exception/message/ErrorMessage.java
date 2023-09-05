@@ -22,4 +22,5 @@ public class ErrorMessage {
     public static final String PRODUCT_PROPERTY_KEY_NOT_FOUND = "Product Property Key not found";
     public static final String CURRENCY_NOT_FOUND_EXCEPTION = "Currency not found";
     public static final String MODEL_NOT_FOUND_EXCEPTION = "Model not found";
+
 }
