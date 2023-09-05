@@ -21,7 +21,7 @@ public class ModelPropertyValue {
 
     @Column(nullable = false)
     @Size(max = 100, message = "Name must be maximum 100 characters")
-    private char value;
+    private String value;
 
     @ManyToOne
     @JoinColumn(name = "model_id",referencedColumnName = "id")
