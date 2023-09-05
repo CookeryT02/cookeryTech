@@ -84,13 +84,4 @@ public class CategoryController {
 
 
 
-
-    @GetMapping("/{id}/products")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER') or hasRole('CUSTOMER')")
-    public ResponseEntity<List<ProductResponse>> getActiveProductsByCategoryId(@PathVariable Long id) {
-        List<ProductResponse> activeProducts = categoryService.getActiveProductsByCategoryId(id);
-        return ResponseEntity.ok(activeProducts);
-    }
-
-
 }
