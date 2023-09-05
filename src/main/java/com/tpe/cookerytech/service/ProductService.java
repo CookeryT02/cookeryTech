@@ -203,13 +203,14 @@ public class ProductService {
 
     public ModelResponse createProductModels(ModelRequest modelRequest) {
 
+        Model model = modelMapper.modelRequestToModel(modelRequest);
+
         Product product= productRepository.findById(modelRequest.getProductId()).orElseThrow(()->
                 new ResourceNotFoundException(ErrorMessage.PRODUCT_NOT_FOUND_EXCEPTION));
 
         Currency currency = currencyRepository.findById(modelRequest.getCurrencyId()).orElseThrow(()->
-                new ResourceNotFoundException(ErrorMessage.PRODUCT_NOT_FOUND_EXCEPTION));
+                new ResourceNotFoundException(ErrorMessage.CURRENCY_NOT_FOUND_EXCEPTION));
 
-        Model model = modelMapper.modelRequestToModel(modelRequest);
 
         model.setProduct(product);
         model.setCurrency(currency);
@@ -219,5 +220,21 @@ public class ProductService {
         modelResponse.setProductId(product.getId());
         modelResponse.setCurrencyId(currency.getId());
         return modelResponse;
+    }
+
+
+    public ModelResponse deleteModelById(Long id) {
+
+        Model model=modelRepository.findById(id).orElseThrow(()->
+            new ResourceNotFoundException(ErrorMessage.MODEL_NOT_FOUND_EXCEPTION));
+        if(model.getBuilt_in()){throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
+        } //else if () {
+        //If any model is deleted, related records in model_property_values,, cart_items should be deleted
+        //If the model has any related records in offer_items table, it can not be deleted and endpoint returns an error
+        //  }
+        else {
+            modelRepository.deleteById(id);
+        }
+        return modelMapper.modelToModelResponse(model);
     }
 }

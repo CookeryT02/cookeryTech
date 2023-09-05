@@ -104,4 +104,13 @@ public class ProductController {
 
     }
 
+    @DeleteMapping("/models/{id}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PRODUCT_MANAGER')")
+    public ResponseEntity<ModelResponse> deleteProductModel(@PathVariable Long id){
+
+        ModelResponse modelResponse = productService.deleteModelById(id);
+
+        return ResponseEntity.ok(modelResponse);
+    }
+
 }
