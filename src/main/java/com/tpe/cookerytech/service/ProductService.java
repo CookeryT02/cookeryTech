@@ -229,7 +229,8 @@ public class ProductService {
 
     public Page<ProductResponse> allProducts(String q, Long brandId, Long categoryId, Pageable pageable) {
 
-        User user = userService.getUserForRoleAuthUser();
+//        User user = userService.getUserForRoleAuthUser();
+        User user = userService.getAllUsers();
         // user null ise admin mi degil mi bakiyor -- admin degil ise kullanici null
         Boolean isAdmin = false;
         if (user != null) {
