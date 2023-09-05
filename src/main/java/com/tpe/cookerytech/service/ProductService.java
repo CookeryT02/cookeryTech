@@ -5,14 +5,13 @@ import com.tpe.cookerytech.dto.request.ModelRequest;
 import com.tpe.cookerytech.dto.request.ProductPropertyKeyRequest;
 import com.tpe.cookerytech.dto.request.ProductRequest;
 import com.tpe.cookerytech.dto.response.ModelResponse;
+import com.tpe.cookerytech.dto.response.ProductObjectResponse;
 import com.tpe.cookerytech.dto.response.ProductPropertyKeyResponse;
 import com.tpe.cookerytech.dto.response.ProductResponse;
 import com.tpe.cookerytech.exception.BadRequestException;
 import com.tpe.cookerytech.exception.ResourceNotFoundException;
 import com.tpe.cookerytech.exception.message.ErrorMessage;
-import com.tpe.cookerytech.mapper.ModelMapper;
-import com.tpe.cookerytech.mapper.ProductMapper;
-import com.tpe.cookerytech.mapper.ProductPropertyKeyMapper;
+import com.tpe.cookerytech.mapper.*;
 import com.tpe.cookerytech.repository.CurrencyRepository;
 import com.tpe.cookerytech.repository.ModelRepository;
 import com.tpe.cookerytech.repository.ProductPropertyKeyRepository;
@@ -43,9 +42,11 @@ public class ProductService {
 
     private final ProductPropertyKeyRepository productPropertyKeyRepository;
     private final ModelRepository modelRepository;
+    private final BrandMapper brandMapper;
 
+    private final CategoryMapper categoryMapper;
 
-    public ProductService(ProductRepository productRepository, ProductMapper productMapper, BrandService brandService, CategoryService categoryService, CurrencyService currencyService, CurrencyRepository currencyRepository, ModelMapper modelMapper, ProductPropertyKeyMapper productPropertyKeyMapper, ProductPropertyKeyRepository productPropertyKeyRepository, ModelRepository modelRepository) {
+    public ProductService(ProductRepository productRepository, ProductMapper productMapper, BrandService brandService, CategoryService categoryService, CurrencyService currencyService, CurrencyRepository currencyRepository, ModelMapper modelMapper, ProductPropertyKeyMapper productPropertyKeyMapper, ProductPropertyKeyRepository productPropertyKeyRepository, ModelRepository modelRepository, BrandMapper brandMapper, CategoryMapper categoryMapper) {
         this.productRepository = productRepository;
         this.productMapper = productMapper;
         this.brandService = brandService;
@@ -55,6 +56,8 @@ public class ProductService {
         this.productPropertyKeyMapper = productPropertyKeyMapper;
         this.productPropertyKeyRepository = productPropertyKeyRepository;
         this.modelRepository = modelRepository;
+        this.brandMapper = brandMapper;
+        this.categoryMapper = categoryMapper;
     }
 
     public ProductResponse createProducts(ProductRequest productRequest) {
@@ -136,14 +139,17 @@ public class ProductService {
 
     }
 
-    public List<ProductResponse> getAllProducts() {
+    public List<ProductObjectResponse> getAllProducts() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication != null && authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
 
             List<Product> productList = productRepository.findAll();
 
-            return productMapper.productsToProductResponses(productList);
+            List<ProductObjectResponse> listObjectResponse=productMapper.productsToProductObjectResponses(productList);
+
+
+            return listObjectResponse;
 
         } else {
 
@@ -157,8 +163,7 @@ public class ProductService {
                     })
                     .collect(Collectors.toList());
 
-            return productMapper.productsToProductResponses(filteredProducts);
-
+            return productMapper.productsToProductObjectResponses(filteredProducts);
 
         }
 

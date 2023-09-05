@@ -3,10 +3,7 @@ package com.tpe.cookerytech.controller;
 import com.tpe.cookerytech.dto.request.*;
 import com.tpe.cookerytech.domain.Brand;
 import com.tpe.cookerytech.dto.request.ProductRequest;
-import com.tpe.cookerytech.dto.response.BrandResponse;
-import com.tpe.cookerytech.dto.response.ModelResponse;
-import com.tpe.cookerytech.dto.response.ProductPropertyKeyResponse;
-import com.tpe.cookerytech.dto.response.ProductResponse;
+import com.tpe.cookerytech.dto.response.*;
 import com.tpe.cookerytech.service.BrandService;
 import com.tpe.cookerytech.service.CategoryService;
 import com.tpe.cookerytech.service.ProductService;
@@ -70,8 +67,8 @@ public class ProductController {
 
     @GetMapping("/featured")
     @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER') or hasRole('CUSTOMER')")
-    public ResponseEntity<List<ProductResponse>> getAllProducts() {
-        List<ProductResponse> allProducts = productService.getAllProducts();
+    public ResponseEntity<List<ProductObjectResponse>> getAllProducts() {
+        List<ProductObjectResponse> allProducts = productService.getAllProducts();
         return ResponseEntity.ok(allProducts);
     }
     @GetMapping("/{id}")

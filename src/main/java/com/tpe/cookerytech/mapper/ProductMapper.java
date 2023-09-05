@@ -43,4 +43,6 @@ public interface ProductMapper{
     }
 
 
+    List<ProductObjectResponse> productsToProductObjectResponses(List<Product> productList);
+
 }
