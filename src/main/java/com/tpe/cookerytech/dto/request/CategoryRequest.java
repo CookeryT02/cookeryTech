@@ -32,7 +32,4 @@ public class CategoryRequest {
     private String slug;
 
     private  Boolean isActive = true;
-
-
-
 }

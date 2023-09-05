@@ -34,7 +34,7 @@ public class BrandController {
 
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('PRODUCT_MANAGER')")
-    public ResponseEntity<BrandResponse> getBrandsById(@Valid @RequestParam Long id){
+    public ResponseEntity<BrandResponse> getBrandsById(@Valid @PathVariable Long id){
 
         BrandResponse brandResponse = brandService.getBrandById(id);
 

@@ -33,7 +33,7 @@ public class UserController {
 
 
     @PatchMapping("/auth")
-    @PreAuthorize("hasRole('CUSTOMER')")
+    @PreAuthorize("hasRole('CUSTOMER') or hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER')")
     public ResponseEntity<CkResponse>
     updateUserPassword(@Valid @RequestBody UpdatePasswordRequest updatePasswordRequest) {
         userService.updateUserPassword(updatePasswordRequest);
@@ -67,7 +67,7 @@ public class UserController {
 
     // USERBYID
     @GetMapping("/{id}/auth")
-    @PreAuthorize("hasRole('CUSTOMER')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER') or hasRole('CUSTOMER')")
     public ResponseEntity<UserResponse> getUserById(@PathVariable Long id){
 
         UserResponse userResponse = userService.getUserById(id);

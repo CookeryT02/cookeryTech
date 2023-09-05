@@ -28,17 +28,15 @@ public class ProductResponse {
 
     private String longDescription;
 
-    private boolean isFeatured = false;
+    private Boolean isFeatured = false;
 
-    private boolean isNew = false;
+    private Boolean isNew = false;
 
-    private boolean isActive = true;
+    private Boolean isActive = true;
 
     private Long brandId;
 
     private Long categoryId;
-
-//    private Set<ImageFile> image;
 
 //    private Set<ImageFile> image;
 
@@ -47,8 +45,5 @@ public class ProductResponse {
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
-
-
-
 
 }
