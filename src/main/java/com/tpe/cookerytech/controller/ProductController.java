@@ -1,5 +1,6 @@
 package com.tpe.cookerytech.controller;
 
+import com.tpe.cookerytech.domain.Model;
 import com.tpe.cookerytech.dto.request.*;
 import com.tpe.cookerytech.domain.Brand;
 import com.tpe.cookerytech.dto.request.ProductRequest;
@@ -99,6 +100,17 @@ public class ProductController {
     public ResponseEntity<ModelResponse> createProductModel(@Valid @RequestBody ModelRequest modelRequest) {
 
         ModelResponse modelResponse = productService.createProductModels(modelRequest);
+
+        return ResponseEntity.ok(modelResponse);
+
+    }
+
+    @PutMapping("/models/{id}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PRODUCT_MANAGER')")
+    public ResponseEntity<ModelResponse> updateProductModel(@PathVariable Long id,
+                                                            @Valid @RequestBody ModelRequest modelRequest){
+
+        ModelResponse modelResponse = productService.updateProductModelById(id,modelRequest);
 
         return ResponseEntity.ok(modelResponse);
 
