@@ -141,9 +141,6 @@ public class ProductService {
         productPropertyKey.setProduct(product);
         productPropertyKeyRepository.save(productPropertyKey);
 
-        ProductPropertyKeyResponse productPropertyKeyResponse = productPropertyKeyMapper.productPropertyKeyToProductPropertyKeyResponse(productPropertyKey);
-        productPropertyKeyResponse.setProductId(product.getId());
-
         return productPropertyKeyResponse;
     }
 
