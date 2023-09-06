@@ -121,7 +121,7 @@ public class ProductService {
         productPropertyKey.setProduct(product);
         productPropertyKeyRepository.save(productPropertyKey);
 
-        ProductPropertyKeyResponse productPropertyKeyResponse = productPropertyKeyMapper.productPropertyKeyToProductPropertyKeyResponce(productPropertyKey);
+        ProductPropertyKeyResponse productPropertyKeyResponse = productPropertyKeyMapper.productPropertyKeyToProductPropertyKeyResponse(productPropertyKey);
         productPropertyKeyResponse.setProductId(product.getId());
 
         return productPropertyKeyResponse;
@@ -200,7 +200,7 @@ public class ProductService {
         else {
             productPropertyKeyRepository.deleteById(id);
         }
-        return productPropertyKeyMapper.productPropertyKeyToProductPropertyKeyResponce(productPropertyKey);
+        return productPropertyKeyMapper.productPropertyKeyToProductPropertyKeyResponse(productPropertyKey);
     }
 
     public ModelResponse createProductModels(ModelRequest modelRequest) {
