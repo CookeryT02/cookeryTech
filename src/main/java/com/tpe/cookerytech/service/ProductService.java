@@ -343,4 +343,43 @@ public class ProductService {
 
         return modelMapper.modelListToModelResponseList(modelList);
     }
+
+    public Page<ProductResponse> allProducts(String q, Long brandId, Long categoryId, Pageable pageable) {
+        //        User user = userService.getUserForRoleAuthUser();
+        User user = userService.getAllUsers();
+        // user null ise admin mi degil mi bakiyor -- admin degil ise kullanici null
+        Boolean isAdmin = false;
+        if (user != null) {
+            Set<Role> roles = user.getRoles();
+            isAdmin = roles.stream().anyMatch(r->r.getType() == RoleType.ROLE_ADMIN);
+        }
+
+        Page<Product> productPage = null;
+
+        productPage = productRepository.findProductsByCriteria(pageable,q,categoryId,brandId);
+
+        Page<ProductResponse> productResponsePage = productPage.map(product -> {
+
+            ProductResponse productResponse = new ProductResponse();
+            productResponse.setId(product.getId());
+            productResponse.setTitle(product.getTitle());
+            productResponse.setShortDescription(product.getShortDescription());
+            productResponse.setLongDescription(product.getLongDescription());
+            productResponse.setIsFeatured(product.getIsFeatured());
+            productResponse.setIsNew(product.getIsNew());
+            productResponse.setIsActive(product.getIsActive());
+            productResponse.setBrandId(product.getBrand().getId());
+            productResponse.setCategoryId(product.getCategory().getId());
+            productResponse.setSequence(product.getSequence());
+            productResponse.setCreatedAt(product.getCreatedAt());
+            productResponse.setUpdatedAt(product.getUpdatedAt());
+
+            return productResponse;
+
+        });
+        return productResponsePage;
+
+
+    }
+
 }
