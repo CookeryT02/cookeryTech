@@ -82,6 +82,14 @@ public class CategoryController {
         return ResponseEntity.ok(activeProducts);
     }
 
+    @GetMapping
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PRODUCT_MANAGER')")
+    public ResponseEntity<List<CategoryResponse>> getAllCategories(){
+
+        List<CategoryResponse> categoryResponses = categoryService.getAllCategory();
+
+        return ResponseEntity.ok(categoryResponses);
+    }
 
 
 

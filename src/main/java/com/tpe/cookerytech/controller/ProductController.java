@@ -144,4 +144,16 @@ public class ProductController {
         return ResponseEntity.ok(ppkResponseList);
     }
 
+    //*****************************Yardimci Method**************************************************
+
+    @GetMapping("/{id}/models")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PRODUCT_MANAGER')")
+    public ResponseEntity<List<ModelResponse>> getModelsByProductId(@PathVariable Long id){
+
+
+        List<ModelResponse> modelResponseList = productService.getModelsByProductId(id);
+
+        return ResponseEntity.ok(modelResponseList);
+    }
+
 }
