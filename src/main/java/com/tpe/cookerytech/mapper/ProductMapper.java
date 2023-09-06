@@ -1,13 +1,11 @@
 package com.tpe.cookerytech.mapper;
 
-import com.tpe.cookerytech.domain.Brand;
 import com.tpe.cookerytech.domain.Product;
 import com.tpe.cookerytech.domain.User;
 import com.tpe.cookerytech.dto.request.ProductRequest;
 import com.tpe.cookerytech.dto.response.ProductObjectResponse;
 import com.tpe.cookerytech.dto.response.ProductResponse;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 
 import java.util.ArrayList;
 import java.util.List;
