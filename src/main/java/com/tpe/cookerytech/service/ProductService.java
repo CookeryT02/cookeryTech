@@ -158,8 +158,11 @@ public class ProductService {
             Product product = productRepository.findById(id).orElseThrow(()->
                     new ResourceNotFoundException(String.format(ErrorMessage.PRODUCT_NOT_FOUND_EXCEPTION,id)));
 
-            return productMapper.productToProductResponse(product);
+            ProductResponse productResponse = productMapper.productToProductResponse(product);
+            productResponse.setBrandId(product.getBrand().getId());
+            productResponse.setCategoryId(product.getCategory().getId());
 
+            return productResponse;
     }
 
     public List<ProductObjectResponse> getAllProducts() {
