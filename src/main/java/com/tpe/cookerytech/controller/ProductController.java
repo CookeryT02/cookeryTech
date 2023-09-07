@@ -73,6 +73,7 @@ public class ProductController {
         List<ProductObjectResponse> allProducts = productService.getAllProducts();
         return ResponseEntity.ok(allProducts);
     }
+
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER') or hasRole('CUSTOMER')")
     public ResponseEntity<ProductResponse> getProductById(@PathVariable Long id){
@@ -142,6 +143,18 @@ public class ProductController {
          List<ProductPropertyKeyResponse> ppkResponseList = productService.listPPKeysByProductId(id);
 
         return ResponseEntity.ok(ppkResponseList);
+    }
+
+    //*****************************Yardimci Method**************************************************
+
+    @GetMapping("/{id}/models")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PRODUCT_MANAGER')")
+    public ResponseEntity<List<ModelResponse>> getModelsByProductId(@PathVariable Long id){
+
+
+        List<ModelResponse> modelResponseList = productService.getModelsByProductId(id);
+
+        return ResponseEntity.ok(modelResponseList);
     }
 
 }
