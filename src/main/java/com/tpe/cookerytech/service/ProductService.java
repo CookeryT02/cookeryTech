@@ -344,7 +344,7 @@ public class ProductService {
         return modelMapper.modelListToModelResponseList(modelList);
     }
 
-    public Page<ProductResponse> allProducts(String q, Long brandId, Long categoryId, Pageable pageable) {
+    public Page<ProductResponse> allProducts(String q ,Pageable pageable, Long brandId, Long categoryId) {
         //        User user = userService.getUserForRoleAuthUser();
         User user = userService.getAllUsers();
         // user null ise admin mi degil mi bakiyor -- admin degil ise kullanici null
@@ -354,32 +354,82 @@ public class ProductService {
             isAdmin = roles.stream().anyMatch(r->r.getType() == RoleType.ROLE_ADMIN);
         }
 
+        Boolean isActive = true;
+
+        Boolean isAdminOrProductManagerOrSalesSpecialistOrSalesManager = true;
+
+        if (isActive == true){
+            Set<Role> roles = user.getRoles();
+            isAdminOrProductManagerOrSalesSpecialistOrSalesManager = roles.stream()
+                    .anyMatch(r -> r.getType() == RoleType.ROLE_ADMIN || r.getType() == RoleType.ROLE_PRODUCT_MANAGER || r.getType() == RoleType.ROLE_SALES_SPECIALIST ||
+                            r.getType() == RoleType.ROLE_SALES_MANAGER );
+        }
+
         Page<Product> productPage = null;
 
-        productPage = productRepository.findProductsByCriteria(pageable,q,categoryId,brandId);
+        if ( isAdminOrProductManagerOrSalesSpecialistOrSalesManager ) {
+            productPage = productRepository.findProductsByCriteria(pageable,q,brandId,categoryId);
+            Page<ProductResponse> productResponsePage = productPage.map(product -> {
 
-        Page<ProductResponse> productResponsePage = productPage.map(product -> {
+                ProductResponse productResponse = new ProductResponse();
+                productResponse.setId(product.getId());
+                productResponse.setTitle(product.getTitle());
+                productResponse.setShortDescription(product.getShortDescription());
+                productResponse.setLongDescription(product.getLongDescription());
+                productResponse.setIsFeatured(product.getIsFeatured());
+                productResponse.setIsNew(product.getIsNew());
+                productResponse.setIsActive(product.getIsActive());
+                productResponse.setBrandId(product.getBrand().getId());
+                productResponse.setCategoryId(product.getCategory().getId());
+                productResponse.setSequence(product.getSequence());
+                productResponse.setCreatedAt(product.getCreatedAt());
+                productResponse.setUpdatedAt(product.getUpdatedAt());
 
-            ProductResponse productResponse = new ProductResponse();
-            productResponse.setId(product.getId());
-            productResponse.setTitle(product.getTitle());
-            productResponse.setShortDescription(product.getShortDescription());
-            productResponse.setLongDescription(product.getLongDescription());
-            productResponse.setIsFeatured(product.getIsFeatured());
-            productResponse.setIsNew(product.getIsNew());
-            productResponse.setIsActive(product.getIsActive());
-            productResponse.setBrandId(product.getBrand().getId());
-            productResponse.setCategoryId(product.getCategory().getId());
-            productResponse.setSequence(product.getSequence());
-            productResponse.setCreatedAt(product.getCreatedAt());
-            productResponse.setUpdatedAt(product.getUpdatedAt());
+                return productResponse;
 
-            return productResponse;
+            });
+            return productResponsePage;
 
-        });
-        return productResponsePage;
+        } else {
+            throw new ResourceNotFoundException(String.format(ErrorMessage.CUSTOMER_NOT_FOUND_EXCEPTION, pageable));
+        }
 
+
+
+//        Page<Product> productPage = null;
+//
+//        productPage = productRepository.findProductsByCriteria(pageable,q);
+//
+//        Page<ProductResponse> productResponsePage = productPage.map(product -> {
+//
+//            ProductResponse productResponse = new ProductResponse();
+//            productResponse.setId(product.getId());
+//            productResponse.setTitle(product.getTitle());
+//            productResponse.setShortDescription(product.getShortDescription());
+//            productResponse.setLongDescription(product.getLongDescription());
+//            productResponse.setIsFeatured(product.getIsFeatured());
+//            productResponse.setIsNew(product.getIsNew());
+//            productResponse.setIsActive(product.getIsActive());
+////            productResponse.setBrandId(product.getBrand().getId());
+////            productResponse.setCategoryId(product.getCategory().getId());
+//            productResponse.setSequence(product.getSequence());
+//            productResponse.setCreatedAt(product.getCreatedAt());
+//            productResponse.setUpdatedAt(product.getUpdatedAt());
+//
+//            return productResponse;
+//
+//        });
+//        return productResponsePage;
+
+
+
+//        if (!isAdmin && productResponse.getIsActive()) {
+//            throw new ResourceNotFoundException(String.format(ErrorMessage.CATEGORY_NOT_FOUND_EXCEPTION, categoryId));
+//        }
+//
+//        return categoryMapper.categoryToCategoryResponse(category);
 
     }
+
 
 }

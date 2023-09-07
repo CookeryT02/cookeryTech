@@ -18,18 +18,22 @@ public interface ProductRepository extends JpaRepository<Product,Long> {
 
     List<Product> findByCategoryIdAndIsActiveTrue(Long categoryId);
 
+//    @Query("SELECT p FROM Product p WHERE  p.title LIKE %:q%")
+//    Page<Product> findProductsByCriteria(Pageable pageable, String q);
 
-    @Query("SELECT p FROM Product p WHERE  p.title LIKE %:query%" +
-//            "(LOWER(p.title) LIKE CONCAT('%', LOWER(:q), '%') OR LOWER(p.short_desc) LIKE CONCAT('%', LOWER(:q), '%') OR LOWER(p.long_desc) LIKE CONCAT('%', LOWER(:q), '%')) " +
-            "AND (:cId IS NULL OR p.category.id = :cId) " +
-            "AND (:bId IS NULL OR p.brand.id = :bId) " )
-    Page<Product> findProductsByCriteria( Pageable pageable,
-                                          @Param("q") String query, @Param("cId") Long categoryId,
-                                          @Param("bId") Long brandId);
+
+    @Query("SELECT p FROM Product AS p WHERE " + "(LOWER(p.title) LIKE CONCAT('%', LOWER(:q), '%') OR "
+            + "LOWER(p.shortDescription) LIKE CONCAT('%', LOWER(:q), '%') OR "
+            + "LOWER(p.longDescription) LIKE CONCAT('%', LOWER(:q), '%')) AND "
+            + "(:cId IS NULL OR p.category.id = :cId) AND " + "(:bId IS NULL OR p.brand.id = :bId)")
+    Page<Product> findProductsByCriteria(Pageable pageable, @Param("q") String query, @Param("cId") Long categoryId,
+                                         @Param("bId") Long brandId);
+
 
 
 //    Product findByBrandId(Long id);
  //    Product findByBrandId(Long id);
 
+    // Products A11 - /products/:id/models/get product ın id sine gore model getirme
 
 }
