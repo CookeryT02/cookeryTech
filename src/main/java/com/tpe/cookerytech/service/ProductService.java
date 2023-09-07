@@ -17,11 +17,14 @@ import com.tpe.cookerytech.repository.CurrencyRepository;
 import com.tpe.cookerytech.repository.ModelRepository;
 import com.tpe.cookerytech.repository.ProductPropertyKeyRepository;
 import com.tpe.cookerytech.repository.ProductRepository;
+import org.springframework.context.annotation.Bean;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.Column;
 import javax.persistence.EntityManager;
+import java.lang.reflect.Field;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -136,12 +139,14 @@ public class ProductService {
                  throw new ConflictException(String.format(ErrorMessage.MODEL_ALREADY_EXIST_EXCEPTION,productPropertyKey.getName()));
         }
             }
+
         String[] modelFields = {"Title", "sku", "stock amount", "in box quantity", "seq", "buying price", "tax rate"};
         for (String w:modelFields){
            if (w.equalsIgnoreCase(productPropertyKeyRequest.getName())){
                throw new ConflictException(String.format(ErrorMessage.MODEL_FIELD_ALREADY_EXIST_EXCEPTION));
            }
         }
+
 
         productPropertyKeyRepository.save(productPropertyKey);
 
@@ -349,4 +354,6 @@ public class ProductService {
 
         return modelMapper.modelListToModelResponseList(modelList);
     }
+
+
 }
