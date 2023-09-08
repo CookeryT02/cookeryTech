@@ -141,7 +141,7 @@ public class ProductController {
     @GetMapping
     @PreAuthorize("hasRole('CUSTOMER') or hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER')")
     public ResponseEntity<Page<ProductResponse>> getAllProductsWithPage(
-            @RequestParam(required = false,defaultValue = "title",name = "q") String q,
+            @RequestParam(required = false,defaultValue = "",name = "q") String q,
             @RequestParam(required = false) Long brandId,
             @RequestParam(required = false) Long categoryId,
             @RequestParam(required = false,defaultValue = "0",name = "page") int page,

@@ -354,15 +354,17 @@ public class ProductService {
             isAdmin = roles.stream().anyMatch(r->r.getType() == RoleType.ROLE_ADMIN);
         }
 
-        Boolean isActive = true;
+        Boolean isActive = false;
 
         Boolean isAdminOrProductManagerOrSalesSpecialistOrSalesManager = true;
 
-        if (isActive == true){
+        if (isActive =! false){
             Set<Role> roles = user.getRoles();
             isAdminOrProductManagerOrSalesSpecialistOrSalesManager = roles.stream()
                     .anyMatch(r -> r.getType() == RoleType.ROLE_ADMIN || r.getType() == RoleType.ROLE_PRODUCT_MANAGER || r.getType() == RoleType.ROLE_SALES_SPECIALIST ||
                             r.getType() == RoleType.ROLE_SALES_MANAGER );
+        } else {
+            throw new ResourceNotFoundException(String.format(ErrorMessage.CUSTOMER_NOT_FOUND_EXCEPTION, pageable));
         }
 
         Page<Product> productPage = null;
@@ -390,10 +392,9 @@ public class ProductService {
             });
             return productResponsePage;
 
-        } else {
-            throw new ResourceNotFoundException(String.format(ErrorMessage.CUSTOMER_NOT_FOUND_EXCEPTION, pageable));
+        }  else {
+            throw new ResourceNotFoundException(String.format(ErrorMessage.PRODUCT_NOT_FOUND_EXCEPTION, pageable));
         }
-
 
 
 //        Page<Product> productPage = null;

@@ -22,12 +22,12 @@ public interface ProductRepository extends JpaRepository<Product,Long> {
 //    Page<Product> findProductsByCriteria(Pageable pageable, String q);
 
 
-    @Query("SELECT p FROM Product AS p WHERE " + "(LOWER(p.title) LIKE CONCAT('%', LOWER(:q), '%') OR "
+    @Query("SELECT p FROM Product p WHERE (LOWER(p.title) LIKE CONCAT('%', LOWER(:q), '%') OR "
             + "LOWER(p.shortDescription) LIKE CONCAT('%', LOWER(:q), '%') OR "
             + "LOWER(p.longDescription) LIKE CONCAT('%', LOWER(:q), '%')) AND "
             + "(:cId IS NULL OR p.category.id = :cId) AND " + "(:bId IS NULL OR p.brand.id = :bId)")
-    Page<Product> findProductsByCriteria(Pageable pageable, @Param("q") String query, @Param("cId") Long categoryId,
-                                         @Param("bId") Long brandId);
+    Page<Product> findProductsByCriteria(Pageable pageable, @Param("q") String query, @Param("bId") Long brandId,
+                                         @Param("cId") Long categoryId);
 
 
 
