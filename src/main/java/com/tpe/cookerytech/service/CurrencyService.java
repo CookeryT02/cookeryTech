@@ -9,7 +9,9 @@ import com.tpe.cookerytech.repository.CurrencyRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class CurrencyService {
@@ -26,14 +28,29 @@ public class CurrencyService {
         this.currencyMapper = currencyMapper;
     }
 
-    public List<CurrencyResponse> getCurrenciesTCMB() {
-       // double usd = tcmbData.getExchangeRate();
+    public List<CurrencyResponse> getAllCurrencies() {
 
-        List<Currency> currencyList = currencyRepository.findAll();
-//        currency.setValue(26.7);
-//        currency.setUpdateAt(LocalDateTime.now());
-//        currencyRepository.save(currency);
-
-        return currencyMapper.currencyListToCurrencyResponseList(currencyList);
+        List<Currency> currencies = currencyRepository.findAll();
+        return currencyMapper.currenciesToCurrencyResponseList(currencies);
     }
+
+    public List<CurrencyResponse> getAllCurrenciesAdmin() {
+
+        updateCurrencies(currencyRepository.findAll());
+
+        List<Currency> currencies = currencyRepository.findAll();
+
+        return currencyMapper.currenciesToCurrencyResponseList(currencies);
+    }
+
+    // *******************************  YARDIMCI METOT ***************************************
+    private void updateCurrencies(List<Currency> currencies) {
+        for (Currency currency: currencies) {
+            currency.setValue(tcmbData.getExchangeRate(currency.getCode()));
+            currencyRepository.save(currency);
+        }
+    }
+
+
+
 }
