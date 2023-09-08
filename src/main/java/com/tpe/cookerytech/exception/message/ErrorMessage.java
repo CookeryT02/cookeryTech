@@ -25,6 +25,7 @@ public class ErrorMessage {
     public static final String MODEL_NOT_FOUND_BY_PRODUCT_ID_EXCEPTION = "Model with ProductId: %s not found";
 
     public static final String PPK_ALREADY_EXIST_EXCEPTION = "Product Property Key with name: %s is already exist";
+
     public static final String MODEL_ALREADY_EXIST_EXCEPTION = "Model name : %s field already exist";
     public static final String MODEL_FIELD_ALREADY_EXIST_EXCEPTION = "Model Field: %s already exist";
     public static final String CUSTOMER_NOT_FOUND_EXCEPTION = "The customer is not authorized";

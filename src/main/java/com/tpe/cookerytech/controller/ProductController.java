@@ -77,6 +77,7 @@ public class ProductController {
         List<ProductObjectResponse> allProducts = productService.getAllProducts();
         return ResponseEntity.ok(allProducts);
     }
+
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER') or hasRole('CUSTOMER')")
     public ResponseEntity<ProductResponse> getProductById(@PathVariable Long id){

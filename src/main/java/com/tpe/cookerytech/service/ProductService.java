@@ -26,6 +26,8 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -123,29 +125,36 @@ public class ProductService {
     public ProductPropertyKeyResponse createPPKey(ProductPropertyKeyRequest productPropertyKeyRequest) {
 
         ProductPropertyKey productPropertyKey = productPropertyKeyMapper.productPropertyKeyRequestToProductPropertyKey(productPropertyKeyRequest);
-
         Product product = productRepository.findById(productPropertyKeyRequest.getProductId()).orElseThrow(() ->
                 new ResourceNotFoundException(String.format(ErrorMessage.PRODUCT_NOT_FOUND_EXCEPTION,productPropertyKeyRequest.getProductId())));
+        productPropertyKey.setProduct(product);
 
-        ProductPropertyKey productPropertyKey1 = productPropertyKeyRepository.findByName(productPropertyKeyRequest.getName());
-        if (productPropertyKey1.getName()==null){
-
-        }else {
+        List<ProductPropertyKey> productPropertyKeys = productPropertyKeyRepository.findByProductId(productPropertyKeyRequest.getProductId());
+        for (ProductPropertyKey ppk:productPropertyKeys){
+            if (ppk.getName().equals(productPropertyKeyRequest.getName())){
                 throw  new ConflictException(String.format(ErrorMessage.PPK_ALREADY_EXIST_EXCEPTION,productPropertyKeyRequest.getName()));
-
+            }
         }
+
         List<ModelResponse> modelResponseList = getModelsByProductId(productPropertyKey.getProduct().getId());
         for (ModelResponse modelResponse: modelResponseList
              ) { if (modelResponse.getTitle().equals(productPropertyKey.getName())){
-                 throw new ConflictException(String.format(ErrorMessage.MODEL_FIELD_ALREADY_EXIST_EXCEPTION,productPropertyKey.getName()));
+                 throw new ConflictException(String.format(ErrorMessage.MODEL_ALREADY_EXIST_EXCEPTION,productPropertyKey.getName()));
         }
             }
+        String[] modelFields = {"Title", "sku", "stock amount", "in box quantity", "seq", "buying price", "tax rate"};
+        for (String w:modelFields){
+           if (w.equalsIgnoreCase(productPropertyKeyRequest.getName())){
+               throw new ConflictException(String.format(ErrorMessage.MODEL_FIELD_ALREADY_EXIST_EXCEPTION));
+           }
+        }
+
+        productPropertyKeyRepository.save(productPropertyKey);
 
         ProductPropertyKeyResponse productPropertyKeyResponse = productPropertyKeyMapper.productPropertyKeyToProductPropertyKeyResponse(productPropertyKey);
         productPropertyKeyResponse.setProductId(product.getId());
 
-        productPropertyKey.setProduct(product);
-        productPropertyKeyRepository.save(productPropertyKey);
+
 
         return productPropertyKeyResponse;
     }
@@ -155,8 +164,11 @@ public class ProductService {
             Product product = productRepository.findById(id).orElseThrow(()->
                     new ResourceNotFoundException(String.format(ErrorMessage.PRODUCT_NOT_FOUND_EXCEPTION,id)));
 
-            return productMapper.productToProductResponse(product);
+            ProductResponse productResponse = productMapper.productToProductResponse(product);
+            productResponse.setBrandId(product.getBrand().getId());
+            productResponse.setCategoryId(product.getCategory().getId());
 
+            return productResponse;
     }
 
     public List<ProductObjectResponse> getAllProducts() {
