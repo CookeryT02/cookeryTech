@@ -1,6 +1,7 @@
 package com.tpe.cookerytech.controller;
 
 import com.tpe.cookerytech.domain.ImageFile;
+import com.tpe.cookerytech.dto.response.ImageFileResponse;
 import com.tpe.cookerytech.dto.response.ImageSavedResponse;
 import com.tpe.cookerytech.dto.response.ResponseMessage;
 import com.tpe.cookerytech.service.ImageFileService;
@@ -35,11 +36,11 @@ public class ImageFileController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/{productId}")
+    @GetMapping("/{modelId}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER') or hasRole('CUSTOMER')")
-    public ResponseEntity<List<ImageFile>> getProductImages(@PathVariable Long productId) {
+    public ResponseEntity<List<ImageFileResponse>> getProductImages(@PathVariable Long modelId) {
 
-        List<ImageFile> images = imageFileService.getProductImages(productId);
+        List<ImageFileResponse> images = imageFileService.getProductImages(modelId);
         if (images.isEmpty()) {
             return ResponseEntity.notFound().build();
         }

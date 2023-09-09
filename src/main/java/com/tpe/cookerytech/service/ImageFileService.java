@@ -3,6 +3,7 @@ package com.tpe.cookerytech.service;
 import com.tpe.cookerytech.domain.ImageData;
 import com.tpe.cookerytech.domain.ImageFile;
 import com.tpe.cookerytech.domain.Model;
+import com.tpe.cookerytech.dto.response.ImageFileResponse;
 import com.tpe.cookerytech.dto.response.ImageSavedResponse;
 import com.tpe.cookerytech.dto.response.ResponseMessage;
 import com.tpe.cookerytech.exception.ResourceNotFoundException;
@@ -17,8 +18,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @Service
 public class ImageFileService {
@@ -63,17 +66,23 @@ public class ImageFileService {
 //        return responses;
 //    }
 
-    public List<ImageFile> getProductImages(Long modelId) {
+    public List<ImageFileResponse> getProductImages(Long modelId) {
 
         Model model = modelRepository.findById(modelId).orElseThrow(()->
-                new ResourceNotFoundException(String.format(ErrorMessage.PRODUCT_NOT_FOUND_EXCEPTION,modelId)));
+                new ResourceNotFoundException(String.format(ErrorMessage.MODEL_NOT_FOUND_EXCEPTION,modelId)));
 
-        Set<ImageFile> images = model.getImage();
+        List<ImageFile> imageFiles = imageFileRepository.findAllByModel(model);
 
-        // Resim setini bir liste olarak dönüştürün
-        List<ImageFile> imageList = new ArrayList<>(images);
 
-        return imageList;
+        List<ImageFileResponse> imageFileResponseList = imageFiles.stream().map(imFile->{
+            //URI olusturulmasini saglayacgiz
+            String imageUri = ServletUriComponentsBuilder.
+                    fromCurrentContextPath(). //localhost:8080 gelmis oluyor
+                            path("/files/download/").
+                    path(imFile.getId()).toUriString();
+            return new ImageFileResponse(imFile.getName(),imageUri,imFile.getType(),imFile.getLength());
+        }).collect(Collectors.toList());
+        return imageFileResponseList;
 
     }
 }
