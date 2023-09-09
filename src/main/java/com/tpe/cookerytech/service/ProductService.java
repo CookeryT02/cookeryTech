@@ -143,10 +143,9 @@ public class ProductService {
         String[] modelFields = {"Title", "sku", "stock amount", "in box quantity", "seq", "buying price", "tax rate"};
         for (String w:modelFields){
            if (w.equalsIgnoreCase(productPropertyKeyRequest.getName())){
-               throw new ConflictException(String.format(ErrorMessage.MODEL_FIELD_ALREADY_EXIST_EXCEPTION));
+               throw new ConflictException(String.format(ErrorMessage.MODEL_FIELD_ALREADY_EXIST_EXCEPTION,productPropertyKeyRequest.getName()));
            }
         }
-
 
         productPropertyKeyRepository.save(productPropertyKey);
 
@@ -307,7 +306,6 @@ public class ProductService {
         }
 
         productPropertyKey.setName(productPropertyKeyRequest.getName());
-        productPropertyKey.setSeq(productPropertyKeyRequest.getSeq());
 
         productPropertyKeyRepository.save(productPropertyKey);
 
