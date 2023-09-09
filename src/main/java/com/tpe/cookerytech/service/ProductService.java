@@ -29,6 +29,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 
@@ -248,6 +249,9 @@ public class ProductService {
 
         Model model = modelMapper.modelRequestToModel(modelRequest);
 
+        isSkuUnique(modelRequest.getSku());
+
+        model.setSku(modelRequest.getSku());
         model.setProduct(product);
         model.setCurrency(currency);
         model.setCreate_at(LocalDateTime.now());
@@ -257,6 +261,8 @@ public class ProductService {
         modelResponse.setCurrencyId(currency.getId());
         return modelResponse;
     }
+
+
 
     public ModelResponse updateProductModelById(Long id, ModelRequest modelRequest) {
 
@@ -272,6 +278,8 @@ public class ProductService {
         if (model.getBuilt_in()) {
             throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
         }
+
+        isSkuUniqueWithId(modelRequest.getSku(),id);
 
         model.setSku(modelRequest.getSku());
         model.setTitle(modelRequest.getTitle());
@@ -294,6 +302,25 @@ public class ProductService {
         return modelResponse;
 
     }
+
+    private void isSkuUniqueWithId(String sku, Long id) {
+        if (sku != null && id != null) {
+            Model model= modelRepository.findBySku(sku);
+            //Aşağıdaki kod eski sku ile kıyaslamayı engellemek için yazıldı
+            if(model!=null && model.getId()!=id)  { throw new BadRequestException(ErrorMessage.NOT_CREATED_SKU_MESSAGE);}
+        }
+    }
+
+    public void isSkuUnique(String sku) {
+            if (sku != null) {
+                 Model model= modelRepository.findBySku(sku);
+                 if(model!=null)  { throw new BadRequestException(ErrorMessage.NOT_CREATED_SKU_MESSAGE);}
+            }
+        }
+
+
+
+
 
     public ProductPropertyKeyResponse updatePPKeyById(Long id, ProductPropertyKeyRequest productPropertyKeyRequest) {
 

@@ -6,9 +6,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 import java.util.Set;
+
 
 @Getter
 @Setter
@@ -27,6 +29,7 @@ public class Model {
     private String title;
 
     @Column(nullable = false)
+    @NotBlank(message = "SKU not be blank")
     private String sku;
 
     @Column(nullable = false)
