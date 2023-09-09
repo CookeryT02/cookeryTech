@@ -1,6 +1,5 @@
 package com.tpe.cookerytech.domain;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 
 import javax.persistence.*;
