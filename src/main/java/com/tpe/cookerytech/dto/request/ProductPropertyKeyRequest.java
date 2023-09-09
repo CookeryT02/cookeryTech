@@ -11,8 +11,6 @@ public class ProductPropertyKeyRequest {
 
     private String name;
 
-    private int seq;
-
     private Long productId;
 
 }

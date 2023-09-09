@@ -8,4 +8,5 @@ public class ResponseMessage {
 
 
     public static final String PRODUCT_SAVED_RESPONSE_MESSAGE = "Product successfully saved";
+    public static final String IMAGE_SAVED_RESPONSE_MESSAGE = "Image successfully created";
 }
