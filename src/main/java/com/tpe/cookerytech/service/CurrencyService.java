@@ -1,12 +1,15 @@
 package com.tpe.cookerytech.service;
 
-import com.tpe.cookerytech.TCMBapi;
 import com.tpe.cookerytech.domain.Currency;
 import com.tpe.cookerytech.dto.response.CurrencyResponse;
+import com.tpe.cookerytech.exception.ResourceNotFoundException;
+import com.tpe.cookerytech.init.TCMBData;
 import com.tpe.cookerytech.mapper.CurrencyMapper;
 import com.tpe.cookerytech.repository.CurrencyRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -14,24 +17,21 @@ import java.util.stream.Collectors;
 public class CurrencyService {
     private final CurrencyRepository currencyRepository;
 
+    private final TCMBData tcmbData;
+
     private final CurrencyMapper currencyMapper;
 
-    private final TCMBapi tcmbApi;
 
-    public CurrencyService(CurrencyRepository currencyRepository, CurrencyMapper currencyMapper, TCMBapi tcmbApi) {
+    public CurrencyService(CurrencyRepository currencyRepository, TCMBData tcmbData, CurrencyMapper currencyMapper) {
         this.currencyRepository = currencyRepository;
+        this.tcmbData = tcmbData;
         this.currencyMapper = currencyMapper;
-        this.tcmbApi = tcmbApi;
     }
 
     public List<CurrencyResponse> getAllCurrencies() {
 
         List<Currency> currencies = currencyRepository.findAll();
-        List<CurrencyResponse> currencyResponseList =currencies.stream()
-                .map(currencyMapper::currencyToCurrencyResponse)
-                .collect(Collectors.toList());
-
-        return currencyResponseList;
+        return currencyMapper.currenciesToCurrencyResponseList(currencies);
     }
 
     public List<CurrencyResponse> getAllCurrenciesAdmin() {
@@ -40,21 +40,17 @@ public class CurrencyService {
 
         List<Currency> currencies = currencyRepository.findAll();
 
-        List<CurrencyResponse> currencyResponseList= currencyMapper.currenciesToCurrencyResponseList(currencies);
-//        List<CurrencyResponse> currencyResponseList =currencies.stream()
-//                .map(currencyMapper::currencyToCurrencyResponse)
-//                .collect(Collectors.toList());
-
-        return currencyResponseList;
+        return currencyMapper.currenciesToCurrencyResponseList(currencies);
     }
 
     // *******************************  YARDIMCI METOT ***************************************
     private void updateCurrencies(List<Currency> currencies) {
         for (Currency currency: currencies) {
-            currency.setValue(tcmbApi.getExchangeRate(currency.getCode()));
-        currencyRepository.save(currency);
+            currency.setValue(tcmbData.getExchangeRate(currency.getCode()));
+            currencyRepository.save(currency);
         }
     }
+
 
 
 }
