@@ -2,16 +2,12 @@ package com.tpe.cookerytech.service;
 
 import com.tpe.cookerytech.domain.Currency;
 import com.tpe.cookerytech.dto.response.CurrencyResponse;
-import com.tpe.cookerytech.exception.ResourceNotFoundException;
 import com.tpe.cookerytech.init.TCMBData;
 import com.tpe.cookerytech.mapper.CurrencyMapper;
 import com.tpe.cookerytech.repository.CurrencyRepository;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+
 
 @Service
 public class CurrencyService {
