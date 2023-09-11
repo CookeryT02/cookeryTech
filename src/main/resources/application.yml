@@ -46,6 +46,12 @@ management: #actuator
     shutdown:
       enabled: true
 
+#image
+servlet:
+  multipart:
+    max-file-size: 2MB
+    max-request-size: 2MB
+
 
 cookeryTech:
   app:
