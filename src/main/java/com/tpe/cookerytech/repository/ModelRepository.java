@@ -12,4 +12,6 @@ public interface ModelRepository extends JpaRepository <Model, Long> {
 
 
     Optional<List<Model>> findByProductId(Long id);
+
+    Model findBySku(String sku);
 }

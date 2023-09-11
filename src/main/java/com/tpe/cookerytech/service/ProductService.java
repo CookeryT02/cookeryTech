@@ -17,15 +17,19 @@ import com.tpe.cookerytech.repository.CurrencyRepository;
 import com.tpe.cookerytech.repository.ModelRepository;
 import com.tpe.cookerytech.repository.ProductPropertyKeyRepository;
 import com.tpe.cookerytech.repository.ProductRepository;
+import org.springframework.context.annotation.Bean;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.Column;
 import javax.persistence.EntityManager;
+import java.lang.reflect.Field;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 
@@ -136,10 +140,11 @@ public class ProductService {
                  throw new ConflictException(String.format(ErrorMessage.MODEL_ALREADY_EXIST_EXCEPTION,productPropertyKey.getName()));
         }
             }
+
         String[] modelFields = {"Title", "sku", "stock amount", "in box quantity", "seq", "buying price", "tax rate"};
         for (String w:modelFields){
            if (w.equalsIgnoreCase(productPropertyKeyRequest.getName())){
-               throw new ConflictException(String.format(ErrorMessage.MODEL_FIELD_ALREADY_EXIST_EXCEPTION));
+               throw new ConflictException(String.format(ErrorMessage.MODEL_FIELD_ALREADY_EXIST_EXCEPTION,productPropertyKeyRequest.getName()));
            }
         }
 
@@ -244,6 +249,9 @@ public class ProductService {
 
         Model model = modelMapper.modelRequestToModel(modelRequest);
 
+        isSkuUnique(modelRequest.getSku());
+
+        model.setSku(modelRequest.getSku());
         model.setProduct(product);
         model.setCurrency(currency);
         model.setCreate_at(LocalDateTime.now());
@@ -253,6 +261,8 @@ public class ProductService {
         modelResponse.setCurrencyId(currency.getId());
         return modelResponse;
     }
+
+
 
     public ModelResponse updateProductModelById(Long id, ModelRequest modelRequest) {
 
@@ -268,6 +278,8 @@ public class ProductService {
         if (model.getBuilt_in()) {
             throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
         }
+
+        isSkuUniqueWithId(modelRequest.getSku(),id);
 
         model.setSku(modelRequest.getSku());
         model.setTitle(modelRequest.getTitle());
@@ -291,6 +303,25 @@ public class ProductService {
 
     }
 
+    private void isSkuUniqueWithId(String sku, Long id) {
+        if (sku != null && id != null) {
+            Model model= modelRepository.findBySku(sku);
+            //Aşağıdaki kod eski sku ile kıyaslamayı engellemek için yazıldı
+            if(model!=null && model.getId()!=id)  { throw new BadRequestException(ErrorMessage.NOT_CREATED_SKU_MESSAGE);}
+        }
+    }
+
+    public void isSkuUnique(String sku) {
+            if (sku != null) {
+                 Model model= modelRepository.findBySku(sku);
+                 if(model!=null)  { throw new BadRequestException(ErrorMessage.NOT_CREATED_SKU_MESSAGE);}
+            }
+        }
+
+
+
+
+
     public ProductPropertyKeyResponse updatePPKeyById(Long id, ProductPropertyKeyRequest productPropertyKeyRequest) {
 
         ProductPropertyKey productPropertyKey = productPropertyKeyRepository.findById(id).orElseThrow(() ->
@@ -302,7 +333,6 @@ public class ProductService {
         }
 
         productPropertyKey.setName(productPropertyKeyRequest.getName());
-        productPropertyKey.setSeq(productPropertyKeyRequest.getSeq());
 
         productPropertyKeyRepository.save(productPropertyKey);
 
@@ -349,4 +379,6 @@ public class ProductService {
 
         return modelMapper.modelListToModelResponseList(modelList);
     }
+
+
 }
