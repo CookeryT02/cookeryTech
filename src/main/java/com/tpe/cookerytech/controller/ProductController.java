@@ -161,6 +161,17 @@ public class ProductController {
 
     }
 
+    @GetMapping
+    @PreAuthorize("hasRole('CUSTOMER') or hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER')")
+    public ResponseEntity<List<ModelResponse>> getProductsByIdModels(@PathVariable Long id) {
+
+
+        List<ModelResponse> modelResponseList  = productService.listProductsByIdModels(id);
+
+        return ResponseEntity.ok(modelResponseList);
+
+    }
+
     @GetMapping("/{id}/properties")
     @PreAuthorize("hasRole('ADMIN') or hasRole('PRODUCT_MANAGER')")
     public ResponseEntity<List<ProductPropertyKeyResponse>> getPPKByProductId(@PathVariable Long id){
