@@ -220,8 +220,6 @@ public class ProductService {
 
 
 
-
-
     public ProductPropertyKeyResponse deletePPKById(Long id) {
         ProductPropertyKey productPropertyKey = productPropertyKeyRepository.findById(id).orElseThrow(()->
                 new ResourceNotFoundException(String.format(ErrorMessage.PRODUCT_PROPERTY_KEY_NOT_FOUND,id)));
@@ -292,7 +290,6 @@ public class ProductService {
         model.setProduct(product);
         model.setCurrency(currency);
         model.setUpdate_at(LocalDateTime.now());
-//        model.setImage(null);
 
         modelRepository.save(model);
 

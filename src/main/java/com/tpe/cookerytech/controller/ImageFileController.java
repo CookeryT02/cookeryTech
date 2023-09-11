@@ -2,20 +2,17 @@ package com.tpe.cookerytech.controller;
 
 import com.tpe.cookerytech.domain.ImageFile;
 import com.tpe.cookerytech.dto.response.CkResponse;
-import com.tpe.cookerytech.dto.response.ImageFileDTO;
+import com.tpe.cookerytech.dto.response.ImageFileResponse;
 import com.tpe.cookerytech.dto.response.ImageSavedResponse;
 import com.tpe.cookerytech.dto.response.ResponseMessage;
 import com.tpe.cookerytech.service.ImageFileService;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @RestController
 @RequestMapping("/images")
@@ -41,15 +38,16 @@ public class ImageFileController {
     }
 
     @GetMapping("/{modelId}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<ImageFileDTO>> getImage(@PathVariable Long modelId) {
+    @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER') or hasRole('CUSTOMER')")
+    public ResponseEntity<List<ImageFileResponse>> getProductImages(@PathVariable Long modelId) {
 
-        List<ImageFileDTO> imageFiles=imageFileService.displayImage(modelId);
-
-        return ResponseEntity.ok(imageFiles);
+        List<ImageFileResponse> images = imageFileService.getProductImages(modelId);
+        if (images.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(images);
     }
 
-    //!!! ******** Delete Image ************
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CkResponse> deleteImageFile(@PathVariable String id) {
@@ -64,6 +62,5 @@ public class ImageFileController {
         }
         return ResponseEntity.ok(response);
     }
-
 
 }

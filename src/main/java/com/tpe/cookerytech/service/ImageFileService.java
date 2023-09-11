@@ -3,18 +3,21 @@ package com.tpe.cookerytech.service;
 import com.tpe.cookerytech.domain.ImageData;
 import com.tpe.cookerytech.domain.ImageFile;
 import com.tpe.cookerytech.domain.Model;
-import com.tpe.cookerytech.dto.response.ImageFileDTO;
+import com.tpe.cookerytech.dto.response.ImageFileResponse;
 import com.tpe.cookerytech.dto.response.ImageSavedResponse;
+import com.tpe.cookerytech.dto.response.ResponseMessage;
 import com.tpe.cookerytech.exception.ResourceNotFoundException;
 import com.tpe.cookerytech.exception.message.ErrorMessage;
-import com.tpe.cookerytech.mapper.ImageMapper;
 import com.tpe.cookerytech.repository.ImageFileRepository;
 import com.tpe.cookerytech.repository.ModelRepository;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -29,11 +32,9 @@ public class ImageFileService {
     private final ModelRepository modelRepository;
 
 
-    private final ImageMapper imageMapper;
-    public ImageFileService(ImageFileRepository imageFileRepository, ModelRepository modelRepository, ImageMapper imageMapper) {
+    public ImageFileService(ImageFileRepository imageFileRepository, ModelRepository modelRepository) {
         this.imageFileRepository = imageFileRepository;
         this.modelRepository = modelRepository;
-        this.imageMapper = imageMapper;
     }
 
     public String saveImage(MultipartFile file,Long id) {
@@ -55,24 +56,48 @@ public class ImageFileService {
         return imageFile.getId();
     }
 
-    public List<ImageFileDTO> displayImage(Long modelId) {
-        List<ImageFile> imageFiles=imageFileRepository.findAllByModelId(modelId);
+//    public List<ImageSavedResponse> saveImages(MultipartFile[] files, Long modelId) {
+//        List<ImageSavedResponse> responses = new ArrayList<>();
+//        for (MultipartFile file:files){
+//            String imageId = saveImage(file,modelId);
+//            ImageSavedResponse response = new ImageSavedResponse(imageId, ResponseMessage.IMAGE_SAVED_RESPONSE_MESSAGE,true);
+//            responses.add(response);
+//        }
+//        return responses;
+//    }
+
+    public List<ImageFileResponse> getProductImages(Long modelId) {
+
         Model model = modelRepository.findById(modelId).orElseThrow(()->
-                new ResourceNotFoundException(ErrorMessage.MODEL_NOT_FOUND_EXCEPTION));
-        List<ImageFileDTO> imageFileDTOS =imageFiles.stream().map(imFile->{
-            // URI olusturulmasini sagliyacagiz
-            String imageUri = ServletUriComponentsBuilder.
-                    fromCurrentContextPath(). // localhost:8080
-                            path("/files/download/"). // localhost:8080/files/download
-                            path(imFile.getId()).toUriString();// localhost:8080/files/download/id
-            return new ImageFileDTO(imFile.getName(),
-                    imageUri,
-                    imFile.getType(),
-                    imFile.getLength());
+                new ResourceNotFoundException(String.format(ErrorMessage.MODEL_NOT_FOUND_EXCEPTION, modelId)));
 
-        }).collect(Collectors.toList());
-        return imageFileDTOS;
+        List<ImageFileResponse> imageResponses = new ArrayList<>();
+        for (ImageFile imageFile : model.getImage()) {
 
+            ImageFileResponse imageFileResponse = convertToResponse(imageFile);
+            imageResponses.add(imageFileResponse);
+        }
+
+        return imageResponses;
+
+
+    }
+
+    public static ImageFileResponse convertToResponse(ImageFile imageFile) {
+
+        ImageFileResponse response = new ImageFileResponse();
+
+        String imageUri = ServletUriComponentsBuilder.
+                fromCurrentContextPath(). // localhost:8080
+                        path("/images/download/"). // localhost:8080/images/download
+                        path(imageFile.getId()).toUriString();
+
+        response.setName(imageFile.getName());
+        response.setUrl(imageUri);
+        response.setSize(imageFile.getLength());
+        response.setType(imageFile.getType());
+
+        return response;
     }
 
     public Boolean removeById(String id) {
@@ -82,7 +107,6 @@ public class ImageFileService {
             imageFileRepository.delete(imageFile);
             return true;
         }else {
-
             return false;
         }
     }
@@ -95,13 +119,5 @@ public class ImageFileService {
     }
 
 
-//    public List<ImageSavedResponse> saveImages(MultipartFile[] files, Long modelId) {
-//        List<ImageSavedResponse> responses = new ArrayList<>();
-//        for (MultipartFile file:files){
-//            String imageId = saveImage(file,modelId);
-//            ImageSavedResponse response = new ImageSavedResponse(imageId, ResponseMessage.IMAGE_SAVED_RESPONSE_MESSAGE,true);
-//            responses.add(response);
-//        }
-//        return responses;
-//    }
+
 }

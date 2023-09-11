@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class ImageSavedResponse extends CkResponse{
+
     private String imageId;
 
     public ImageSavedResponse(String imageId, String message, boolean success){

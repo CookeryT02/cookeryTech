@@ -22,6 +22,7 @@ public class ImageFile {
     @GenericGenerator(name = "uuid", strategy = "uuid2")
 
     private String id;
+
     @Column(nullable = false)
     private String name;
 
@@ -31,10 +32,10 @@ public class ImageFile {
 
 
     @ManyToOne
-    @JoinColumn(name="model_id")
+    @JoinColumn(name="model_id",referencedColumnName = "id")
     private Model model;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private ImageData imageData;
 
     public ImageFile(String name, String type, ImageData imageData) {
