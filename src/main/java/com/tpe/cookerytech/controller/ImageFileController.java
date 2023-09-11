@@ -1,6 +1,7 @@
 package com.tpe.cookerytech.controller;
 
 import com.tpe.cookerytech.domain.ImageFile;
+import com.tpe.cookerytech.dto.response.CkResponse;
 import com.tpe.cookerytech.dto.response.ImageFileResponse;
 import com.tpe.cookerytech.dto.response.ImageSavedResponse;
 import com.tpe.cookerytech.dto.response.ResponseMessage;
@@ -45,6 +46,21 @@ public class ImageFileController {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(images);
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<CkResponse> deleteImageFile(@PathVariable String id) {
+        CkResponse response;
+        Boolean isRemoveImage=imageFileService.removeById(id);
+        if(isRemoveImage) {
+            response = new CkResponse(
+                    ResponseMessage.IMAGE_DELETED_RESPONSE_MESSAGE, true);
+        }else{
+            response = new CkResponse(
+                    ResponseMessage.IMAGE_NOT_FOUND_MESSAGE, false);
+        }
+        return ResponseEntity.ok(response);
     }
 
 }

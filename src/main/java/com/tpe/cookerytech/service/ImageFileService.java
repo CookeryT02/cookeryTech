@@ -50,7 +50,7 @@ public class ImageFileService {
         }
         Model model = modelRepository.findById(id).orElseThrow(()->
                 new ResourceNotFoundException(ErrorMessage.MODEL_NOT_FOUND_EXCEPTION));
-        imageFile.setModelId(model);
+        imageFile.setModel(model);
         imageFileRepository.save(imageFile);
 
         return imageFile.getId();
@@ -69,20 +69,55 @@ public class ImageFileService {
     public List<ImageFileResponse> getProductImages(Long modelId) {
 
         Model model = modelRepository.findById(modelId).orElseThrow(()->
-                new ResourceNotFoundException(String.format(ErrorMessage.MODEL_NOT_FOUND_EXCEPTION,modelId)));
+                new ResourceNotFoundException(String.format(ErrorMessage.MODEL_NOT_FOUND_EXCEPTION, modelId)));
 
-        List<ImageFile> imageFiles = imageFileRepository.findAllByModel(model);
+        List<ImageFileResponse> imageResponses = new ArrayList<>();
+        for (ImageFile imageFile : model.getImage()) {
 
+            ImageFileResponse imageFileResponse = convertToResponse(imageFile);
+            imageResponses.add(imageFileResponse);
+        }
 
-        List<ImageFileResponse> imageFileResponseList = imageFiles.stream().map(imFile->{
-            //URI olusturulmasini saglayacgiz
-            String imageUri = ServletUriComponentsBuilder.
-                    fromCurrentContextPath(). //localhost:8080 gelmis oluyor
-                            path("/files/download/").
-                    path(imFile.getId()).toUriString();
-            return new ImageFileResponse(imFile.getName(),imageUri,imFile.getType(),imFile.getLength());
-        }).collect(Collectors.toList());
-        return imageFileResponseList;
+        return imageResponses;
+
 
     }
+
+    public static ImageFileResponse convertToResponse(ImageFile imageFile) {
+
+        ImageFileResponse response = new ImageFileResponse();
+
+        String imageUri = ServletUriComponentsBuilder.
+                fromCurrentContextPath(). // localhost:8080
+                        path("/images/download/"). // localhost:8080/images/download
+                        path(imageFile.getId()).toUriString();
+
+        response.setName(imageFile.getName());
+        response.setUrl(imageUri);
+        response.setSize(imageFile.getLength());
+        response.setType(imageFile.getType());
+
+        return response;
+    }
+
+    public Boolean removeById(String id) {
+        ImageFile imageFile =  getImageById(id);
+
+        if(imageFileRepository.existsById(id)){
+            imageFileRepository.delete(imageFile);
+            return true;
+        }else {
+            return false;
+        }
+    }
+
+    public ImageFile getImageById(String id) {
+        ImageFile imageFile = imageFileRepository.findById(id).orElseThrow(()->
+                new ResourceNotFoundException(
+                        String.format(ErrorMessage.IMAGE_NOT_FOUND_MESSAGE,id)));
+        return imageFile ;
+    }
+
+
+
 }

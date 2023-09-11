@@ -12,8 +12,8 @@ import java.util.Optional;
 @Repository
 public interface ImageFileRepository extends JpaRepository<ImageFile, String> {
 
+//    List<ImageFile> findAllByModelId(Long id);
 
     List<ImageFile> findAllByModelId(Long model);
 
-    List<ImageFile> findAllByModel(Model model);
 }

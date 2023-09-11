@@ -31,9 +31,9 @@ public class ImageFile {
 
     @ManyToOne
     @JoinColumn(name="model_id",referencedColumnName = "id")
-    private Model modelId;
+    private Model model;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private ImageData imageData;
 
     public ImageFile(String name, String type, ImageData imageData) {
