@@ -31,8 +31,8 @@ public class ImageFile {
 
 
     @ManyToOne
-    @JoinColumn(name="model_id",referencedColumnName = "id")
-    private Model modelId;
+    @JoinColumn(name="model_id")
+    private Model model;
 
     @OneToOne(cascade = CascadeType.ALL)
     private ImageData imageData;

@@ -1,5 +1,6 @@
 package com.tpe.cookerytech.dto.response;
 
+import com.tpe.cookerytech.domain.Model;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
