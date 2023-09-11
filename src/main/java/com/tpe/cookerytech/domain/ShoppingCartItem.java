@@ -11,15 +11,16 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 
 @Entity
-@Table(name = "t_shoppingCrtItem")
+@Table(name = "t_shoppingCartItem")
 public class ShoppingCartItem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(nullable = false,unique = true)
-    private Integer cart_id;
+    @ManyToOne
+    @JoinColumn(name="shopping_cart_id", referencedColumnName = "id")
+    private ShoppingCart shoppingCart;
 
     @ManyToOne
     @JoinColumn(name = "product_id", referencedColumnName = "id")
@@ -31,12 +32,12 @@ public class ShoppingCartItem {
 
     private double amount;
 
+//    @DateTimeFormat(pattern = "")
     @Column(nullable = false)
-    @DateTimeFormat(pattern = "")
-    private LocalDateTime create_at;
+    private LocalDateTime createAt;
 
     @Column(nullable = false)
-    private LocalDateTime update_at;
+    private LocalDateTime updateAt;
 
 
 }
