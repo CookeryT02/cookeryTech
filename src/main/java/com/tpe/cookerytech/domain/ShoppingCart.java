@@ -18,12 +18,12 @@ public class ShoppingCart {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
+//    @DateTimeFormat(pattern = "")
     @Column(nullable = false)
-    @DateTimeFormat(pattern = "")
-    private LocalDateTime create_at;
+    private LocalDateTime createAt;
 
 }

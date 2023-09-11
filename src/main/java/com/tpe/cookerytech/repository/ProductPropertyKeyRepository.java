@@ -2,6 +2,7 @@ package com.tpe.cookerytech.repository;
 
 import com.tpe.cookerytech.domain.ProductPropertyKey;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -12,5 +13,6 @@ public interface ProductPropertyKeyRepository extends JpaRepository<ProductPrope
 
     List<ProductPropertyKey> findByProductId(Long product_id);
 
-    ProductPropertyKey findByName(String name);
+  //  @Query("CREATE SEQUENCE my_sequence START 1000 INCREMENT 10 MAXVALUE 9999;")
+
 }

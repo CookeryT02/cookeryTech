@@ -29,4 +29,8 @@ public class ErrorMessage {
     public static final String MODEL_ALREADY_EXIST_EXCEPTION = "Model name : %s field already exist";
     public static final String MODEL_FIELD_ALREADY_EXIST_EXCEPTION = "Model Field: %s already exist";
     public static final String CUSTOMER_NOT_FOUND_EXCEPTION = "The customer is not authorized";
+    public static final String IMAGE_NOT_FOUND_MESSAGE = "ImageFile with id %s not found";
+    public static final String NOT_CREATED_SKU_MESSAGE = "Model sku not unique";
+
+
 }
