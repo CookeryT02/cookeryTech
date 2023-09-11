@@ -46,10 +46,6 @@ public class Product {
     @Column(name = "is_active", nullable = false)
     private Boolean isActive = true;
 
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id")
-    private Set<ImageFile> image;
-
     @Column(name = "built_in", nullable = false)
     private Boolean builtIn = false;
 
