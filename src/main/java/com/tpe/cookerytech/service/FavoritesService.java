@@ -65,4 +65,13 @@ public class FavoritesService {
         return modelResponse;
     }
 
+    public void deleteAllFavoritesAuthUser() {
+        User user = userService.getCurrentUser();
+
+        List<Favorites> favoritesListAuthUser = favoritesRepository.findByUserId(user.getId());
+
+        for (Favorites favorites: favoritesListAuthUser){
+            favoritesRepository.delete(favorites);
+        }
+    }
 }

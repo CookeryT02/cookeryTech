@@ -6,10 +6,7 @@ import com.tpe.cookerytech.dto.response.ModelResponse;
 import com.tpe.cookerytech.service.FavoritesService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/favorites")
@@ -30,6 +27,12 @@ public class FavoritesController {
         ModelResponse modelResponse = favoritesService.updateAuthUserFavorites(favoritesRequest.getModelId());
 
         return ResponseEntity.ok(modelResponse);
+    }
+
+    @DeleteMapping("/auth")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER') or hasRole('CUSTOMER')")
+    public void deleteAllFavorites(){
+        favoritesService.deleteAllFavoritesAuthUser();
     }
 
 
