@@ -28,4 +28,9 @@ public class ErrorMessage {
 
     public static final String MODEL_ALREADY_EXIST_EXCEPTION = "Model name : %s field already exist";
     public static final String MODEL_FIELD_ALREADY_EXIST_EXCEPTION = "Model Field: %s already exist";
+    public static final String IMAGE_NOT_FOUND_MESSAGE = "ImageFile with id %s not found";
+    public static final String NOT_CREATED_SKU_MESSAGE = "Model sku not unique";
+
+
+    public static final String SHOPPING_CART_ITEMS_NOT_FOUND = "There is no item in shopping cart";
 }

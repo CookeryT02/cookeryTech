@@ -1,5 +1,8 @@
 package com.tpe.cookerytech.controller;
 
+import com.tpe.cookerytech.domain.ImageFile;
+import com.tpe.cookerytech.dto.response.CkResponse;
+import com.tpe.cookerytech.dto.response.ImageFileResponse;
 import com.tpe.cookerytech.dto.response.ImageSavedResponse;
 import com.tpe.cookerytech.dto.response.ResponseMessage;
 import com.tpe.cookerytech.service.ImageFileService;
@@ -31,6 +34,32 @@ public class ImageFileController {
         ImageSavedResponse response =
                 new ImageSavedResponse(imageId,ResponseMessage.IMAGE_SAVED_RESPONSE_MESSAGE,true);
 
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{modelId}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER') or hasRole('CUSTOMER')")
+    public ResponseEntity<List<ImageFileResponse>> getProductImages(@PathVariable Long modelId) {
+
+        List<ImageFileResponse> images = imageFileService.getProductImages(modelId);
+        if (images.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(images);
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<CkResponse> deleteImageFile(@PathVariable String id) {
+        CkResponse response;
+        Boolean isRemoveImage=imageFileService.removeById(id);
+        if(isRemoveImage) {
+            response = new CkResponse(
+                    ResponseMessage.IMAGE_DELETED_RESPONSE_MESSAGE, true);
+        }else{
+            response = new CkResponse(
+                    ResponseMessage.IMAGE_NOT_FOUND_MESSAGE, false);
+        }
         return ResponseEntity.ok(response);
     }
 
