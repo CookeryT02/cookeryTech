@@ -31,5 +31,5 @@ public class ErrorMessage {
     public static final String IMAGE_NOT_FOUND_MESSAGE = "ImageFile with id %s not found";
     public static final String NOT_CREATED_SKU_MESSAGE = "Model sku not unique";
 
-
+    public static final String USER_FAVORITES_NOT_FOUND_EXCEPTION = "User dont have favorites";
 }

@@ -9,11 +9,13 @@ import com.tpe.cookerytech.exception.message.ErrorMessage;
 import com.tpe.cookerytech.mapper.ModelMapper;
 import com.tpe.cookerytech.repository.FavoritesRepository;
 import com.tpe.cookerytech.repository.ModelRepository;
+import com.tpe.cookerytech.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class FavoritesService {
@@ -22,13 +24,16 @@ public class FavoritesService {
 
     private final UserService userService;
 
+    private final UserRepository userRepository;
+
     private final ModelRepository modelRepository;
 
     private final ModelMapper modelMapper;
 
-    public FavoritesService(FavoritesRepository favoritesRepository, UserService userService, ModelRepository modelRepository, ModelMapper modelMapper) {
+    public FavoritesService(FavoritesRepository favoritesRepository, UserService userService, UserRepository userRepository, ModelRepository modelRepository, ModelMapper modelMapper) {
         this.favoritesRepository = favoritesRepository;
         this.userService = userService;
+        this.userRepository = userRepository;
         this.modelRepository = modelRepository;
         this.modelMapper = modelMapper;
     }
@@ -65,4 +70,27 @@ public class FavoritesService {
         return modelResponse;
     }
 
+    public List<ModelResponse> getAllAuthUserFavorites() {
+
+        User user = userService.getCurrentUser();
+
+        if(favoritesRepository.findByUserId(user.getId()) == null){
+
+            throw new ResourceNotFoundException(ErrorMessage.USER_FAVORITES_NOT_FOUND_EXCEPTION);
+
+        }
+
+        List<Favorites> favoritesList = favoritesRepository.findByUserId(user.getId());
+
+        List<Model> modelList = favoritesList.stream()
+                .map(t->t.getModel())
+                .collect(Collectors.toList());
+
+        List<ModelResponse> modelResponseList = modelMapper.modelListToModelResponseList(modelList);
+
+        return modelResponseList;
+
+
+
+    }
 }
