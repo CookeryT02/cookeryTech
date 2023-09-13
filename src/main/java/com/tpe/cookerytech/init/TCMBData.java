@@ -43,7 +43,7 @@ public class TCMBData {
                     return Double.parseDouble(exchangeRateString);
                 }
 
-                if (code.equals("EUR")) {
+                if (code.equals("EURO")) {
                     NodeList nodeList = doc.getElementsByTagName("CrossRateOther");
                     Element element = (Element) nodeList.item(3);
                     String exchangeRateString = element.getTextContent();

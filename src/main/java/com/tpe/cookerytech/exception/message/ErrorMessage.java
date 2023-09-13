@@ -34,4 +34,5 @@ public class ErrorMessage {
     public static final String NOT_CREATED_SKU_MESSAGE = "Model sku not unique";
 
 
+    public static final String SHOPPING_CART_ITEMS_NOT_FOUND = "There is no item in shopping cart";
 }
