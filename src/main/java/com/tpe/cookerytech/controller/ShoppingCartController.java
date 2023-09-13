@@ -26,7 +26,7 @@ public class ShoppingCartController {
 
     @PostMapping("/auth")
     @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER') or hasRole('CUSTOMER')")
-    public ResponseEntity<ShoppingCartItemResponse> updateAuthUserFavorites(@Valid @RequestBody CartRequest cartRequest) {
+    public ResponseEntity<ShoppingCartItemResponse> updateAuthUserCart(@Valid @RequestBody CartRequest cartRequest) {
 
         ShoppingCartItemResponse shoppingCartItemResponse = shoppingCartService.createUpdateCartItem(cartRequest);
 
