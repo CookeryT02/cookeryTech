@@ -17,7 +17,7 @@ public class ShoppingCartItemResponse {
 
     private Long id;
 
-    private ShoppingCart shoppingCart;
+    private Long shoppingCartId;
 
     private ProductResponse productResponse;
 
