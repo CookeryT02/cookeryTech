@@ -3,10 +3,14 @@ package com.tpe.cookerytech.domain;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.jpa.domain.Specification;
 
 import javax.persistence.*;
+import javax.persistence.criteria.Predicate;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -62,5 +66,6 @@ public class Product {
 
     @Column(name = "update_at")
     private LocalDateTime updatedAt;
+
 
 }

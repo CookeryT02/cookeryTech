@@ -418,12 +418,7 @@ public class UserService {
 
     }
 
-    public User getAllUsers() {
-        String email = SecurityUtils.getCurrentUserLogin().orElseThrow(()->
-                new ResourceNotFoundException(ErrorMessage.PRINCIPAL_FOUND_MESSAGE));
-        User user = getUserByEmail(email);
-        return user;
-    }
+
 
 
 }

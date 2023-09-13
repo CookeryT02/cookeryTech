@@ -5,10 +5,7 @@ import com.tpe.cookerytech.domain.enums.RoleType;
 import com.tpe.cookerytech.dto.request.ModelRequest;
 import com.tpe.cookerytech.dto.request.ProductPropertyKeyRequest;
 import com.tpe.cookerytech.dto.request.ProductRequest;
-import com.tpe.cookerytech.dto.response.ModelResponse;
-import com.tpe.cookerytech.dto.response.ProductObjectResponse;
-import com.tpe.cookerytech.dto.response.ProductPropertyKeyResponse;
-import com.tpe.cookerytech.dto.response.ProductResponse;
+import com.tpe.cookerytech.dto.response.*;
 import com.tpe.cookerytech.exception.BadRequestException;
 import com.tpe.cookerytech.exception.ConflictException;
 import com.tpe.cookerytech.exception.ResourceNotFoundException;
@@ -18,15 +15,17 @@ import com.tpe.cookerytech.repository.CurrencyRepository;
 import com.tpe.cookerytech.repository.ModelRepository;
 import com.tpe.cookerytech.repository.ProductPropertyKeyRepository;
 import com.tpe.cookerytech.repository.ProductRepository;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.context.annotation.Bean;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.Column;
 import javax.persistence.EntityManager;
+import javax.persistence.criteria.Predicate;
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -383,221 +382,71 @@ public class ProductService {
         return modelMapper.modelListToModelResponseList(modelList);
     }
 
+
+
+
     public Page<ProductResponse> allProducts(String q ,Pageable pageable, Long brandId, Long categoryId) {
-        //        User user = userService.getUserForRoleAuthUser();
-        User user = userService.getAllUsers();
-        // user null ise admin mi degil mi bakiyor -- admin degil ise kullanici null
-        Boolean isAdmin = false;
-        if (user != null) {
-            Set<Role> roles = user.getRoles();
-            isAdmin = roles.stream().anyMatch(r->r.getType() == RoleType.ROLE_ADMIN);
-        }
 
-        Boolean isActive = false;
+//        User user = userService.getUserForRoleAuthUser();
+//        User user = userService.getCurrentUser();
 
-        Boolean isAdminOrProductManagerOrSalesSpecialistOrSalesManager = true;
-        Boolean isCustomer = true;
 
-        if (isActive =! false){
-            Set<Role> roles = user.getRoles();
-            isAdminOrProductManagerOrSalesSpecialistOrSalesManager = roles.stream()
-                    .anyMatch(r -> r.getType() == RoleType.ROLE_ADMIN || r.getType() == RoleType.ROLE_PRODUCT_MANAGER || r.getType() == RoleType.ROLE_SALES_SPECIALIST ||
-                            r.getType() == RoleType.ROLE_SALES_MANAGER );
-        } else if (isActive =! true) {
-            Set<Role> roles = user.getRoles();
-            isCustomer = roles.stream()
-                    .anyMatch(r -> r.getType() == RoleType.ROLE_CUSTOMER);
-        } else {
-            throw new ResourceNotFoundException(String.format(ErrorMessage.CUSTOMER_NOT_FOUND_EXCEPTION, pageable));
-        }
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-//        else {
-//            throw new ResourceNotFoundException(String.format(ErrorMessage.CUSTOMER_NOT_FOUND_EXCEPTION, pageable));
-//        }
+        if (authentication != null && authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_CUSTOMER"))) {
 
-        Page<Product> productPage = null;
+            List<Product> productList = (productRepository.findByIsActive(false));
+            List<Product> filteredProductsCustomer =productList.stream()
+                    .filter(p -> {
+                        Brand brand = p.getBrand();
+                        Category category = p.getCategory();
+                        System.out.println(p.getCategory().getIsActive());
+                        return p.getIsFeatured() && brand != null && category != null && brand.getIsActive() && category.getIsActive();
+                    })
+                    .collect(Collectors.toList());
 
-        if ( isAdminOrProductManagerOrSalesSpecialistOrSalesManager ) {
-            productPage = productRepository.findProductsByCriteria(pageable,q,brandId,categoryId);
-            Page<ProductResponse> productResponsePage = productPage.map(product -> {
+            // list convert to page
+            Page<Product> p = new PageImpl<Product>(productList);
+            Page<Product> f = new PageImpl<Product>(filteredProductsCustomer);
 
-                ProductResponse productResponse = new ProductResponse();
-                productResponse.setId(product.getId());
-                productResponse.setTitle(product.getTitle());
-                productResponse.setShortDescription(product.getShortDescription());
-                productResponse.setLongDescription(product.getLongDescription());
-                productResponse.setIsFeatured(product.getIsFeatured());
-                productResponse.setIsNew(product.getIsNew());
-                productResponse.setIsActive(product.getIsActive());
-                productResponse.setBrandId(product.getBrand().getId());
-                productResponse.setCategoryId(product.getCategory().getId());
-                productResponse.setSequence(product.getSequence());
-                productResponse.setCreatedAt(product.getCreatedAt());
-                productResponse.setUpdatedAt(product.getUpdatedAt());
 
-                return productResponse;
 
-            });
-            return productResponsePage;
+            Page<Product> productPage = productRepository.getAllProductsIsActiveFalse(q, pageable, brandId, categoryId);
 
-        } else if ( isCustomer ) {
-            productPage = productRepository.findProductsByCriteriaForCustomer(pageable,q,brandId,categoryId);
-            Page<ProductResponse> productResponsePage = productPage.map(product -> {
 
-                ProductResponse productResponse = new ProductResponse();
-                productResponse.setId(product.getId());
-                productResponse.setTitle(product.getTitle());
-                productResponse.setShortDescription(product.getShortDescription());
-                productResponse.setLongDescription(product.getLongDescription());
-                productResponse.setIsActive(product.getIsActive());
-                productResponse.setBrandId(product.getBrand().getId());
-                productResponse.setCategoryId(product.getCategory().getId());
+            return productPage.map(productMapper::productToProductResponse);
 
-                return productResponse;
-
-            });
-            return productResponsePage;
 
         } else {
-            throw new ResourceNotFoundException(String.format(ErrorMessage.PRODUCT_NOT_FOUND_EXCEPTION, pageable));
+
+            List<Product> productList = (productRepository.findByIsActive(true));
+            List<Product> filteredProducts =productList.stream()
+                    .filter(p -> {
+                        Brand brand = p.getBrand();
+                        Category category = p.getCategory();
+                        System.out.println(p.getCategory().getIsActive());
+                        return p.getIsFeatured() && brand != null && category != null && brand.getIsActive() && category.getIsActive();
+                    })
+                    .collect(Collectors.toList());
+
+            Page<Product> p = new PageImpl<Product>(productList);
+            Page<Product> f = new PageImpl<Product>(filteredProducts);
+
+
+            Page<Product> productPage = productRepository.getAllProductsIsActiveTrue(q, pageable, brandId, categoryId);
+
+            return productPage.map(productMapper::productToProductResponse);
+
+
+
         }
 
 
 
 
-
-
-//        if (isActive =! true) {
-//            Set<Role> roles = user.getRoles();
-//            isCustomer = roles.stream()
-//                    .anyMatch(r -> r.getType() == RoleType.ROLE_CUSTOMER);
-//        } else {
-//            throw new ResourceNotFoundException(String.format(ErrorMessage.CUSTOMER_NOT_FOUND_EXCEPTION, pageable));
-//        }
-
-
-
-//        Page<Product> productPage = null;
-//
-//        productPage = productRepository.findProductsByCriteria(pageable,q);
-//
-//        Page<ProductResponse> productResponsePage = productPage.map(product -> {
-//
-//            ProductResponse productResponse = new ProductResponse();
-//            productResponse.setId(product.getId());
-//            productResponse.setTitle(product.getTitle());
-//            productResponse.setShortDescription(product.getShortDescription());
-//            productResponse.setLongDescription(product.getLongDescription());
-//            productResponse.setIsFeatured(product.getIsFeatured());
-//            productResponse.setIsNew(product.getIsNew());
-//            productResponse.setIsActive(product.getIsActive());
-////            productResponse.setBrandId(product.getBrand().getId());
-////            productResponse.setCategoryId(product.getCategory().getId());
-//            productResponse.setSequence(product.getSequence());
-//            productResponse.setCreatedAt(product.getCreatedAt());
-//            productResponse.setUpdatedAt(product.getUpdatedAt());
-//
-//            return productResponse;
-//
-//        });
-//        return productResponsePage;
-
-
-
-//        if (!isAdmin && productResponse.getIsActive()) {
-//            throw new ResourceNotFoundException(String.format(ErrorMessage.CATEGORY_NOT_FOUND_EXCEPTION, categoryId));
-//        }
-//
-//        return categoryMapper.categoryToCategoryResponse(category);
 
     }
 
-
-    public List<ModelResponse> listProductsByIdModels(Long id) {
-
-        User user = userService.getAllUsers();
-        // user null ise admin mi degil mi bakiyor -- admin degil ise kullanici null
-        Boolean isAdmin = false;
-        if (user != null) {
-            Set<Role> roles = user.getRoles();
-            isAdmin = roles.stream().anyMatch(r->r.getType() == RoleType.ROLE_ADMIN);
-        }
-
-
-        Product product = productRepository.findById(id).orElseThrow(() ->
-                new ResourceNotFoundException(String.format(ErrorMessage.PRODUCT_NOT_FOUND_EXCEPTION, id)));
-
-
-
-//        Boolean isActive = false;
-//
-//        Boolean isAdminOrProductManagerOrSalesSpecialistOrSalesManager = true;
-//        Boolean isCustomer = true;
-//
-//        if (isActive =! false){
-//            Set<Role> roles = user.getRoles();
-//            isAdminOrProductManagerOrSalesSpecialistOrSalesManager = roles.stream()
-//                    .anyMatch(r -> r.getType() == RoleType.ROLE_ADMIN || r.getType() == RoleType.ROLE_PRODUCT_MANAGER || r.getType() == RoleType.ROLE_SALES_SPECIALIST ||
-//                            r.getType() == RoleType.ROLE_SALES_MANAGER );
-//        } else if (isActive =! true) {
-//            Set<Role> roles = user.getRoles();
-//            isCustomer = roles.stream()
-//                    .anyMatch(r -> r.getType() == RoleType.ROLE_CUSTOMER);
-//        } else {
-//            throw new ResourceNotFoundException(String.format(ErrorMessage.CUSTOMER_NOT_FOUND_EXCEPTION, productID));
-//        }
-//
-//
-//
-//        List<ModelResponse> modelResponseList = new ArrayList<ModelResponse>();
-//
-//        if ( isAdminOrProductManagerOrSalesSpecialistOrSalesManager ) {
-//            productPage = productRepository.findProductsByCriteria(pageable,q,brandId,categoryId);
-//            Page<ProductResponse> productResponsePage = productPage.map(product -> {
-//
-//                ProductResponse productResponse = new ProductResponse();
-//                productResponse.setId(product.getId());
-//                productResponse.setTitle(product.getTitle());
-//                productResponse.setShortDescription(product.getShortDescription());
-//                productResponse.setLongDescription(product.getLongDescription());
-//                productResponse.setIsFeatured(product.getIsFeatured());
-//                productResponse.setIsNew(product.getIsNew());
-//                productResponse.setIsActive(product.getIsActive());
-//                productResponse.setBrandId(product.getBrand().getId());
-//                productResponse.setCategoryId(product.getCategory().getId());
-//                productResponse.setSequence(product.getSequence());
-//                productResponse.setCreatedAt(product.getCreatedAt());
-//                productResponse.setUpdatedAt(product.getUpdatedAt());
-//
-//                return productResponse;
-//
-//            });
-//            return productResponsePage;
-//
-//        } else if ( isCustomer ) {
-//            productPage = productRepository.findProductsByCriteriaCustomer(pageable,q,brandId,categoryId);
-//            Page<ProductResponse> productResponsePage = productPage.map(product -> {
-//
-//                ProductResponse productResponse = new ProductResponse();
-//                productResponse.setId(product.getId());
-//                productResponse.setTitle(product.getTitle());
-//                productResponse.setShortDescription(product.getShortDescription());
-//                productResponse.setLongDescription(product.getLongDescription());
-//                productResponse.setIsActive(product.getIsActive());
-//                productResponse.setBrandId(product.getBrand().getId());
-//                productResponse.setCategoryId(product.getCategory().getId());
-//
-//                return productResponse;
-//
-//            });
-//            return productResponsePage;
-//
-//        } else {
-//            throw new ResourceNotFoundException(String.format(ErrorMessage.PRODUCT_NOT_FOUND_EXCEPTION, pageable));
-//        }
-//
-        return null;
-    }
 
 
 }
