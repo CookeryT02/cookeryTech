@@ -4,6 +4,7 @@ import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -24,11 +25,11 @@ public class Offer {
     @Column(nullable = false)
     private byte status=0;
 
-    private double sub_total;
+    private double subTotal;
 
     private double discount;
 
-    private double grand_total;
+    private double grandTotal;
 
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
@@ -38,13 +39,13 @@ public class Offer {
     @JoinColumn(name = "currency_id", referencedColumnName = "id")
     private Currency currency;
 
-    private LocalDateTime delivery_at;
+    private LocalDate deliveryAt;
 
     @Column(nullable = false)
     @DateTimeFormat(pattern = "")
-    private LocalDateTime create_at;
+    private LocalDateTime createAt;
 
-    @Column(nullable = false)
-    private LocalDateTime update_at;
+    @Column
+    private LocalDateTime updateAt;
 
 }
