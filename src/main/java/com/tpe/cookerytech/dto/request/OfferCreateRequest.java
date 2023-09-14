@@ -1,17 +1,18 @@
 package com.tpe.cookerytech.dto.request;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
+import java.time.LocalDate;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class FavoritesRequest {
+public class OfferCreateRequest {
 
-    @NotNull
-    private Long id;
+
+    private LocalDate deliveryDate;
+
 }

@@ -20,6 +20,7 @@ public class ImageFile {
     @Id
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid2")
+
     private String id;
 
     @Column(nullable = false)
@@ -28,6 +29,7 @@ public class ImageFile {
     private String type;
 
     private long length;
+
 
     @ManyToOne
     @JoinColumn(name="model_id",referencedColumnName = "id")

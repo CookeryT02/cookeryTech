@@ -177,6 +177,7 @@ public class ProductService {
     }
 
     public List<ProductObjectResponse> getAllProducts() {
+
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication != null && authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {

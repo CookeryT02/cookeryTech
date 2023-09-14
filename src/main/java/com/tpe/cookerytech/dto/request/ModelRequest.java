@@ -22,7 +22,7 @@ public class ModelRequest {
     @Size(min = 5, max = 150, message = "Title must be between 5 and 150 characters")
     private String title;
 
-    @NotNull
+    @Size(min = 10, max = 100, message = "sku must be between 10 and 100 characters")
     private String sku;
 
     @NotNull

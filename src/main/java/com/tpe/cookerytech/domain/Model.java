@@ -29,7 +29,7 @@ public class Model {
     private String title;
 
     @Column(nullable = false)
-    @NotBlank(message = "SKU not be blank")
+    @Size(min = 10, max = 100, message = "sku must be between 10 and 100 characters")
     private String sku;
 
     @Column(nullable = false)
@@ -41,8 +41,7 @@ public class Model {
     @Column(nullable = false)
     private int seq=0;
 
-    @OneToMany(orphanRemoval = true)
-    @JoinColumn(name="model_id")
+    @OneToMany(mappedBy="model", cascade={CascadeType.ALL})
     private Set<ImageFile> image;
 
     @Column(nullable = false)
@@ -70,6 +69,5 @@ public class Model {
 
     @Column(nullable = true)
     private LocalDateTime update_at;
-
 
 }
