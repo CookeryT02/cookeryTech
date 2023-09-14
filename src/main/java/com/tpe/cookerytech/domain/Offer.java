@@ -42,7 +42,7 @@ public class Offer {
     private LocalDate deliveryAt;
 
     @Column(nullable = false)
-    @DateTimeFormat(pattern = "")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createAt;
 
     @Column

@@ -4,7 +4,6 @@ import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
-import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 
 @Data
@@ -20,12 +19,12 @@ public class OfferItem {
     private Long id;
 
     @Column(nullable = false)
-    @Size(min = 10,max = 100)
     private String sku;
 
     private int quantity;
 
     private double selling_price;
+
     private double tax;
 
     private double sub_total;
@@ -34,12 +33,12 @@ public class OfferItem {
     @JoinColumn(name = "product_id", referencedColumnName = "id")
     private Product product;
 
-    @ManyToOne (cascade = CascadeType.PERSIST)
+    @ManyToOne
     @JoinColumn(name = "offer_id", referencedColumnName = "id")
     private Offer offer;
 
     @Column(nullable = false)
-    @DateTimeFormat(pattern = "")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime createAt;
 
 

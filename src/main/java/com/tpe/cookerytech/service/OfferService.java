@@ -40,6 +40,7 @@ public class OfferService {
         this.offerItemRepository = offerItemRepository;
     }
 
+
     public OfferResponse createOfferAuthUser(OfferCreateRequest offerCreateRequest) {
 
         String randomCode = RandomString.make(8);
@@ -62,34 +63,39 @@ public class OfferService {
         offerRepository.save(offer);
 
 
-        List<OfferItem> offerItemList = new ArrayList<>();
-
         ShoppingCart shoppingCart = shoppingCartRepository.findByUserId(user.getId()).orElseThrow(() ->
                 new ResourceNotFoundException(ErrorMessage.SHOPPING_CART_NOT_FOUND));
         List<ShoppingCartItem> shoppingCartItemList = shoppingCartItemRepository.findByShoppingCartId(shoppingCart.getId());
 
         double offersubTotal = 0;
 
+        List<OfferItem> offerItemList = new ArrayList<>();
+
         for (ShoppingCartItem shoppingCartItem : shoppingCartItemList) {
             OfferItem offerItem = new OfferItem();
             offerItem.setSku(shoppingCartItem.getModel().getSku());
-            offerItem.setQuantity(shoppingCartItem.getModel().getIn_box_quantity());
-            offerItem.setSelling_price(shoppingCartItem.getModel().getBuying_price() + (shoppingCartItem.getModel().getBuying_price() *
+           offerItem.setQuantity(shoppingCartItem.getModel().getIn_box_quantity());
+           offerItem.setSelling_price(shoppingCartItem.getModel().getBuying_price() + (shoppingCartItem.getModel().getBuying_price() *
                     shoppingCartItem.getModel().getProduct().getBrand().getProfitRate()));
             offerItem.setTax(shoppingCartItem.getModel().getTax_rate());
             offerItem.setProduct(shoppingCartItem.getProduct());
             offerItem.setCreateAt(LocalDateTime.now());
             offerItem.setOffer(offer);
             offerItem.setSub_total(offerItem.getSelling_price()*offerItem.getQuantity()*(1+offerItem.getTax()/100));
-            offerItemRepository.save(offerItem);
-            offersubTotal += offerItem.getSub_total();
             offerItemList.add(offerItem);
+            offersubTotal += offerItem.getSub_total();
+
         }
 
 
         offer.setSubTotal(offersubTotal);
         offer.setGrandTotal(offersubTotal * (1 - offer.getDiscount() / 100));
 
+        offerRepository.save(offer);
+
+        for (OfferItem offerItem : offerItemList){
+            offerItemRepository.save(offerItem);
+        }
 
         OfferResponse offerResponse = offerMapper.offerToOfferResponse(offer);
         offerResponse.setUserId(offer.getUser().getId());
