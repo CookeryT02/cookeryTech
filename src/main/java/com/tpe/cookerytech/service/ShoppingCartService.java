@@ -29,13 +29,15 @@ public class ShoppingCartService {
 
     private final ShoppingCartItemRepository shoppingCartItemRepository;
 
+    private final ModelRepository modelRepository;
+
+    private final ProductRepository productRepository;
+
     private final ShoppingCartItemMapper shoppingCartItemMapper;
 
     private final ProductMapper productMapper;
 
     private final ModelMapper modelMapper;
-    private final ModelRepository modelRepository;
-    private final ProductRepository productRepository;
 
     public ShoppingCartService(ShoppingCartRepository shoppingCartRepository, UserService userService, ShoppingCartItemRepository shoppingCartItemRepository, ShoppingCartItemMapper shoppingCartItemMapper, ProductMapper productMapper, ModelMapper modelMapper, ModelRepository modelRepository, ProductRepository productRepository) {
         this.shoppingCartRepository = shoppingCartRepository;
@@ -180,4 +182,8 @@ public class ShoppingCartService {
         }
         return null;
     }
+
+
+
+
 }
