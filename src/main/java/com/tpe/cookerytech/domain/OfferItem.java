@@ -28,21 +28,21 @@ public class OfferItem {
     private double selling_price;
     private double tax;
 
-    private double sub_total=selling_price*quantity*(1+tax/100);
+    private double sub_total;
 
     @ManyToOne
     @JoinColumn(name = "product_id", referencedColumnName = "id")
     private Product product;
 
-    @ManyToOne
+    @ManyToOne (cascade = CascadeType.PERSIST)
     @JoinColumn(name = "offer_id", referencedColumnName = "id")
     private Offer offer;
 
     @Column(nullable = false)
     @DateTimeFormat(pattern = "")
-    private LocalDateTime create_at;
+    private LocalDateTime createAt;
 
-    @Column(nullable = false)
-    private LocalDateTime update_at;
+
+    private LocalDateTime updateAt;
 
 }
