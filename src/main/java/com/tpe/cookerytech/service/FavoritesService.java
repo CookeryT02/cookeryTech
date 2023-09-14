@@ -1,15 +1,12 @@
 package com.tpe.cookerytech.service;
 
-import com.tpe.cookerytech.domain.Favorites;
-import com.tpe.cookerytech.domain.Model;
-import com.tpe.cookerytech.domain.User;
+import com.tpe.cookerytech.domain.*;
+import com.tpe.cookerytech.dto.response.CkResponse;
 import com.tpe.cookerytech.dto.response.ModelResponse;
 import com.tpe.cookerytech.exception.ResourceNotFoundException;
 import com.tpe.cookerytech.exception.message.ErrorMessage;
 import com.tpe.cookerytech.mapper.ModelMapper;
-import com.tpe.cookerytech.repository.FavoritesRepository;
-import com.tpe.cookerytech.repository.ModelRepository;
-import com.tpe.cookerytech.repository.UserRepository;
+import com.tpe.cookerytech.repository.*;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -26,14 +23,20 @@ public class FavoritesService {
 
     private final UserRepository userRepository;
 
+    private final ShoppingCartRepository shoppingCartRepository;
+
+    private final ShoppingCartItemRepository shoppingCartItemRepository;
+
     private final ModelRepository modelRepository;
 
     private final ModelMapper modelMapper;
 
-    public FavoritesService(FavoritesRepository favoritesRepository, UserService userService, UserRepository userRepository, ModelRepository modelRepository, ModelMapper modelMapper) {
+    public FavoritesService(FavoritesRepository favoritesRepository, UserService userService, UserRepository userRepository, ShoppingCartRepository shoppingCartRepository, ShoppingCartItemRepository shoppingCartItemRepository, ModelRepository modelRepository, ModelMapper modelMapper) {
         this.favoritesRepository = favoritesRepository;
         this.userService = userService;
         this.userRepository = userRepository;
+        this.shoppingCartRepository = shoppingCartRepository;
+        this.shoppingCartItemRepository = shoppingCartItemRepository;
         this.modelRepository = modelRepository;
         this.modelMapper = modelMapper;
     }
@@ -100,6 +103,71 @@ public class FavoritesService {
         return modelResponseList;
 
 
+
+    }
+
+    public CkResponse moveAllFavoritesToShoppingCart() {
+
+        User user = userService.getCurrentUser();
+
+        List<Favorites> favoritesListAuthUser = favoritesRepository.findByUserId(user.getId());
+
+
+        ShoppingCart shoppingCart = shoppingCartRepository.findByUserId(user.getId())
+                .orElseGet(() -> {
+                    ShoppingCart newCart = new ShoppingCart();
+                    newCart.setUser(user);
+                    newCart.setCreateAt(LocalDateTime.now());
+                    return shoppingCartRepository.save(newCart);
+                });
+
+
+        List<Long> modelIdList = new ArrayList<>();
+
+        for (Favorites favorites: favoritesListAuthUser){
+
+            modelIdList.add(favorites.getModel().getId());
+        }
+
+        List<ShoppingCartItem> shoppingCartItemList = shoppingCartItemRepository.findByShoppingCartId(shoppingCart.getId());
+
+        for (Favorites favoriteItem : favoritesListAuthUser) {
+
+            boolean isItemInCart = false;
+
+            for (ShoppingCartItem cartItem : shoppingCartItemList) {
+
+                if (cartItem.getModel().getId() == favoriteItem.getModel().getId()) {
+
+                    isItemInCart = true;
+
+                    cartItem.setShoppingCart(shoppingCart);
+                    cartItem.setModel(favoriteItem.getModel());
+                    cartItem.setProduct(favoriteItem.getModel().getProduct());
+                    cartItem.setAmount(cartItem.getAmount()+1);
+                    cartItem.setCreateAt(LocalDateTime.now());
+
+                    shoppingCartItemRepository.save(cartItem);
+
+                    break;
+                }
+            }
+
+            if (!isItemInCart) {
+
+                ShoppingCartItem cartItem = new ShoppingCartItem();
+                cartItem.setShoppingCart(shoppingCart);
+                cartItem.setModel(favoriteItem.getModel());
+                cartItem.setProduct(favoriteItem.getModel().getProduct());
+                cartItem.setAmount(1);
+                cartItem.setCreateAt(LocalDateTime.now());
+
+                shoppingCartItemRepository.save(cartItem);
+
+            }
+        }
+
+        return new CkResponse("Favorites move to shopping Cart succesfully",true);
 
     }
 }
