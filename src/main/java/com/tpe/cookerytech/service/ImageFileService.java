@@ -72,8 +72,8 @@ public class ImageFileService {
                 new ResourceNotFoundException(String.format(ErrorMessage.MODEL_NOT_FOUND_EXCEPTION, modelId)));
 
         List<ImageFileResponse> imageResponses = new ArrayList<>();
-        for (ImageFile imageFile : model.getImage()) {
 
+        for (ImageFile imageFile : model.getImage()) {
             ImageFileResponse imageFileResponse = convertToResponse(imageFile);
             imageResponses.add(imageFileResponse);
         }

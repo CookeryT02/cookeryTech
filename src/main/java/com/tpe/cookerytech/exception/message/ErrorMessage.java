@@ -1,6 +1,8 @@
 package com.tpe.cookerytech.exception.message;
 
 public class ErrorMessage {
+    public final static String IMAGE_NOT_FOUND_MESSAGE = "ImageFile with id %s not found";
+
     public final static String CATEGORY_ALREADY_EXIST_EXCEPTION = "This category %s is already exist";
     public final static String PASSWORD_NOT_MATCHED_MESSAGE = "Your passwords are not matched";
     public final static String NOT_PERMITTED_METHOD_MESSAGE = "You don't have any permission to change this data";
@@ -10,6 +12,7 @@ public class ErrorMessage {
     public static final String EMAIL_ALREADY_EXIST_MESSAGE = "Email: %s already exist";
     public static final String ROLE_NOT_FOUND_EXCEPTION = "Role : %s not found";
     public static final String USER_PASSWORD_CONTROL = "Password field should be at least 8 characters long,include at least one letter,one number and one special character";
+
     public static final String CODE_NOT_VALID = "Code is not valid";
     public static final String RESOURCE_NOT_FOUND_EXCEPTION = "Resource with id %s not found";
     public static final String WRONG_PASSWORD_EXCEPTION = "Wrong Password";
@@ -28,9 +31,9 @@ public class ErrorMessage {
 
     public static final String MODEL_ALREADY_EXIST_EXCEPTION = "Model name : %s field already exist";
     public static final String MODEL_FIELD_ALREADY_EXIST_EXCEPTION = "Model Field: %s already exist";
-    public static final String IMAGE_NOT_FOUND_MESSAGE = "ImageFile with id %s not found";
     public static final String NOT_CREATED_SKU_MESSAGE = "Model sku not unique";
 
+    public static final String USER_FAVORITES_NOT_FOUND_EXCEPTION = "User dont have favorites";
 
     public static final String SHOPPING_CART_ITEMS_NOT_FOUND = "There is no item in shopping cart";
 }
