@@ -34,4 +34,5 @@ public class ErrorMessage {
 
 
     public static final String SHOPPING_CART_ITEMS_NOT_FOUND = "There is no item in shopping cart";
+    public static final String PRODUCT_NOT_FOUND_BY_MODEL_ID_EXCEPTION = "Product with ModelId: %s not found" ;
 }

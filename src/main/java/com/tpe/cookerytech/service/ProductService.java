@@ -15,6 +15,7 @@ import com.tpe.cookerytech.repository.CurrencyRepository;
 import com.tpe.cookerytech.repository.ModelRepository;
 import com.tpe.cookerytech.repository.ProductPropertyKeyRepository;
 import com.tpe.cookerytech.repository.ProductRepository;
+import com.tpe.cookerytech.security.SecurityUtils;
 import org.springframework.data.domain.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.domain.Specification;
@@ -448,5 +449,76 @@ public class ProductService {
     }
 
 
+    public List<ModelResponse> getProductsByIdModels(Long id) {
 
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication != null && authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_CUSTOMER"))) {
+
+            List<Product> productList = (productRepository.findByIsActive(false));
+            List<Product> filteredProductsCustomer =productList.stream()
+                    .filter(p -> {
+                        Brand brand = p.getBrand();
+                        Category category = p.getCategory();
+                        System.out.println(p.getCategory().getIsActive());
+                        return p.getIsFeatured() && brand != null && category != null && brand.getIsActive() && category.getIsActive();
+                    })
+                    .collect(Collectors.toList());
+
+            List<Model> modelList = (modelRepository.findByIsActive(false));
+            List<Model> filteredModelsCustomer = modelList.stream()
+                    .filter(m -> {
+                        Product product = m.getProduct();
+                        return product != null && product.getIsActive();
+                    }).collect(Collectors.toList());
+
+            productRepository.findById(id).orElseThrow(() ->
+                    new ResourceNotFoundException(String.format(ErrorMessage.PRODUCT_NOT_FOUND_EXCEPTION,id)));
+
+            List<Model> modelLists = modelRepository.findByProductId(id).orElseThrow(()->
+                    new ResourceNotFoundException(String.format(ErrorMessage.MODEL_NOT_FOUND_BY_PRODUCT_ID_EXCEPTION,id)));
+
+            return modelMapper.modelListToModelResponseList(modelLists);
+
+
+
+        } else {
+
+            List<Product> productList = (productRepository.findByIsActive(true));
+            List<Product> filteredProducts =productList.stream()
+                    .filter(p -> {
+                        Brand brand = p.getBrand();
+                        Category category = p.getCategory();
+                        System.out.println(p.getCategory().getIsActive());
+                        return p.getIsFeatured() && brand != null && category != null && brand.getIsActive() && category.getIsActive();
+                    })
+                    .collect(Collectors.toList());
+
+            List<Model> modelList = (modelRepository.findByIsActive(false));
+            List<Model> filteredModelsCustomer = modelList.stream()
+                    .filter(m -> {
+                        Product product = m.getProduct();
+                        return product != null && product.getIsActive();
+                    }).collect(Collectors.toList());
+
+            productRepository.findById(id).orElseThrow(() ->
+                    new ResourceNotFoundException(String.format(ErrorMessage.PRODUCT_NOT_FOUND_EXCEPTION,id)));
+
+            List<Model> modelLists = modelRepository.findByProductId(id).orElseThrow(()->
+                    new ResourceNotFoundException(String.format(ErrorMessage.MODEL_NOT_FOUND_BY_PRODUCT_ID_EXCEPTION,id)));
+
+            return modelMapper.modelListToModelResponseList(modelLists);
+
+
+
+
+        }
+
+
+
+
+
+
+    }
 }

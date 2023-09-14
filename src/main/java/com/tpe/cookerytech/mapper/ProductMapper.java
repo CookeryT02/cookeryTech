@@ -3,6 +3,7 @@ package com.tpe.cookerytech.mapper;
 import com.tpe.cookerytech.domain.Product;
 import com.tpe.cookerytech.domain.User;
 import com.tpe.cookerytech.dto.request.ProductRequest;
+import com.tpe.cookerytech.dto.response.ModelResponse;
 import com.tpe.cookerytech.dto.response.ProductObjectResponse;
 import com.tpe.cookerytech.dto.response.ProductResponse;
 import org.mapstruct.Mapper;
@@ -63,6 +64,7 @@ public interface ProductMapper{
 
         return new PageImpl<>(productResponse,pageable,productResponse.size());
     }
+
 
 
 

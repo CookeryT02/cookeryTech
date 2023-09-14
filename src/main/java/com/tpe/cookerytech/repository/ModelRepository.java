@@ -17,7 +17,8 @@ public interface ModelRepository extends JpaRepository <Model, Long> {
 
     Model findBySku(String sku);
 
-  
+    List<Model> findByIsActive(boolean isActive);
+
 
 //    List<ModelResponse> findByIsActive(Integer isActive);
 //

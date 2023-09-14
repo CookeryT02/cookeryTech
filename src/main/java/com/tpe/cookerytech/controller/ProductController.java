@@ -16,6 +16,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import javax.swing.table.JTableHeader;
@@ -166,18 +167,18 @@ public class ProductController {
     
     
         }
-   /*
-        @GetMapping
+
+        @GetMapping("/{id}/get/models")
         @PreAuthorize("hasRole('CUSTOMER') or hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER')")
         public ResponseEntity<List<ModelResponse>> getProductsByIdModels(@PathVariable Long id) {
     
     
-            List<ModelResponse> modelResponseList  = productService.listProductsByIdModels(id);
+            List<ModelResponse> modelResponseList  = productService.getProductsByIdModels(id);
     
             return ResponseEntity.ok(modelResponseList);
     
         }
-    */
+
     @GetMapping("/{id}/properties")
     @PreAuthorize("hasRole('ADMIN') or hasRole('PRODUCT_MANAGER')")
     public ResponseEntity<List<ProductPropertyKeyResponse>> getPPKByProductId(@PathVariable Long id){
