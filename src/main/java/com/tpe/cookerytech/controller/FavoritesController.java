@@ -1,15 +1,12 @@
 package com.tpe.cookerytech.controller;
 
 
-import com.tpe.cookerytech.domain.Model;
 import com.tpe.cookerytech.dto.request.FavoritesRequest;
-import com.tpe.cookerytech.dto.request.RegisterRequest;
+import com.tpe.cookerytech.dto.response.CkResponse;
 import com.tpe.cookerytech.dto.response.ModelResponse;
 import com.tpe.cookerytech.service.FavoritesService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -46,6 +43,16 @@ public class FavoritesController {
         List<ModelResponse> modelResponseList = favoritesService.getAllAuthUserFavorites();
 
         return ResponseEntity.ok(modelResponseList);
+
+    }
+
+    @PutMapping("/auth")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER') or hasRole('CUSTOMER')")
+    public ResponseEntity<CkResponse> moveFavoritesToCart(){
+
+        CkResponse ckResponse = favoritesService.moveAllFavoritesToShoppingCart();
+
+        return ResponseEntity.ok(ckResponse);
 
     }
 

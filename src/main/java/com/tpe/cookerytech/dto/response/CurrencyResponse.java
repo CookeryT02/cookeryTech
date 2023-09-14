@@ -16,7 +16,6 @@ public class CurrencyResponse {
 
     private String code;
 
-
     private String symbol;
 
     private double value;

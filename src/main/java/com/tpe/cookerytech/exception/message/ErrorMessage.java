@@ -36,4 +36,5 @@ public class ErrorMessage {
     public static final String USER_FAVORITES_NOT_FOUND_EXCEPTION = "User dont have favorites";
 
     public static final String SHOPPING_CART_ITEMS_NOT_FOUND = "There is no item in shopping cart";
+    public static final String SHOPPING_CART_NOT_FOUND = "There is no shopping cart";
 }
