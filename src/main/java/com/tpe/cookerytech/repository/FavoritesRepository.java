@@ -1,17 +1,17 @@
 package com.tpe.cookerytech.repository;
 
 import com.tpe.cookerytech.domain.Favorites;
+import com.tpe.cookerytech.domain.User;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-@Repository
-public interface FavoritesRepository extends JpaRepository<Favorites,Long> {
+public interface FavoritesRepository  extends JpaRepository<Favorites, Long > {
+
+
+    Favorites findByUser(User authUser);
+
     @EntityGraph(attributePaths = "id")
     List<Favorites> findByUserId(Long id);
-
-
-
 }

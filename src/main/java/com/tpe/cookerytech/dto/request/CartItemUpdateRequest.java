@@ -10,8 +10,10 @@ import javax.validation.constraints.NotNull;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class FavoritesRequest {
+public class CartItemUpdateRequest {
 
     @NotNull
-    private Long id;
+    private Long modelId;
+    @NotNull
+    private double amount;
 }

@@ -15,7 +15,6 @@ public class FavoritesController {
     private final FavoritesService favoritesService;
 
 
-
     public FavoritesController(FavoritesService favoritesService) {
         this.favoritesService = favoritesService;
     }
@@ -24,8 +23,7 @@ public class FavoritesController {
     @PostMapping("/auth")
     @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER') or hasRole('CUSTOMER')")
     public ResponseEntity<ModelResponse> updateAuthUserFavorites(@RequestBody FavoritesRequest favoritesRequest){
-        ModelResponse modelResponse = favoritesService.updateAuthUserFavorites(favoritesRequest.getModelId());
-
+        ModelResponse modelResponse = favoritesService.updateAuthUserFavorites(favoritesRequest.getId());
         return ResponseEntity.ok(modelResponse);
     }
 
