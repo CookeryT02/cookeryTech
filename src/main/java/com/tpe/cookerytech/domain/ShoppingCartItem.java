@@ -32,12 +32,10 @@ public class ShoppingCartItem {
 
     private double amount;
 
-//    @DateTimeFormat(pattern = "")
+    //    @DateTimeFormat(pattern = "")
     @Column(nullable = false)
     private LocalDateTime createAt;
 
 
     private LocalDateTime updateAt;
-
-
 }

@@ -41,8 +41,7 @@ public class Model {
     @Column(nullable = false)
     private int seq=0;
 
-    @OneToMany(orphanRemoval = true)
-    @JoinColumn(name="model_id")
+    @OneToMany(mappedBy="model", cascade={CascadeType.ALL})
     private Set<ImageFile> image;
 
     @Column(nullable = false)
@@ -70,6 +69,5 @@ public class Model {
 
     @Column(nullable = true)
     private LocalDateTime update_at;
-
 
 }
