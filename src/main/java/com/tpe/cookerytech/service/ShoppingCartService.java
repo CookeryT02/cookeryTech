@@ -81,8 +81,9 @@ public class ShoppingCartService {
             ShoppingCart shoppingCart=new ShoppingCart();
             shoppingCart.setCreateAt(LocalDateTime.now());
             shoppingCart.setUser(user);
-            ShoppingCartItem shoppingCartItem=new ShoppingCartItem();
             shoppingCartRepository.save(shoppingCart);
+
+            ShoppingCartItem shoppingCartItem=new ShoppingCartItem();
             shoppingCartItem.setShoppingCart(shoppingCart);
             shoppingCartItemRepository.save(shoppingCartItem);
         }
@@ -101,20 +102,8 @@ public class ShoppingCartService {
         if (modelIdList.contains(cartItemUpdateRequest.getModelId()) && cartItemUpdateRequest.getAmount()==0) {
             for (ShoppingCartItem shoppingCartItem : shoppingCartItemList) {
                 if (shoppingCartItem.getModel().equals(model)) {
-                    shoppingCartItemList.remove(shoppingCartItem);
-                    shoppingCartItemRepository.delete(shoppingCartItem);
-                }
-            }
-        } else if(modelIdList.contains(cartItemUpdateRequest.getModelId()) ) {
-            for (ShoppingCartItem shoppingCartItem : shoppingCartItemList) {
-                if (shoppingCartItem.getModel().equals(model)) {
-                    shoppingCartItem.setShoppingCart(shoppingCart);
-                    shoppingCartItem.setModel(model);
-                    shoppingCartItem.setCreateAt(shoppingCartItem.getCreateAt());
-                    shoppingCartItem.setUpdateAt(LocalDateTime.now());
-                    shoppingCartItem.setAmount(cartItemUpdateRequest.getAmount());
-                    shoppingCartItem.setProduct(model.getProduct());
-                    shoppingCartItemRepository.save(shoppingCartItem);
+
+
                     ShoppingCartItemResponse shoppingCartItemResponse = shoppingCartItemMapper.ShoppingCartItemToShoppingCartItemResponse(shoppingCartItem);
 
                     ProductResponse productResponse=  productMapper.productToProductResponse(shoppingCartItem.getProduct());
@@ -127,6 +116,39 @@ public class ShoppingCartService {
                     modelResponse.setProductId(model.getProduct().getId());
                     modelResponse.setCurrencyId(model.getCurrency().getId());
                     shoppingCartItemResponse.setModelResponse(modelResponse);
+
+                    shoppingCartItemResponse.setShoppingCartId(shoppingCart.getId());
+                    shoppingCartItemResponse.setAmount(cartItemUpdateRequest.getAmount());
+
+                    shoppingCartItemList.remove(shoppingCartItem);
+                    shoppingCartItemRepository.delete(shoppingCartItem);
+                    return shoppingCartItemResponse;
+                }
+            }
+        } else if(modelIdList.contains(cartItemUpdateRequest.getModelId()) ) {
+            for (ShoppingCartItem shoppingCartItem : shoppingCartItemList) {
+                if (shoppingCartItem.getModel().equals(model)) {
+                    shoppingCartItem.setShoppingCart(shoppingCart);
+                    shoppingCartItem.setModel(model);
+                    shoppingCartItem.setCreateAt(shoppingCartItem.getCreateAt());
+                    shoppingCartItem.setUpdateAt(LocalDateTime.now());
+                    shoppingCartItem.setAmount(cartItemUpdateRequest.getAmount());
+                    shoppingCartItem.setProduct(model.getProduct());
+                    shoppingCartItemRepository.save(shoppingCartItem);
+
+                    ShoppingCartItemResponse shoppingCartItemResponse = shoppingCartItemMapper.ShoppingCartItemToShoppingCartItemResponse(shoppingCartItem);
+
+                    ProductResponse productResponse=  productMapper.productToProductResponse(shoppingCartItem.getProduct());
+                    productResponse.setBrandId(model.getProduct().getBrand().getId());
+                    productResponse.setCategoryId(model.getProduct().getCategory().getId());
+
+                    shoppingCartItemResponse.setProductResponse(productResponse);
+
+                    ModelResponse modelResponse=modelMapper.modelToModelResponse(shoppingCartItem.getModel());
+                    modelResponse.setProductId(model.getProduct().getId());
+                    modelResponse.setCurrencyId(model.getCurrency().getId());
+                    shoppingCartItemResponse.setModelResponse(modelResponse);
+
                     shoppingCartItemResponse.setShoppingCartId(shoppingCart.getId());
                     shoppingCartItemResponse.setAmount(cartItemUpdateRequest.getAmount());
                     return shoppingCartItemResponse;
