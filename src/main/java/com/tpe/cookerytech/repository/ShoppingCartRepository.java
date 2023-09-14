@@ -12,8 +12,6 @@ import java.util.Optional;
 @Repository
 public interface ShoppingCartRepository extends JpaRepository<ShoppingCart,Long> {
 
-//    List<ShoppingCartItem> findByUserId(Long id);
-
     @EntityGraph(attributePaths = "id")
     Optional<ShoppingCart> findByUserId(Long id);
 }
