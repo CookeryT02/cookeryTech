@@ -3,18 +3,25 @@ package com.tpe.cookerytech.service;
 import com.tpe.cookerytech.domain.*;
 import com.tpe.cookerytech.dto.request.OfferCreateRequest;
 import com.tpe.cookerytech.dto.response.OfferResponse;
+import com.tpe.cookerytech.exception.BadRequestException;
 import com.tpe.cookerytech.exception.ResourceNotFoundException;
 import com.tpe.cookerytech.exception.message.ErrorMessage;
 import com.tpe.cookerytech.mapper.CurrencyMapper;
 import com.tpe.cookerytech.mapper.OfferMapper;
 import com.tpe.cookerytech.repository.*;
 import net.bytebuddy.utility.RandomString;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class OfferService {
@@ -28,8 +35,9 @@ public class OfferService {
     private final ShoppingCartItemRepository shoppingCartItemRepository;
     private final OfferItemRepository offerItemRepository;
 
+    private final UserRepository userRepository;
 
-    public OfferService(UserService userService, OfferRepository offerRepository, OfferMapper offerMapper, CurrencyMapper currencyMapper, CurrencyRepository currencyRepository, ShoppingCartRepository shoppingCartRepository, ShoppingCartItemRepository shoppingCartItemRepository, OfferItemRepository offerItemRepository) {
+    public OfferService(UserService userService, OfferRepository offerRepository, OfferMapper offerMapper, CurrencyMapper currencyMapper, CurrencyRepository currencyRepository, ShoppingCartRepository shoppingCartRepository, ShoppingCartItemRepository shoppingCartItemRepository, OfferItemRepository offerItemRepository, UserRepository userRepository) {
         this.userService = userService;
         this.offerRepository = offerRepository;
         this.offerMapper = offerMapper;
@@ -38,6 +46,7 @@ public class OfferService {
         this.shoppingCartRepository = shoppingCartRepository;
         this.shoppingCartItemRepository = shoppingCartItemRepository;
         this.offerItemRepository = offerItemRepository;
+        this.userRepository = userRepository;
     }
 
 
@@ -102,6 +111,44 @@ public class OfferService {
         offerResponse.setCurrencyResponse(currencyMapper.currencyToCurrencyResponse(offer.getCurrency()));
 
         return offerResponse;
+    }
+
+    public Page<OfferResponse> getUserOfferById(Long id, Pageable pageable, String status, LocalDate date1, LocalDate date2) {
+
+
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication != null && authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN")) && authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_SALES_SPECIALIST")) && authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_SALES_MANAGER")) ) {
+
+            List<Offer> offerList = (offerRepository.findByByUser());
+            List<Offer> filteredOffers =offerList.stream()
+                    .filter(o -> {
+                        User user = o.getUser();
+                        System.out.println(o.getUser().getId().longValue());
+                        return  user != null && user.getId().longValue() == o.getId().longValue();
+                    })
+                    .collect(Collectors.toList());
+
+            userRepository.findById(id).orElseThrow(
+                    () -> new ResourceNotFoundException(String.format(ErrorMessage.RESOURCE_NOT_FOUND_EXCEPTION, id)));
+
+
+
+            Page<Offer> p = new PageImpl<Offer>(offerList);
+            Page<Offer> f = new PageImpl<Offer>(filteredOffers);
+
+
+            Page<Offer> offerPage = offerRepository.getAllUserOfferById(id, pageable, status, date1, date2);
+
+            return offerPage.map(offerMapper::offerToOfferResponse);
+
+
+        } else {
+            throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
+        }
+
+
     }
 }
 
