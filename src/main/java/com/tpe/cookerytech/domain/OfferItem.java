@@ -4,6 +4,7 @@ import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 
 @Data
@@ -19,6 +20,7 @@ public class OfferItem {
     private Long id;
 
     @Column(nullable = false)
+    @Size(min = 10,max = 100)
     private String sku;
 
     private int quantity;

@@ -3,6 +3,7 @@ package com.tpe.cookerytech.service;
 import com.tpe.cookerytech.domain.*;
 import com.tpe.cookerytech.dto.request.OfferCreateRequest;
 import com.tpe.cookerytech.dto.response.OfferResponse;
+import com.tpe.cookerytech.exception.BadRequestException;
 import com.tpe.cookerytech.exception.ResourceNotFoundException;
 import com.tpe.cookerytech.exception.message.ErrorMessage;
 import com.tpe.cookerytech.mapper.CurrencyMapper;
@@ -15,6 +16,7 @@ import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class OfferService {
@@ -49,9 +51,10 @@ public class OfferService {
 
         Offer offer = new Offer();
 
-        Currency currency = currencyRepository.findById(2L).orElseThrow(
+        Currency currency = currencyRepository.findById(3L).orElseThrow(
                 () -> new ResourceNotFoundException(ErrorMessage.CURRENCY_NOT_FOUND_EXCEPTION)
         );
+
 
         offer.setCreateAt(LocalDateTime.now());
         offer.setUser(user);
@@ -103,5 +106,27 @@ public class OfferService {
 
         return offerResponse;
     }
+
+    public OfferResponse getOfferByAuthUser(Long id) {
+        User user = userService.getCurrentUser();
+
+        List<Offer> offerList = offerRepository.findByUserId(user.getId());
+
+        OfferResponse offerResponse = new OfferResponse();
+
+        for (Offer offer: offerList){
+            if(Objects.equals(offer.getId(), id)){
+                offerResponse = offerMapper.offerToOfferResponse(offer);
+                offerResponse.setUserId(user.getId());
+                offerResponse.setCurrencyResponse(currencyMapper.currencyToCurrencyResponse(offer.getCurrency()));
+                return offerResponse;
+            }
+        }
+        if (offerResponse.getCode()==null) {
+            throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
+        }
+        return null;
+
+        }
 }
 

@@ -30,4 +30,15 @@ public class OfferController {
 
         return ResponseEntity.ok(offerResponse);
     }
+
+
+    @GetMapping("/{id}/auth")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER') or hasRole('CUSTOMER')")
+    public ResponseEntity<OfferResponse> getOfferByAuthUser(@Valid @PathVariable Long id){
+
+        OfferResponse offerResponse = offerService.getOfferByAuthUser(id);
+
+        return ResponseEntity.ok(offerResponse);
+    }
+
 }
