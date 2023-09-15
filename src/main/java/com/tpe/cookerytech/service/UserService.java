@@ -1,7 +1,6 @@
 package com.tpe.cookerytech.service;
 
-import com.tpe.cookerytech.domain.Role;
-import com.tpe.cookerytech.domain.User;
+import com.tpe.cookerytech.domain.*;
 import com.tpe.cookerytech.domain.enums.RoleType;
 import com.tpe.cookerytech.dto.request.AdminUserUpdateRequest;
 import com.tpe.cookerytech.dto.request.RegisterRequest;
@@ -13,13 +12,17 @@ import com.tpe.cookerytech.exception.ConflictException;
 import com.tpe.cookerytech.exception.PasswordValidator;
 import com.tpe.cookerytech.exception.ResourceNotFoundException;
 import com.tpe.cookerytech.exception.message.ErrorMessage;
+import com.tpe.cookerytech.mapper.ProductMapper;
 import com.tpe.cookerytech.mapper.UserMapper;
 import com.tpe.cookerytech.repository.OfferRepository;
+import com.tpe.cookerytech.repository.ProductRepository;
 import com.tpe.cookerytech.repository.UserRepository;
 import org.springframework.context.annotation.Lazy;
 import com.tpe.cookerytech.security.SecurityUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -27,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 
@@ -41,13 +45,19 @@ public class UserService {
 
     private final UserMapper userMapper;
 
+    private final ProductRepository productRepository;
+
+    private final ProductMapper productMapper;
 
 
-    public UserService(UserRepository userRepository, RoleService roleService, @Lazy PasswordEncoder passwordEncoder, UserMapper userMapper) {
+
+    public UserService(UserRepository userRepository, RoleService roleService, @Lazy PasswordEncoder passwordEncoder, UserMapper userMapper, ProductRepository productRepository, ProductMapper productMapper) {
         this.userRepository = userRepository;
         this.roleService = roleService;
         this.passwordEncoder = passwordEncoder;
         this.userMapper = userMapper;
+        this.productRepository = productRepository;
+        this.productMapper = productMapper;
     }
 
     public User getUserByEmail(String email) {
@@ -388,6 +398,26 @@ public class UserService {
 
         return userMapper.userToUserResponse(user);
     }
+
+
+    public User getUserForRoleAuthUser() {
+
+        String email = SecurityUtils.getCurrentUserLogin().orElse(null);
+
+        if (email.equals("anonymousUser")) {
+            return null;
+        }
+
+        User user = getUserByEmail(email);
+        if ( user == null ) {
+            throw new ResourceNotFoundException(ErrorMessage.PRINCIPAL_FOUND_MESSAGE);
+        }
+
+        return user;
+
+
+    }
+
 
 
 

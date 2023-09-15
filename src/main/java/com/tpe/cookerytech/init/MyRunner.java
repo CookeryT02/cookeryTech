@@ -32,6 +32,7 @@ public class MyRunner {
     public CommandLineRunner init(UserRepository userRepository) {
         return args -> {
           //createAdminUser(userRepository);
+            //createCustomerUser(userRepository);
         };
     }
     public void createAdminUser(UserRepository userRepository) {
@@ -60,5 +61,38 @@ public class MyRunner {
         userRepository.save(adminUser);
 
         System.out.println("Admin user created and saved to the database!");
+    }
+
+    public void createCustomerUser(UserRepository userRepository){
+
+        User customerUser = new User();
+        customerUser.setFirstName("Customer1");
+        customerUser.setLastName("Customer");
+        customerUser.setEmail("customer1@gmail.com");
+        customerUser.setPhone("987654321");
+        customerUser.setAddress("123 Main St");
+        customerUser.setBuiltIn(true);
+        customerUser.setCity("New York");
+        customerUser.setCountry("USA");
+        customerUser.setBirthDate(LocalDate.of(1996, 2, 2));
+        customerUser.setResetPasswordCode(null);
+        customerUser.setCreateAt(LocalDateTime.now());
+        customerUser.setUpdateAt(null);
+        customerUser.setStatus((byte) 0);
+        customerUser.setPasswordHash(passwordEncoder.encode("Pass*12345"));
+
+        Role role = roleService.findByType(RoleType.ROLE_ADMIN);
+        Set<Role> roles = new HashSet<>();
+        roles.add(role);
+
+        customerUser.setRoles(roles);
+
+        userRepository.save(customerUser);
+
+        System.out.println("Customer user created and saved to the database!");
+
+
+
+
     }
 }

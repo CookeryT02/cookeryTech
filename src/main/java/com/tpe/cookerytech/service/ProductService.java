@@ -1,13 +1,11 @@
 package com.tpe.cookerytech.service;
 
 import com.tpe.cookerytech.domain.*;
+import com.tpe.cookerytech.domain.enums.RoleType;
 import com.tpe.cookerytech.dto.request.ModelRequest;
 import com.tpe.cookerytech.dto.request.ProductPropertyKeyRequest;
 import com.tpe.cookerytech.dto.request.ProductRequest;
-import com.tpe.cookerytech.dto.response.ModelResponse;
-import com.tpe.cookerytech.dto.response.ProductObjectResponse;
-import com.tpe.cookerytech.dto.response.ProductPropertyKeyResponse;
-import com.tpe.cookerytech.dto.response.ProductResponse;
+import com.tpe.cookerytech.dto.response.*;
 import com.tpe.cookerytech.exception.BadRequestException;
 import com.tpe.cookerytech.exception.ConflictException;
 import com.tpe.cookerytech.exception.ResourceNotFoundException;
@@ -17,18 +15,24 @@ import com.tpe.cookerytech.repository.CurrencyRepository;
 import com.tpe.cookerytech.repository.ModelRepository;
 import com.tpe.cookerytech.repository.ProductPropertyKeyRepository;
 import com.tpe.cookerytech.repository.ProductRepository;
+import com.tpe.cookerytech.security.SecurityUtils;
+import org.springframework.data.domain.*;
 import org.springframework.context.annotation.Bean;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.Column;
 import javax.persistence.EntityManager;
+import javax.persistence.criteria.Predicate;
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.Random;
 import java.util.stream.Collectors;
 
@@ -51,8 +55,9 @@ public class ProductService {
     private final ProductPropertyKeyRepository productPropertyKeyRepository;
     private final ModelRepository modelRepository;
 
+    private final UserService userService;
 
-    public ProductService(ProductRepository productRepository, ProductMapper productMapper, BrandService brandService, CategoryService categoryService, CurrencyService currencyService, CurrencyRepository currencyRepository, ModelMapper modelMapper, ProductPropertyKeyMapper productPropertyKeyMapper, ProductPropertyKeyRepository productPropertyKeyRepository, ModelRepository modelRepository) {
+    public ProductService(ProductRepository productRepository, ProductMapper productMapper, BrandService brandService, CategoryService categoryService, CurrencyService currencyService, CurrencyRepository currencyRepository, ModelMapper modelMapper, ProductPropertyKeyMapper productPropertyKeyMapper, ProductPropertyKeyRepository productPropertyKeyRepository, ModelRepository modelRepository, UserService userService) {
         this.productRepository = productRepository;
         this.productMapper = productMapper;
         this.brandService = brandService;
@@ -62,6 +67,7 @@ public class ProductService {
         this.productPropertyKeyMapper = productPropertyKeyMapper;
         this.productPropertyKeyRepository = productPropertyKeyRepository;
         this.modelRepository = modelRepository;
+        this.userService = userService;
     }
 
     public ProductResponse createProducts(ProductRequest productRequest) {
@@ -378,5 +384,143 @@ public class ProductService {
         return modelMapper.modelListToModelResponseList(modelList);
     }
 
+
+
+
+    public Page<ProductResponse> allProducts(String q ,Pageable pageable, Long brandId, Long categoryId) {
+
+//        User user = userService.getUserForRoleAuthUser();
+//        User user = userService.getCurrentUser();
+
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication != null && authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_CUSTOMER"))) {
+
+            List<Product> productList = (productRepository.findByIsActive(false));
+            List<Product> filteredProductsCustomer =productList.stream()
+                    .filter(p -> {
+                        Brand brand = p.getBrand();
+                        Category category = p.getCategory();
+                        System.out.println(p.getCategory().getIsActive());
+                        return p.getIsFeatured() && brand != null && category != null && brand.getIsActive() && category.getIsActive();
+                    })
+                    .collect(Collectors.toList());
+
+            // list convert to page
+            Page<Product> p = new PageImpl<Product>(productList);
+            Page<Product> f = new PageImpl<Product>(filteredProductsCustomer);
+
+
+
+            Page<Product> productPage = productRepository.getAllProductsIsActiveFalse(q, pageable, brandId, categoryId);
+
+
+            return productPage.map(productMapper::productToProductResponse);
+
+
+        } else {
+
+            List<Product> productList = (productRepository.findByIsActive(true));
+            List<Product> filteredProducts =productList.stream()
+                    .filter(p -> {
+                        Brand brand = p.getBrand();
+                        Category category = p.getCategory();
+                        System.out.println(p.getCategory().getIsActive());
+                        return p.getIsFeatured() && brand != null && category != null && brand.getIsActive() && category.getIsActive();
+                    })
+                    .collect(Collectors.toList());
+
+            Page<Product> p = new PageImpl<Product>(productList);
+            Page<Product> f = new PageImpl<Product>(filteredProducts);
+
+
+            Page<Product> productPage = productRepository.getAllProductsIsActiveTrue(q, pageable, brandId, categoryId);
+
+            return productPage.map(productMapper::productToProductResponse);
+
+
+
+        }
+
+
+
+
+
+    }
+
+
+    public List<ModelResponse> getProductsByIdModels(Long id) {
+
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication != null && authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_CUSTOMER"))) {
+
+            List<Product> productList = (productRepository.findByIsActive(false));
+            List<Product> filteredProductsCustomer =productList.stream()
+                    .filter(p -> {
+                        Brand brand = p.getBrand();
+                        Category category = p.getCategory();
+                        System.out.println(p.getCategory().getIsActive());
+                        return p.getIsFeatured() && brand != null && category != null && brand.getIsActive() && category.getIsActive();
+                    })
+                    .collect(Collectors.toList());
+
+            List<Model> modelList = (modelRepository.findByIsActive(false));
+            List<Model> filteredModelsCustomer = modelList.stream()
+                    .filter(m -> {
+                        Product product = m.getProduct();
+                        return product != null && product.getIsActive();
+                    }).collect(Collectors.toList());
+
+            productRepository.findById(id).orElseThrow(() ->
+                    new ResourceNotFoundException(String.format(ErrorMessage.PRODUCT_NOT_FOUND_EXCEPTION,id)));
+
+            List<Model> modelLists = modelRepository.findByProductId(id).orElseThrow(()->
+                    new ResourceNotFoundException(String.format(ErrorMessage.MODEL_NOT_FOUND_BY_PRODUCT_ID_EXCEPTION,id)));
+
+            return modelMapper.modelListToModelResponseList(modelLists);
+
+
+
+        } else {
+
+            List<Product> productList = (productRepository.findByIsActive(true));
+            List<Product> filteredProducts =productList.stream()
+                    .filter(p -> {
+                        Brand brand = p.getBrand();
+                        Category category = p.getCategory();
+                        System.out.println(p.getCategory().getIsActive());
+                        return p.getIsFeatured() && brand != null && category != null && brand.getIsActive() && category.getIsActive();
+                    })
+                    .collect(Collectors.toList());
+
+            List<Model> modelList = (modelRepository.findByIsActive(false));
+            List<Model> filteredModelsCustomer = modelList.stream()
+                    .filter(m -> {
+                        Product product = m.getProduct();
+                        return product != null && product.getIsActive();
+                    }).collect(Collectors.toList());
+
+            productRepository.findById(id).orElseThrow(() ->
+                    new ResourceNotFoundException(String.format(ErrorMessage.PRODUCT_NOT_FOUND_EXCEPTION,id)));
+
+            List<Model> modelLists = modelRepository.findByProductId(id).orElseThrow(()->
+                    new ResourceNotFoundException(String.format(ErrorMessage.MODEL_NOT_FOUND_BY_PRODUCT_ID_EXCEPTION,id)));
+
+            return modelMapper.modelListToModelResponseList(modelLists);
+
+
+
+
+        }
+
+
+
+
+
+
+    }
 
 }

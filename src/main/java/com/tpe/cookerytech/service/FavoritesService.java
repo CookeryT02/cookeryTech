@@ -112,7 +112,6 @@ public class FavoritesService {
 
         List<Favorites> favoritesListAuthUser = favoritesRepository.findByUserId(user.getId());
 
-
         ShoppingCart shoppingCart = shoppingCartRepository.findByUserId(user.getId())
                 .orElseGet(() -> {
                     ShoppingCart newCart = new ShoppingCart();
@@ -167,7 +166,7 @@ public class FavoritesService {
             }
         }
 
-        return new CkResponse("Favorites move to shopping Cart succesfully",true);
+        return new CkResponse("Favorites move to shopping Cart successfully",true);
 
     }
 }

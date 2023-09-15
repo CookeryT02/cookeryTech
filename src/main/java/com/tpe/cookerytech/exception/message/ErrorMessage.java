@@ -1,7 +1,7 @@
 package com.tpe.cookerytech.exception.message;
 
 public class ErrorMessage {
-    public final static String IMAGE_NOT_FOUND_MESSAGE = "ImageFile with id %s not found";
+
 
     public final static String CATEGORY_ALREADY_EXIST_EXCEPTION = "This category %s is already exist";
     public final static String PASSWORD_NOT_MATCHED_MESSAGE = "Your passwords are not matched";
@@ -31,10 +31,15 @@ public class ErrorMessage {
 
     public static final String MODEL_ALREADY_EXIST_EXCEPTION = "Model name : %s field already exist";
     public static final String MODEL_FIELD_ALREADY_EXIST_EXCEPTION = "Model Field: %s already exist";
+    public static final String CUSTOMER_NOT_FOUND_EXCEPTION = "The customer is not authorized";
+    public static final String IMAGE_NOT_FOUND_MESSAGE = "ImageFile with id %s not found";
     public static final String NOT_CREATED_SKU_MESSAGE = "Model sku not unique";
 
     public static final String USER_FAVORITES_NOT_FOUND_EXCEPTION = "User dont have favorites";
 
     public static final String SHOPPING_CART_ITEMS_NOT_FOUND = "There is no item in shopping cart";
+    public static final String PRODUCT_NOT_FOUND_BY_MODEL_ID_EXCEPTION = "Product with ModelId: %s not found" ;
     public static final String SHOPPING_CART_NOT_FOUND = "There is no shopping cart";
+
+    public static final String OFFER_NOT_FOUND_EXCEPTION = "Offer with id: %s not found";
 }
