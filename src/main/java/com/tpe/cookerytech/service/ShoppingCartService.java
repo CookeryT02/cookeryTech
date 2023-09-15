@@ -87,6 +87,7 @@ public class ShoppingCartService {
 
             ShoppingCartItem shoppingCartItem=new ShoppingCartItem();
             shoppingCartItem.setShoppingCart(shoppingCart);
+            shoppingCartItem.setCreateAt(LocalDateTime.now());
             shoppingCartItemRepository.save(shoppingCartItem);
         }
 

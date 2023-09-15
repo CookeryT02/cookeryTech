@@ -1,5 +1,6 @@
 package com.tpe.cookerytech.controller;
 
+import com.tpe.cookerytech.dto.request.CartItemUpdateRequest;
 import com.tpe.cookerytech.dto.response.ShoppingCartItemResponse;
 import com.tpe.cookerytech.service.ShoppingCartService;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +29,14 @@ public class ShoppingCartController {
         return ResponseEntity.ok(shoppingCartItemResponseList);
     }
 
+    @PostMapping("/auth")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER') or hasRole('CUSTOMER')")
+    public ResponseEntity<ShoppingCartItemResponse> updateCartItems(@Valid @RequestBody CartItemUpdateRequest cartItemUpdateRequest){
 
+        ShoppingCartItemResponse shoppingCartItemResponse = shoppingCartService.updateCartItems(cartItemUpdateRequest);
 
+        return ResponseEntity.ok(shoppingCartItemResponse);
+
+    }
 
 }
