@@ -156,27 +156,27 @@ public class ProductController {
                 @RequestParam(required = false,defaultValue = "20",name = "size") int size,
                 @RequestParam(required = false,defaultValue = "id",name = "sort") String sort,
                 @RequestParam(required = false,defaultValue = "DESC",name = "type") String type){
-    
-    
+
+
             Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.valueOf(type), sort));
-    
+
             Page<ProductResponse> productResponse = productService.allProducts(q,pageable,brandId,categoryId);
-    
+
             return ResponseEntity.ok(productResponse);
-    
-    
-    
+
+
+
         }
 
         @GetMapping("/{id}/get/models")
         @PreAuthorize("hasRole('CUSTOMER') or hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER')")
         public ResponseEntity<List<ModelResponse>> getProductsByIdModels(@PathVariable Long id) {
-    
-    
+
+
             List<ModelResponse> modelResponseList  = productService.getProductsByIdModels(id);
-    
+
             return ResponseEntity.ok(modelResponseList);
-    
+
         }
 
     @GetMapping("/{id}/properties")
@@ -188,6 +188,7 @@ public class ProductController {
 
         return ResponseEntity.ok(ppkResponseList);
     }
+
 
     //*****************************Yardimci Method**************************************************
 

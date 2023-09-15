@@ -20,7 +20,7 @@ public interface ProductRepository extends JpaRepository<Product,Long> {
 
     List<Product> findByCategoryIdAndIsActiveTrue(Long categoryId);
 
-//    @Query("SELECT p FROM Product p WHERE (LOWER(p.title) LIKE CONCAT('%', LOWER(:q), '%') OR "
+    //    @Query("SELECT p FROM Product p WHERE (LOWER(p.title) LIKE CONCAT('%', LOWER(:q), '%') OR "
 //            + "LOWER(p.shortDescription) LIKE CONCAT('%', LOWER(:q), '%') OR "
 //            + "LOWER(p.longDescription) LIKE CONCAT('%', LOWER(:q), '%')) AND "
 //            + "(:cId IS NULL OR p.category.id = :cId) AND " + "(:bId IS NULL OR p.brand.id = :bId)")
@@ -115,8 +115,10 @@ Page<Product> getAllProducts(
 
 
 //    Product findByBrandId(Long id);
- //    Product findByBrandId(Long id);
+    //    Product findByBrandId(Long id);
 
     // Products A11 - /products/:id/models/get product ın id sine gore model getirme
+
+
 
 }
