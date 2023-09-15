@@ -29,17 +29,32 @@ public interface OfferRepository extends JpaRepository<Offer, Long> {
 //            + "AND (:dt1 IS NULL OR o.createAt < :dt1) "
 //            + "AND (:dt2 IS NULL OR o.createAt > :dt2)")
 
-    @Query("SELECT o FROM Offer o " +
-            "JOIN FETCH User u on o.user=u.id WHERE " +
-            "u.id=:user_id and (o.createAt not in :createAt) and :dt1 BETWEEN o.dt1 and o.dt2 " +
-            "or " +
-            "u.id=:user_id and (o.createAt not in :createAt) and :dt2 BETWEEN o.dt1 and o.dt2 " +
-            "or " +
-            "u.id=:user_id and (o.createAt not in :createAt) and (o.dt1 BETWEEN :dt1 and :dt2)")
-    @EntityGraph(attributePaths = {"offer","offer.user_id"})
-    Page<Offer> getAllUserOfferById(@Param("uId") Long id, Pageable pageable, @Param("status") String status, @Param("dt1") LocalDate date1, @Param("dt2") LocalDate date2);
+//    @Query("SELECT o FROM Offer o " +
+//            "JOIN FETCH User u on o.user=u.id WHERE " +
+//            "u.id=:user_id and (o.createAt not in :createAt) and :dt1 BETWEEN o.dt1 and o.dt2 " +
+//            "or " +
+//            "u.id=:user_id and (o.createAt not in :createAt) and :dt2 BETWEEN o.dt1 and o.dt2 " +
+//            "or " +
+//            "u.id=:user_id and (o.createAt not in :createAt) and (o.dt1 BETWEEN :dt1 and :dt2)")
+//    @EntityGraph(attributePaths = {"offer","offer.user_id"})
 
-    List<Offer> findByByUser();
+//    @Query("SELECT o FROM Offer o WHERE (:uId IS NULL OR o.user_id = :uId)"
+//            + " AND (:o IS NULL OR o.status = :o) "
+//            + " AND ()
+
+//    @Query("SELECT * FROM Offer o WHERE o.user.id = :uId AND status = :status AND create_at BETWEEN :dt1 AND :dt2" + "ORDER BY create_at DESC")
+
+
+    @Query("SELECT o FROM Offer o WHERE (:uId IS NULL OR o.user.id = :uId) " +
+            "AND (:status IS NULL OR o.status = :status) " +
+            "AND (:dt1 IS NULL OR o.createAt >= :dt1) " +
+            "AND (:dt2 IS NULL OR o.createAt <= :dt2)")
+    Page<Offer> getAllUserOfferById(@Param("uId") Long id, Pageable pageable, @Param("status") byte status, @Param("dt1") LocalDate date1, @Param("dt2") LocalDate date2);
+
+
+    @EntityGraph(attributePaths = {"user"})
+    List<Offer> findByUser(Long id);
+
 
 
 

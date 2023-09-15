@@ -115,7 +115,7 @@ public class OfferService {
         return offerResponse;
     }
 
-    public Page<OfferResponse> getUserOfferById(Long id, Pageable pageable, String status, LocalDate date1, LocalDate date2) {
+    public Page<OfferResponse> getUserOfferById(Long id, Pageable pageable, byte status, LocalDate date1, LocalDate date2) {
 
 
 
@@ -123,7 +123,7 @@ public class OfferService {
 
         if (authentication != null && authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN")) && authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_SALES_SPECIALIST")) && authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_SALES_MANAGER")) ) {
 
-            List<Offer> offerList = (offerRepository.findByByUser());
+            List<Offer> offerList = (offerRepository.findByUser(id));
             List<Offer> filteredOffers =offerList.stream()
                     .filter(o -> {
                         User user = o.getUser();

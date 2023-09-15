@@ -64,7 +64,7 @@ public class OfferController {
     @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST')")
     public ResponseEntity<Page<OfferResponse>> getUserOffers(
             @PathVariable("userId") Long id,
-            @RequestParam(value = "status", required = false) String status,
+            @RequestParam(value = "status", required = false) byte status,
             @RequestParam(value = "date1", required = false) LocalDate date1,
             @RequestParam(value = "date2", required = false) LocalDate date2,
             @RequestParam(value = "page", defaultValue = "0") int page,
