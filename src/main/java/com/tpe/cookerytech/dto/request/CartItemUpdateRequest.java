@@ -14,6 +14,8 @@ public class CartItemUpdateRequest {
 
     @NotNull
     private Long modelId;
+
     @NotNull
     private double amount;
+
 }
