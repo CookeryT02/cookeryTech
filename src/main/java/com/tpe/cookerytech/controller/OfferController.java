@@ -1,8 +1,10 @@
 package com.tpe.cookerytech.controller;
 
 import com.tpe.cookerytech.dto.request.OfferCreateRequest;
-import com.tpe.cookerytech.dto.request.OfferUpdateRequest;
+import com.tpe.cookerytech.dto.request.OfferItemUpdateRequest;
+import com.tpe.cookerytech.dto.response.OfferItemResponse;
 import com.tpe.cookerytech.dto.response.OfferResponse;
+import com.tpe.cookerytech.dto.response.OfferResponseWithUser;
 import com.tpe.cookerytech.service.OfferService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -49,16 +51,6 @@ public class OfferController {
     }
 
     @PutMapping("/{id}/admin")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST')")
-    public ResponseEntity<OfferResponse> updateOfterByAuthorizedPeople(@PathVariable Long id, @Valid @RequestBody OfferUpdateRequest offerUpdateRequest){
-
-        OfferResponse offerResponse = offerService.updateOfferByManagements(id,offerUpdateRequest);
-
-        return ResponseEntity.ok(offerResponse);
-
-    }
-
-    @PutMapping("/{id}/admin")
     @PreAuthorize("hasRole('SALES_SPECIALIST')")
     public ResponseEntity<OfferItemResponse> updateOfferItemWithIdByAdmin(@PathVariable Long id,
                                                                           @RequestBody OfferItemUpdateRequest offerItemUpdateRequest){
@@ -79,7 +71,7 @@ public class OfferController {
                                                                  @RequestParam(value = "size", defaultValue = "20") int size,
                                                                  @RequestParam(value = "sort",defaultValue = "createAt") String prop,
                                                                  @RequestParam(value = "type",required = false,defaultValue = "DESC")Sort.Direction direction
-                                                         ){
+    ){
         Pageable pageable = PageRequest.of(page,size,Sort.by(direction,prop));
         Page<OfferResponseWithUser> offerResponseWithUsersPage = offerService.getOffers(q,pageable,startingDate,endingDate);
 
