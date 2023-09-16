@@ -4,6 +4,8 @@ import com.tpe.cookerytech.dto.request.OfferCreateRequest;
 import com.tpe.cookerytech.dto.request.OfferItemUpdateRequest;
 import com.tpe.cookerytech.dto.request.OfferUpdateRequest;
 import com.tpe.cookerytech.dto.response.OfferItemResponse;
+import com.tpe.cookerytech.dto.request.OfferItemUpdateRequest;
+import com.tpe.cookerytech.dto.response.OfferItemResponse;
 import com.tpe.cookerytech.dto.response.OfferResponse;
 import com.tpe.cookerytech.dto.response.OfferResponseWithUser;
 import com.tpe.cookerytech.service.OfferService;
@@ -72,7 +74,7 @@ public class OfferController {
                                                                  @RequestParam(value = "size", defaultValue = "20") int size,
                                                                  @RequestParam(value = "sort",defaultValue = "createAt") String prop,
                                                                  @RequestParam(value = "type",required = false,defaultValue = "DESC")Sort.Direction direction
-    ){
+                                                         ){
         Pageable pageable = PageRequest.of(page,size,Sort.by(direction,prop));
         Page<OfferResponseWithUser> offerResponseWithUsersPage = offerService.getOffers(q,pageable,startingDate,endingDate);
 
