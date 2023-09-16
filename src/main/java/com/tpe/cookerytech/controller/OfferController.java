@@ -1,6 +1,10 @@
 package com.tpe.cookerytech.controller;
 
+import com.tpe.cookerytech.dto.request.ModelRequest;
 import com.tpe.cookerytech.dto.request.OfferCreateRequest;
+import com.tpe.cookerytech.dto.request.OfferItemUpdateRequest;
+import com.tpe.cookerytech.dto.response.ModelResponse;
+import com.tpe.cookerytech.dto.response.OfferItemResponse;
 import com.tpe.cookerytech.dto.response.OfferResponse;
 import com.tpe.cookerytech.service.OfferService;
 import org.springframework.http.ResponseEntity;
@@ -39,6 +43,18 @@ public class OfferController {
         OfferResponse offerResponse = offerService.getOfferByAuthUser(id);
 
         return ResponseEntity.ok(offerResponse);
+    }
+
+
+    @PutMapping("/{id}/admin")
+    @PreAuthorize("hasRole('SALES_SPECIALIST')")
+    public ResponseEntity<OfferItemResponse> updateOfferItemWithIdByAdmin(@PathVariable Long id,
+                                                                          @RequestBody OfferItemUpdateRequest offerItemUpdateRequest){
+
+        OfferItemResponse offerItemResponse= offerService.updateOfferItemWithIdByAdmin(id,offerItemUpdateRequest);
+
+        return ResponseEntity.ok(offerItemResponse);
+
     }
 
 }
