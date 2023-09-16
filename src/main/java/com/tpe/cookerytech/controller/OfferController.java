@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -60,21 +61,20 @@ public class OfferController {
 //
 //    }
 
-    @GetMapping
+
+    @GetMapping("/admin/user/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST')")
     public ResponseEntity<Page<OfferResponse>> getUserOffers(
-            @PathVariable("userId") Long id,
-            @RequestParam(value = "status", required = false) byte status,
-            @RequestParam(value = "date1", required = false) LocalDate date1,
-            @RequestParam(value = "date2", required = false) LocalDate date2,
+            @PathVariable("id") Long id,
+            @RequestParam(value = "status") byte status,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date1,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date2,
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "20") int size,
             @RequestParam(value = "sort", defaultValue = "createAt") String sort,
-            @RequestParam(value = "type", defaultValue = "desc") String type
+            @RequestParam(value = "type", defaultValue = "DESC") String type
     ) {
-        // Implement the logic to retrieve offers based on the provided parameters
-        // Use the offerRepository to query the database and apply pagination, sorting, and filtering as needed
-        // Return the list of offers
+
 
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.valueOf(type), sort));
 

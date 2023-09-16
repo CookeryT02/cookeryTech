@@ -121,7 +121,12 @@ public class OfferService {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        if (authentication != null && authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN")) && authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_SALES_SPECIALIST")) && authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_SALES_MANAGER")) ) {
+        if (authentication != null || authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))
+                || authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_SALES_SPECIALIST"))
+                || authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_SALES_MANAGER")) ) {
+
+            userRepository.findById(id).orElseThrow(
+                    () -> new ResourceNotFoundException(String.format(ErrorMessage.RESOURCE_NOT_FOUND_EXCEPTION, id)));
 
             List<Offer> offerList = (offerRepository.findByUser(id));
             List<Offer> filteredOffers =offerList.stream()
@@ -131,10 +136,6 @@ public class OfferService {
                         return  user != null && user.getId().longValue() == o.getId().longValue();
                     })
                     .collect(Collectors.toList());
-
-            userRepository.findById(id).orElseThrow(
-                    () -> new ResourceNotFoundException(String.format(ErrorMessage.RESOURCE_NOT_FOUND_EXCEPTION, id)));
-
 
 
             Page<Offer> p = new PageImpl<Offer>(offerList);

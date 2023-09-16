@@ -45,14 +45,18 @@ public interface OfferRepository extends JpaRepository<Offer, Long> {
 //    @Query("SELECT * FROM Offer o WHERE o.user.id = :uId AND status = :status AND create_at BETWEEN :dt1 AND :dt2" + "ORDER BY create_at DESC")
 
 
-    @Query("SELECT o FROM Offer o WHERE (:uId IS NULL OR o.user.id = :uId) " +
+    @Query("SELECT o FROM Offer o WHERE (:id IS NULL OR o.user.id = :id) " +
             "AND (:status IS NULL OR o.status = :status) " +
-            "AND (:dt1 IS NULL OR o.createAt >= :dt1) " +
-            "AND (:dt2 IS NULL OR o.createAt <= :dt2)")
-    Page<Offer> getAllUserOfferById(@Param("uId") Long id, Pageable pageable, @Param("status") byte status, @Param("dt1") LocalDate date1, @Param("dt2") LocalDate date2);
+            "AND DATE(o.createAt) BETWEEN :date1 AND :date2 ORDER BY o.createAt")
+    Page<Offer> getAllUserOfferById( Long id, Pageable pageable, byte status, LocalDate date1, LocalDate date2);
+
+//    @Query("SELECT o FROM Offer o WHERE (:q IS NULL OR o.code LIKE %:q%) AND " +
+//            "DATE(o.createAt) BETWEEN :date1 AND :date2 ORDER BY o.createAt")
+//    Page<Offer> findByCreateAtBetweenOrderByCreateAt(String q, LocalDate date1, LocalDate date2, Pageable pageable);
 
 
-    @EntityGraph(attributePaths = {"user"})
+//    @EntityGraph(attributePaths = {"user"})
+    @EntityGraph(attributePaths = "id")
     List<Offer> findByUser(Long id);
 
 
