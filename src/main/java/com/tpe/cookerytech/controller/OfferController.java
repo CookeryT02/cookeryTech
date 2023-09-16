@@ -2,6 +2,7 @@ package com.tpe.cookerytech.controller;
 
 import com.tpe.cookerytech.dto.request.OfferCreateRequest;
 import com.tpe.cookerytech.dto.request.OfferItemUpdateRequest;
+import com.tpe.cookerytech.dto.request.OfferUpdateRequest;
 import com.tpe.cookerytech.dto.response.OfferItemResponse;
 import com.tpe.cookerytech.dto.response.OfferResponse;
 import com.tpe.cookerytech.dto.response.OfferResponseWithUser;
@@ -50,7 +51,7 @@ public class OfferController {
         return ResponseEntity.ok(offerResponse);
     }
 
-    @PutMapping("/{id}/admin")
+    @PutMapping("/offer-items/{id}/admin")
     @PreAuthorize("hasRole('SALES_SPECIALIST')")
     public ResponseEntity<OfferItemResponse> updateOfferItemWithIdByAdmin(@PathVariable Long id,
                                                                           @RequestBody OfferItemUpdateRequest offerItemUpdateRequest){
@@ -76,6 +77,16 @@ public class OfferController {
         Page<OfferResponseWithUser> offerResponseWithUsersPage = offerService.getOffers(q,pageable,startingDate,endingDate);
 
         return ResponseEntity.ok(offerResponseWithUsersPage);
+    }
+
+    @PutMapping("/{id}/admin")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST')")
+    public ResponseEntity<OfferResponseWithUser> updateOfterByIdAuthorizedPeople(@PathVariable Long id, @Valid @RequestBody OfferUpdateRequest offerUpdateRequest){
+
+        OfferResponseWithUser offerResponseWithUser = offerService.updateOfferByManagements(id,offerUpdateRequest);
+
+        return ResponseEntity.ok(offerResponseWithUser);
+
     }
 
 
