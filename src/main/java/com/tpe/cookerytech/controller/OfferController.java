@@ -65,7 +65,7 @@ public class OfferController {
     @GetMapping("/admin/user/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST')")
     public ResponseEntity<Page<OfferResponse>> getUserOffers(
-            @PathVariable("id") Long id,
+            @RequestParam("id") Long id,
             @RequestParam(value = "status") byte status,
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date1,
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date2,
