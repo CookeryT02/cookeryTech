@@ -1,7 +1,9 @@
 package com.tpe.cookerytech.service;
 
 import com.tpe.cookerytech.domain.*;
+import com.tpe.cookerytech.domain.enums.RoleType;
 import com.tpe.cookerytech.dto.request.OfferCreateRequest;
+import com.tpe.cookerytech.dto.request.OfferUpdateRequest;
 import com.tpe.cookerytech.dto.response.OfferResponse;
 import com.tpe.cookerytech.exception.BadRequestException;
 import com.tpe.cookerytech.exception.ResourceNotFoundException;
@@ -10,6 +12,7 @@ import com.tpe.cookerytech.mapper.CurrencyMapper;
 import com.tpe.cookerytech.mapper.OfferMapper;
 import com.tpe.cookerytech.repository.*;
 import net.bytebuddy.utility.RandomString;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -128,5 +131,45 @@ public class OfferService {
         return null;
 
         }
+
+    public OfferResponse updateOfferByManagements(Long id, OfferUpdateRequest offerUpdateRequest) {
+
+        User user = userService.getCurrentUser();
+
+        String roleControl = user.getRoles().toString();
+
+        Offer offer = offerRepository.findById(id).orElseThrow(()->
+                new ResourceNotFoundException(String.format(ErrorMessage.OFFER_NOT_FOUND_EXCEPTION,id)));
+
+        if (roleControl.contains("ROLE_SALES_SPECIALIST") && (offer.getStatus() != 0 && offer.getStatus() != 3)) {
+            throw new AccessDeniedException("Sales professionals can only update quotes with status 0 or 3");
+        }
+
+
+        if (roleControl.contains("ROLE_SALES_MANAGER") && offer.getStatus() != 1) {
+            throw new AccessDeniedException("Sales managers can only update quotes with status 1");
+        }
+
+        Currency currency = currencyRepository.findById(offerUpdateRequest.getCurrencyId()).orElseThrow(()->
+                new ResourceNotFoundException(String.format(ErrorMessage.CURRENCY_NOT_FOUND_EXCEPTION,id)));
+
+
+        offer.setDiscount(offerUpdateRequest.getDiscount());
+        offer.setStatus(offerUpdateRequest.getStatus());
+        offer.setCurrency(currency);
+        offer.setGrandTotal(offer.getSubTotal() * (1 - offerUpdateRequest.getDiscount() / 100));
+        offer.setUpdateAt(LocalDateTime.now());
+
+
+        offerRepository.save(offer);
+
+        OfferResponse offerResponse =  offerMapper.offerToOfferResponse(offer);
+
+        offerResponse.setUserId(user.getId());
+        offerResponse.setCurrencyResponse(currencyMapper.currencyToCurrencyResponse(currency));
+
+        return offerResponse;
+
+    }
 }
 
