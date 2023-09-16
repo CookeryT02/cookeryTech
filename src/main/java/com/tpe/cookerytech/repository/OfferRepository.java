@@ -31,13 +31,9 @@ public interface OfferRepository extends JpaRepository<Offer, Long> {
             "FROM Offer o " +
             "JOIN User u ON o.user.id = u.id " +
             "WHERE " +
-            "(:q IS NULL OR u.firstName LIKE CONCAT('%', :q, '%') OR u.lastName LIKE CONCAT('%', :q, '%') OR o.code LIKE CONCAT('%', :q, '%')) " +
-            "AND " +
-            "((:startingDate IS NULL AND :endingDate IS NULL) OR (o.createAt BETWEEN :startingDate AND :endingDate))")
+            "(:q IS NULL OR u.firstName LIKE CONCAT('%', :q, '%') OR u.lastName LIKE CONCAT('%', :q, '%') OR o.code LIKE CONCAT('%', :q, '%')) ")
     Page<Offer> findFilteredOffers(
             @Param("q") String q,
-            @Param("startingDate") LocalDateTime startingDate,
-            @Param("endingDate") LocalDateTime endingDate,
             Pageable pageable
     );
 

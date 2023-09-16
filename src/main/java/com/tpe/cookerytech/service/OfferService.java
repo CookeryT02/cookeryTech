@@ -15,6 +15,7 @@ import com.tpe.cookerytech.mapper.OfferMapper;
 import com.tpe.cookerytech.repository.*;
 import net.bytebuddy.utility.RandomString;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class OfferService {
@@ -185,8 +187,11 @@ public class OfferService {
         {
             if (r.getType().equals(RoleType.ROLE_ADMIN)) {
 
-                Page<Offer> offerPage = offerRepository.findFilteredOffers(q,startingDate,endingDate,pageable);
-                return offerPage.map(offerMapper::offerToOfferResponse);
+                Page<Offer> offerPage = offerRepository.findFilteredOffers(q,pageable);
+                List<Offer> offerLists = offerPage.stream().filter(offer -> (startingDate.isBefore(offer.getCreateAt()) && endingDate.isAfter(offer.getCreateAt()))).collect(Collectors.toList());
+                Page<Offer> offerPages = new PageImpl<Offer>(offerLists);
+
+                return offerPages.map(offerMapper::offerToOfferResponse);
 
             } else if (r.getType().equals(RoleType.ROLE_SALES_MANAGER)) {
 
