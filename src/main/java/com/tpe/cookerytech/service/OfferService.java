@@ -10,9 +10,11 @@ import com.tpe.cookerytech.mapper.CurrencyMapper;
 import com.tpe.cookerytech.mapper.OfferMapper;
 import com.tpe.cookerytech.repository.*;
 import net.bytebuddy.utility.RandomString;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -128,5 +130,14 @@ public class OfferService {
         return null;
 
         }
+
+
+    public Page<OfferResponse> getOfferAccordingTimeAuthUser(String q, Pageable pageable, LocalDate date1, LocalDate date2) {
+
+       // LocalDateTime newDate1= (LocalDateTime) date1;
+        Page<Offer> offerPage=offerRepository.findAllAuthOffers(q,pageable,date1,date2);
+
+        return offerPage.map(offerMapper::offerToOfferResponse);
+    }
 }
 
