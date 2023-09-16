@@ -6,12 +6,14 @@ import com.tpe.cookerytech.dto.request.OfferCreateRequest;
 import com.tpe.cookerytech.dto.request.OfferItemUpdateRequest;
 import com.tpe.cookerytech.dto.response.OfferItemResponse;
 import com.tpe.cookerytech.dto.response.OfferResponse;
+import com.tpe.cookerytech.dto.response.OfferResponseWithUser;
 import com.tpe.cookerytech.exception.BadRequestException;
 import com.tpe.cookerytech.exception.ResourceNotFoundException;
 import com.tpe.cookerytech.exception.message.ErrorMessage;
 import com.tpe.cookerytech.mapper.CurrencyMapper;
 import com.tpe.cookerytech.mapper.OfferItemMapper;
 import com.tpe.cookerytech.mapper.OfferMapper;
+import com.tpe.cookerytech.mapper.UserMapper;
 import com.tpe.cookerytech.repository.*;
 import net.bytebuddy.utility.RandomString;
 import org.springframework.data.domain.Page;
@@ -40,8 +42,11 @@ public class OfferService {
 
     private final OfferItemMapper offerItemMapper;
 
+    private final UserMapper userMapper;
 
-    public OfferService(UserService userService, OfferRepository offerRepository, OfferMapper offerMapper, CurrencyMapper currencyMapper, CurrencyRepository currencyRepository, ShoppingCartRepository shoppingCartRepository, ShoppingCartItemRepository shoppingCartItemRepository, OfferItemRepository offerItemRepository, OfferItemMapper offerItemMapper) {
+
+
+    public OfferService(UserService userService, OfferRepository offerRepository, OfferMapper offerMapper, CurrencyMapper currencyMapper, CurrencyRepository currencyRepository, ShoppingCartRepository shoppingCartRepository, ShoppingCartItemRepository shoppingCartItemRepository, OfferItemRepository offerItemRepository, OfferItemMapper offerItemMapper, UserMapper userMapper) {
         this.userService = userService;
         this.offerRepository = offerRepository;
         this.offerMapper = offerMapper;
@@ -51,6 +56,7 @@ public class OfferService {
         this.shoppingCartItemRepository = shoppingCartItemRepository;
         this.offerItemRepository = offerItemRepository;
         this.offerItemMapper = offerItemMapper;
+        this.userMapper = userMapper;
     }
 
 
@@ -179,7 +185,7 @@ public class OfferService {
 
     }
 
-    public Page<OfferResponse> getOffers(String q, Pageable pageable, LocalDateTime startingDate, LocalDateTime endingDate) {
+    public Page<OfferResponseWithUser> getOffers(String q, Pageable pageable, LocalDateTime startingDate, LocalDateTime endingDate) {
         User user = userService.getCurrentUser();
 
         Set<Role> roleControl = user.getRoles();
@@ -188,10 +194,15 @@ public class OfferService {
             if (r.getType().equals(RoleType.ROLE_ADMIN)) {
 
                 Page<Offer> offerPage = offerRepository.findFilteredOffers(q,pageable);
-                List<Offer> offerLists = offerPage.stream().filter(offer -> (startingDate.isBefore(offer.getCreateAt()) && endingDate.isAfter(offer.getCreateAt()))).collect(Collectors.toList());
-                Page<Offer> offerPages = new PageImpl<Offer>(offerLists);
+                List<Offer> offerLists = offerPage.getContent().stream().filter(offer -> (startingDate.isBefore(offer.getCreateAt()) && endingDate.isAfter(offer.getCreateAt()))).collect(Collectors.toList());
+                Page<Offer> offerPages = new PageImpl<>(offerLists);
 
-                return offerPages.map(offerMapper::offerToOfferResponse);
+                return offerPages.map(offer -> {
+                    OfferResponseWithUser offerResponse=offerMapper.offerToOfferResponsewithUser(offer);
+                    offerResponse.setUserResponse(userMapper.userToUserResponse(offer.getUser()));
+                    offerResponse.setCurrencyResponse(currencyMapper.currencyToCurrencyResponse(offer.getCurrency()));
+                    return offerResponse;
+                });
 
             } else if (r.getType().equals(RoleType.ROLE_SALES_MANAGER)) {
 
