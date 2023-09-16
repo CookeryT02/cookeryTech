@@ -1,8 +1,6 @@
 package com.tpe.cookerytech.controller;
 
 import com.tpe.cookerytech.dto.request.OfferCreateRequest;
-import com.tpe.cookerytech.dto.request.OfferItemUpdateRequest;
-import com.tpe.cookerytech.dto.response.OfferItemResponse;
 import com.tpe.cookerytech.dto.response.OfferResponse;
 import com.tpe.cookerytech.dto.response.OfferResponseWithUser;
 import com.tpe.cookerytech.service.OfferService;

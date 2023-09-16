@@ -144,7 +144,7 @@ public class OfferService {
         }
         return null;
 
-        }
+    }
 
     public OfferItemResponse updateOfferItemWithIdByAdmin(Long id, OfferItemUpdateRequest offerItemUpdateRequest) {
 
@@ -189,7 +189,7 @@ public class OfferService {
         User user = userService.getCurrentUser();
 
         Set<Role> roleControl = user.getRoles();
-         for(Role r:roleControl)
+        for(Role r:roleControl)
         {
             Page<Offer> offerPage = offerRepository.findFilteredOffers(q,pageable);
 
@@ -197,7 +197,7 @@ public class OfferService {
 
             Page<Offer> offerPages = new PageImpl<>(offerLists);
 
-             Page<OfferResponseWithUser> offerResponseWithUserPage = offerPages.map(offer -> {
+            Page<OfferResponseWithUser> offerResponseWithUserPage = offerPages.map(offer -> {
                 OfferResponseWithUser offerResponse=offerMapper.offerToOfferResponsewithUser(offer);
                 offerResponse.setUserResponse(userMapper.userToUserResponse(offer.getUser()));
                 offerResponse.setCurrencyResponse(currencyMapper.currencyToCurrencyResponse(offer.getCurrency()));
@@ -208,7 +208,7 @@ public class OfferService {
                 return offerResponseWithUserPage;
 
             } else if (r.getType().equals(RoleType.ROLE_SALES_MANAGER)) {
-               List<OfferResponseWithUser> offerResponseWithUserList= offerResponseWithUserPage.stream().filter(offer -> offer.getStatus()==1).collect(Collectors.toList());
+                List<OfferResponseWithUser> offerResponseWithUserList= offerResponseWithUserPage.stream().filter(offer -> offer.getStatus()==1).collect(Collectors.toList());
                 return new PageImpl<>(offerResponseWithUserList);
             } else if (r.getType().equals(RoleType.ROLE_SALES_SPECIALIST)) {
                 List<OfferResponseWithUser> offerResponseWithUserList1= offerResponseWithUserPage.stream().filter(offer -> offer.getStatus()==0).collect(Collectors.toList());
@@ -217,7 +217,6 @@ public class OfferService {
                 throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
             }
         }
-         return null;
+        return null;
     }
 }
-
