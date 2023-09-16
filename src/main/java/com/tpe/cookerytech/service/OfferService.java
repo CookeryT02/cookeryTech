@@ -191,25 +191,28 @@ public class OfferService {
         Set<Role> roleControl = user.getRoles();
          for(Role r:roleControl)
         {
+            Page<Offer> offerPage = offerRepository.findFilteredOffers(q,pageable);
+
+            List<Offer> offerLists = offerPage.getContent().stream().filter(offer -> (startingDate.isBefore(offer.getCreateAt()) && endingDate.isAfter(offer.getCreateAt()))).collect(Collectors.toList());
+
+            Page<Offer> offerPages = new PageImpl<>(offerLists);
+
+             Page<OfferResponseWithUser> offerResponseWithUserPage = offerPages.map(offer -> {
+                OfferResponseWithUser offerResponse=offerMapper.offerToOfferResponsewithUser(offer);
+                offerResponse.setUserResponse(userMapper.userToUserResponse(offer.getUser()));
+                offerResponse.setCurrencyResponse(currencyMapper.currencyToCurrencyResponse(offer.getCurrency()));
+                return offerResponse;
+            });
             if (r.getType().equals(RoleType.ROLE_ADMIN)) {
 
-                Page<Offer> offerPage = offerRepository.findFilteredOffers(q,pageable);
-                List<Offer> offerLists = offerPage.getContent().stream().filter(offer -> (startingDate.isBefore(offer.getCreateAt()) && endingDate.isAfter(offer.getCreateAt()))).collect(Collectors.toList());
-                Page<Offer> offerPages = new PageImpl<>(offerLists);
-
-                return offerPages.map(offer -> {
-                    OfferResponseWithUser offerResponse=offerMapper.offerToOfferResponsewithUser(offer);
-                    offerResponse.setUserResponse(userMapper.userToUserResponse(offer.getUser()));
-                    offerResponse.setCurrencyResponse(currencyMapper.currencyToCurrencyResponse(offer.getCurrency()));
-                    return offerResponse;
-                });
+                return offerResponseWithUserPage;
 
             } else if (r.getType().equals(RoleType.ROLE_SALES_MANAGER)) {
-
-
+               List<OfferResponseWithUser> offerResponseWithUserList= offerResponseWithUserPage.stream().filter(offer -> offer.getStatus()==1).collect(Collectors.toList());
+                return new PageImpl<>(offerResponseWithUserList);
             } else if (r.getType().equals(RoleType.ROLE_SALES_SPECIALIST)) {
-
-
+                List<OfferResponseWithUser> offerResponseWithUserList1= offerResponseWithUserPage.stream().filter(offer -> offer.getStatus()==0).collect(Collectors.toList());
+                return new PageImpl<>(offerResponseWithUserList1);
             } else {
                 throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
             }
