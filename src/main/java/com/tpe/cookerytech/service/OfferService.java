@@ -55,11 +55,10 @@ public class OfferService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
-    private final UserRepository userRepository;
 
-
-    public OfferService(UserService userService, OfferRepository offerRepository, OfferMapper offerMapper, CurrencyMapper currencyMapper, CurrencyRepository currencyRepository, ShoppingCartRepository shoppingCartRepository, ShoppingCartItemRepository shoppingCartItemRepository, OfferItemRepository offerItemRepository, UserMapper userMapper, UserRepository userRepository) {
     private final OfferItemMapper offerItemMapper;
+
+
 
     public OfferService(UserService userService, OfferRepository offerRepository, OfferMapper offerMapper, CurrencyMapper currencyMapper, CurrencyRepository currencyRepository, ShoppingCartRepository shoppingCartRepository, ShoppingCartItemRepository shoppingCartItemRepository, OfferItemRepository offerItemRepository, UserMapper userMapper,OfferItemMapper offerItemMapper, UserRepository userRepository) {
         this.userService = userService;
@@ -70,7 +69,6 @@ public class OfferService {
         this.shoppingCartRepository = shoppingCartRepository;
         this.shoppingCartItemRepository = shoppingCartItemRepository;
         this.offerItemRepository = offerItemRepository;
-        this.userRepository = userRepository;
         this.userRepository = userRepository;
         this.offerItemMapper = offerItemMapper;
         this.userMapper = userMapper;
@@ -141,44 +139,74 @@ public class OfferService {
         return offerResponse;
     }
 
-    public Page<OfferResponse> getUserOfferById(Long id, Pageable pageable, byte status, LocalDate date1, LocalDate date2) {
+//    public Page<OfferResponse> getUserOfferById(Long id, Pageable pageable, Byte status, LocalDate date1, LocalDate date2) {
 
 
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//
+//        if (authentication != null || authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))
+//                || authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_SALES_SPECIALIST"))
+//                || authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_SALES_MANAGER")) ) {
+//
+//            userRepository.findById(id).orElseThrow(
+//                    () -> new ResourceNotFoundException(String.format(ErrorMessage.RESOURCE_NOT_FOUND_EXCEPTION, id)));
+//
+//            List<Offer> offerList = (offerRepository.findByUser(id));
+//            List<Offer> filteredOffers =offerList.stream()
+//                    .filter(o -> {
+//                        User user = o.getUser();
+//                        System.out.println(o.getUser().getId().longValue());
+//                        return  user != null && user.getId().longValue() == o.getId().longValue();
+//                    })
+//                    .collect(Collectors.toList());
+//
+//
+//            Page<Offer> p = new PageImpl<Offer>(offerList);
+//            Page<Offer> f = new PageImpl<Offer>(filteredOffers);
+//
+//
+//            Page<Offer> offerPage = offerRepository.getAllUserOfferById(id, pageable, status, date1, date2);
+//
+//            return offerPage.map(offerMapper::offerToOfferResponse);
+//
+//
+//        } else {
+//            throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
+//        }
 
-        if (authentication != null || authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))
-                || authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_SALES_SPECIALIST"))
-                || authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_SALES_MANAGER")) ) {
+//
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//
+//        if (authentication != null || authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))
+//                || authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_SALES_SPECIALIST"))
+//                || authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_SALES_MANAGER")) ) {
+//
+//            userRepository.findById(id).orElseThrow(
+//                    () -> new BadRequestException(String.format(ErrorMessage.USER_NOT_FOUND_EXCEPTION, id)));
+//
+//            Page<Offer> offerPages = offerRepository.findByUserIdBetweenOrderByCreateAt(id, pageable, status, date1, date2);
+//
+//            Page<OfferResponse> offerResponses= offerPages.map(offer -> {
+//                OfferResponse offerResponse = new OfferResponse();
+//                offerResponse = offerMapper.offerToOfferResponse(offer);
+//                offerResponse.setUserId(userMapper.userToUserResponse(offer.getUserId(id));
+//                offerResponse.setCurrencyResponse(currencyMapper.currencyToCurrencyResponse(offer.getCurrency()));
+//                return offerResponse;
+//            });
+//
+//            return offerResponses;
+//
+//
+//
+//        } else {
+//            throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
+//        }
+//
+//
+//    }
 
-            userRepository.findById(id).orElseThrow(
-                    () -> new ResourceNotFoundException(String.format(ErrorMessage.RESOURCE_NOT_FOUND_EXCEPTION, id)));
 
-            List<Offer> offerList = (offerRepository.findByUser(id));
-            List<Offer> filteredOffers =offerList.stream()
-                    .filter(o -> {
-                        User user = o.getUser();
-                        System.out.println(o.getUser().getId().longValue());
-                        return  user != null && user.getId().longValue() == o.getId().longValue();
-                    })
-                    .collect(Collectors.toList());
-
-
-            Page<Offer> p = new PageImpl<Offer>(offerList);
-            Page<Offer> f = new PageImpl<Offer>(filteredOffers);
-
-
-            Page<Offer> offerPage = offerRepository.getAllUserOfferById(id, pageable, status, date1, date2);
-
-            return offerPage.map(offerMapper::offerToOfferResponse);
-
-
-        } else {
-            throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
-        }
-
-
-    }
 
     public OfferResponse getOfferByAuthUser(Long id) {
         User user = userService.getCurrentUser();

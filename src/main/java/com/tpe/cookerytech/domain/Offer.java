@@ -23,7 +23,7 @@ public class Offer {
     private String code;
 
     @Column(nullable = false)
-    private byte status=0;
+    private Byte status=0;
 
     private double subTotal;
 
