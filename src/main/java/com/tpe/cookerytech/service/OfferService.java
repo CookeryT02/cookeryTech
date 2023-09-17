@@ -3,16 +3,13 @@ package com.tpe.cookerytech.service;
 import com.tpe.cookerytech.domain.*;
 import com.tpe.cookerytech.domain.enums.RoleType;
 import com.tpe.cookerytech.dto.request.OfferCreateRequest;
-import com.tpe.cookerytech.dto.request.OfferItemUpdateRequest;
 import com.tpe.cookerytech.dto.request.OfferUpdateRequest;
-import com.tpe.cookerytech.dto.response.OfferItemResponse;
 import com.tpe.cookerytech.dto.response.OfferResponse;
 import com.tpe.cookerytech.dto.response.OfferResponseWithUser;
 import com.tpe.cookerytech.exception.BadRequestException;
 import com.tpe.cookerytech.exception.ResourceNotFoundException;
 import com.tpe.cookerytech.exception.message.ErrorMessage;
 import com.tpe.cookerytech.mapper.CurrencyMapper;
-import com.tpe.cookerytech.mapper.OfferItemMapper;
 import com.tpe.cookerytech.mapper.OfferMapper;
 import com.tpe.cookerytech.mapper.UserMapper;
 import com.tpe.cookerytech.repository.*;
@@ -44,11 +41,7 @@ public class OfferService {
 
     private final UserMapper userMapper;
 
-
-
-    public OfferService(UserService userService, OfferRepository offerRepository, OfferMapper offerMapper, CurrencyMapper currencyMapper, CurrencyRepository currencyRepository, ShoppingCartRepository shoppingCartRepository, ShoppingCartItemRepository shoppingCartItemRepository, OfferItemRepository offerItemRepository) {
-
-    public OfferService(UserService userService, OfferRepository offerRepository, OfferMapper offerMapper, CurrencyMapper currencyMapper, CurrencyRepository currencyRepository, ShoppingCartRepository shoppingCartRepository, ShoppingCartItemRepository shoppingCartItemRepository, OfferItemRepository offerItemRepository, OfferItemMapper offerItemMapper, UserMapper userMapper) {
+    public OfferService(UserService userService, OfferRepository offerRepository, OfferMapper offerMapper, CurrencyMapper currencyMapper, CurrencyRepository currencyRepository, ShoppingCartRepository shoppingCartRepository, ShoppingCartItemRepository shoppingCartItemRepository, OfferItemRepository offerItemRepository, UserMapper userMapper) {
         this.userService = userService;
         this.offerRepository = offerRepository;
         this.offerMapper = offerMapper;
@@ -57,9 +50,8 @@ public class OfferService {
         this.shoppingCartRepository = shoppingCartRepository;
         this.shoppingCartItemRepository = shoppingCartItemRepository;
         this.offerItemRepository = offerItemRepository;
-
+        this.userMapper = userMapper;
     }
-
 
 
     public OfferResponse createOfferAuthUser(OfferCreateRequest offerCreateRequest) {
@@ -163,7 +155,7 @@ public class OfferService {
 
             Page<OfferResponseWithUser> offerResponseWithUserPage = offerPages.map(offer -> {
                 OfferResponseWithUser offerResponse=offerMapper.offerToOfferResponsewithUser(offer);
-                offerResponse.setUserResponse(userMapper.userToUserResponse(offer.getUser()));
+                offerResponse.setUserResponse(this.userMapper.userToUserResponse(offer.getUser()));
                 offerResponse.setCurrencyResponse(currencyMapper.currencyToCurrencyResponse(offer.getCurrency()));
                 return offerResponse;
             });
@@ -216,7 +208,7 @@ public class OfferService {
 
         OfferResponseWithUser offerResponseWithUser =  offerMapper.offerToOfferResponsewithUser(offer);
 
-        offerResponseWithUser.setUserResponse(userMapper.userToUserResponse(user));
+        offerResponseWithUser.setUserResponse(this.userMapper.userToUserResponse(user));
         offerResponseWithUser.setCurrencyResponse(currencyMapper.currencyToCurrencyResponse(currency));
 
         return offerResponseWithUser;
