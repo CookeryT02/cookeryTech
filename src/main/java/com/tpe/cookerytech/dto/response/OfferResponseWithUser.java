@@ -11,8 +11,6 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-
-
 public class OfferResponseWithUser {
 
     private String code;

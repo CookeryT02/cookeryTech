@@ -3,17 +3,24 @@ package com.tpe.cookerytech.service;
 import com.tpe.cookerytech.domain.*;
 import com.tpe.cookerytech.domain.enums.RoleType;
 import com.tpe.cookerytech.dto.request.OfferCreateRequest;
+import com.tpe.cookerytech.dto.request.OfferItemUpdateRequest;
 import com.tpe.cookerytech.dto.request.OfferUpdateRequest;
+import com.tpe.cookerytech.dto.response.OfferItemResponse;
 import com.tpe.cookerytech.dto.response.OfferResponse;
 import com.tpe.cookerytech.dto.response.OfferResponseWithUser;
 import com.tpe.cookerytech.exception.BadRequestException;
 import com.tpe.cookerytech.exception.ResourceNotFoundException;
 import com.tpe.cookerytech.exception.message.ErrorMessage;
 import com.tpe.cookerytech.mapper.CurrencyMapper;
+import com.tpe.cookerytech.mapper.OfferItemMapper;
 import com.tpe.cookerytech.mapper.OfferMapper;
 import com.tpe.cookerytech.mapper.UserMapper;
 import com.tpe.cookerytech.repository.*;
 import net.bytebuddy.utility.RandomString;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -48,9 +55,13 @@ public class OfferService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final UserRepository userRepository;
 
 
     public OfferService(UserService userService, OfferRepository offerRepository, OfferMapper offerMapper, CurrencyMapper currencyMapper, CurrencyRepository currencyRepository, ShoppingCartRepository shoppingCartRepository, ShoppingCartItemRepository shoppingCartItemRepository, OfferItemRepository offerItemRepository, UserMapper userMapper, UserRepository userRepository) {
+    private final OfferItemMapper offerItemMapper;
+
+    public OfferService(UserService userService, OfferRepository offerRepository, OfferMapper offerMapper, CurrencyMapper currencyMapper, CurrencyRepository currencyRepository, ShoppingCartRepository shoppingCartRepository, ShoppingCartItemRepository shoppingCartItemRepository, OfferItemRepository offerItemRepository, UserMapper userMapper,OfferItemMapper offerItemMapper, UserRepository userRepository) {
         this.userService = userService;
         this.offerRepository = offerRepository;
         this.offerMapper = offerMapper;
@@ -60,6 +71,8 @@ public class OfferService {
         this.shoppingCartItemRepository = shoppingCartItemRepository;
         this.offerItemRepository = offerItemRepository;
         this.userRepository = userRepository;
+        this.userRepository = userRepository;
+        this.offerItemMapper = offerItemMapper;
         this.userMapper = userMapper;
     }
 
@@ -187,6 +200,45 @@ public class OfferService {
         }
         return null;
 
+    }
+
+    public OfferItemResponse updateOfferItemWithIdByAdmin(Long id, OfferItemUpdateRequest offerItemUpdateRequest) {
+
+        User user = userService.getCurrentUser();
+
+        OfferItem offerItem=offerItemRepository.findById(id).
+                orElseThrow(()->new ResourceNotFoundException(String.format(ErrorMessage.OFFER_ITEM_NOT_FOUND_EXCEPTION,id)));
+
+        Set<Role> roleControl = user.getRoles();
+        for(Role r:roleControl) {
+            if (r.getType().equals(RoleType.ROLE_SALES_SPECIALIST) &&
+                    (offerItem.getOffer().getStatus()==0 ||offerItem.getOffer().getStatus()==3) ) {
+
+                offerItem.setQuantity(offerItemUpdateRequest.getQuantity());
+                offerItem.setSelling_price(offerItemUpdateRequest.getSelling_price());
+                offerItem.setTax(offerItemUpdateRequest.getTax());
+
+                offerItem.getOffer().setDiscount(offerItemUpdateRequest.getDiscount());
+                offerItem.setSub_total(offerItemUpdateRequest.getSelling_price()* offerItemUpdateRequest.getQuantity()*(1+offerItemUpdateRequest.getTax()/100));
+
+                offerItemRepository.save(offerItem);
+
+                OfferItemResponse offerItemResponse=offerItemMapper.offerItemToOfferItemResponse(offerItem);
+                offerItemResponse.setDiscount(offerItem.getOffer().getDiscount());
+
+                offerItemResponse.setSku(offerItem.getSku());
+                offerItemResponse.setSubtotal(offerItem.getSub_total());
+
+                return offerItemResponse;
+
+            } else {
+
+                throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
+            }
+        }
+
+        return null;
+
         }
 
 
@@ -265,4 +317,49 @@ public class OfferService {
     }
 
 
+    public Page<OfferResponseWithUser> getOffersAccordingTimeAuthUser(String q, Pageable pageable, LocalDate date1, LocalDate date2) {
+
+        Page<Offer> offerPages = offerRepository.findByCreateAtBetweenOrderByCreateAt(q, date1, date2, pageable);
+
+        Page<OfferResponseWithUser> offerWithUser= offerPages.map(offer -> {
+            OfferResponseWithUser offerResponseWithUser = offerMapper.offerToOfferResponsewithUser(offer);
+            offerResponseWithUser.setUserResponse(userMapper.userToUserResponse(offer.getUser()));
+            offerResponseWithUser.setCurrencyResponse(currencyMapper.currencyToCurrencyResponse(offer.getCurrency()));
+            return offerResponseWithUser;
+        });
+
+        return offerWithUser;
+    }
+
+    public Page<OfferResponseWithUser> getUserOfferById(Long id, Pageable pageable, Byte status, LocalDate date1, LocalDate date2) {
+
+
+
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication != null || authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))
+                || authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_SALES_SPECIALIST"))
+                || authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_SALES_MANAGER")) ) {
+
+            userRepository.findById(id).orElseThrow(
+                    () -> new BadRequestException(String.format(ErrorMessage.USER_NOT_FOUND_EXCEPTION, id)));
+
+            Page<Offer> offerPages = offerRepository.findByUserIdBetweenOrderByCreateAt(id, pageable, status, date1, date2);
+
+            Page<OfferResponseWithUser> offersWithUser= offerPages.map(offer -> {
+                OfferResponseWithUser offerResponseWithUser = offerMapper.offerToOfferResponsewithUser(offer);
+                offerResponseWithUser.setUserResponse(userMapper.userToUserResponse(offer.getUser()));
+                offerResponseWithUser.setCurrencyResponse(currencyMapper.currencyToCurrencyResponse(offer.getCurrency()));
+                return offerResponseWithUser;
+            });
+
+            return offersWithUser;
+
+        } else {
+            throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
+        }
+
+    }
 }
+
