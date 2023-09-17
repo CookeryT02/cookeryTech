@@ -4,16 +4,23 @@ import com.tpe.cookerytech.domain.*;
 import com.tpe.cookerytech.domain.enums.RoleType;
 import com.tpe.cookerytech.dto.request.OfferCreateRequest;
 import com.tpe.cookerytech.dto.request.OfferItemUpdateRequest;
+import com.tpe.cookerytech.dto.request.OfferUpdateRequest;
 import com.tpe.cookerytech.dto.response.OfferItemResponse;
 import com.tpe.cookerytech.dto.response.OfferResponse;
+import com.tpe.cookerytech.dto.response.OfferResponseWithUser;
 import com.tpe.cookerytech.exception.BadRequestException;
 import com.tpe.cookerytech.exception.ResourceNotFoundException;
 import com.tpe.cookerytech.exception.message.ErrorMessage;
 import com.tpe.cookerytech.mapper.CurrencyMapper;
 import com.tpe.cookerytech.mapper.OfferItemMapper;
 import com.tpe.cookerytech.mapper.OfferMapper;
+import com.tpe.cookerytech.mapper.UserMapper;
 import com.tpe.cookerytech.repository.*;
 import net.bytebuddy.utility.RandomString;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -21,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class OfferService {
@@ -34,9 +42,13 @@ public class OfferService {
     private final ShoppingCartItemRepository shoppingCartItemRepository;
     private final OfferItemRepository offerItemRepository;
 
+    private final UserMapper userMapper;
+
 
 
     public OfferService(UserService userService, OfferRepository offerRepository, OfferMapper offerMapper, CurrencyMapper currencyMapper, CurrencyRepository currencyRepository, ShoppingCartRepository shoppingCartRepository, ShoppingCartItemRepository shoppingCartItemRepository, OfferItemRepository offerItemRepository) {
+
+    public OfferService(UserService userService, OfferRepository offerRepository, OfferMapper offerMapper, CurrencyMapper currencyMapper, CurrencyRepository currencyRepository, ShoppingCartRepository shoppingCartRepository, ShoppingCartItemRepository shoppingCartItemRepository, OfferItemRepository offerItemRepository, OfferItemMapper offerItemMapper, UserMapper userMapper) {
         this.userService = userService;
         this.offerRepository = offerRepository;
         this.offerMapper = offerMapper;
@@ -47,6 +59,7 @@ public class OfferService {
         this.offerItemRepository = offerItemRepository;
 
     }
+
 
 
     public OfferResponse createOfferAuthUser(OfferCreateRequest offerCreateRequest) {
@@ -136,5 +149,79 @@ public class OfferService {
         }
 
 
-}
+    public Page<OfferResponseWithUser> getOffers(String q, Pageable pageable, LocalDateTime startingDate, LocalDateTime endingDate) {
+        User user = userService.getCurrentUser();
 
+        Set<Role> roleControl = user.getRoles();
+        for(Role r:roleControl)
+        {
+            Page<Offer> offerPage = offerRepository.findFilteredOffers(q,pageable);
+
+            List<Offer> offerLists = offerPage.getContent().stream().filter(offer -> (startingDate.isBefore(offer.getCreateAt()) && endingDate.isAfter(offer.getCreateAt()))).collect(Collectors.toList());
+
+            Page<Offer> offerPages = new PageImpl<>(offerLists);
+
+            Page<OfferResponseWithUser> offerResponseWithUserPage = offerPages.map(offer -> {
+                OfferResponseWithUser offerResponse=offerMapper.offerToOfferResponsewithUser(offer);
+                offerResponse.setUserResponse(userMapper.userToUserResponse(offer.getUser()));
+                offerResponse.setCurrencyResponse(currencyMapper.currencyToCurrencyResponse(offer.getCurrency()));
+                return offerResponse;
+            });
+            if (r.getType().equals(RoleType.ROLE_ADMIN)) {
+
+                return offerResponseWithUserPage;
+
+            } else if (r.getType().equals(RoleType.ROLE_SALES_MANAGER)) {
+                List<OfferResponseWithUser> offerResponseWithUserList= offerResponseWithUserPage.stream().filter(offer -> offer.getStatus()==1).collect(Collectors.toList());
+                return new PageImpl<>(offerResponseWithUserList);
+            } else if (r.getType().equals(RoleType.ROLE_SALES_SPECIALIST)) {
+                List<OfferResponseWithUser> offerResponseWithUserList1= offerResponseWithUserPage.stream().filter(offer -> offer.getStatus()==0).collect(Collectors.toList());
+                return new PageImpl<>(offerResponseWithUserList1);
+            } else {
+                throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
+            }
+        }
+        return null;
+    }
+
+    public OfferResponseWithUser updateOfferByManagements(Long id, OfferUpdateRequest offerUpdateRequest) {
+
+
+        User user = userService.getCurrentUser();
+
+        String roleControl = user.getRoles().toString();
+
+        Offer offer = offerRepository.findById(id).orElseThrow(()->
+                new ResourceNotFoundException(String.format(ErrorMessage.OFFER_NOT_FOUND_EXCEPTION,id)));
+
+        if (roleControl.contains("ROLE_SALES_SPECIALIST") && (offer.getStatus() != 0 && offer.getStatus() != 3)) {
+            throw new AccessDeniedException("Sales professionals can only update quotes with status 0 or 3");
+        }
+
+
+        if (roleControl.contains("ROLE_SALES_MANAGER") && offer.getStatus() != 1) {
+            throw new AccessDeniedException("Sales managers can only update quotes with status 1");
+        }
+
+        Currency currency = currencyRepository.findById(offerUpdateRequest.getCurrencyId()).orElseThrow(()->
+                new ResourceNotFoundException(String.format(ErrorMessage.CURRENCY_NOT_FOUND_EXCEPTION,id)));
+
+        offer.setDiscount(offerUpdateRequest.getDiscount());
+        offer.setStatus(offerUpdateRequest.getStatus());
+        offer.setCurrency(currency);
+        offer.setGrandTotal(offer.getSubTotal() * (1 - offerUpdateRequest.getDiscount() / 100));
+        offer.setUpdateAt(LocalDateTime.now());
+
+        offerRepository.save(offer);
+
+        OfferResponseWithUser offerResponseWithUser =  offerMapper.offerToOfferResponsewithUser(offer);
+
+        offerResponseWithUser.setUserResponse(userMapper.userToUserResponse(user));
+        offerResponseWithUser.setCurrencyResponse(currencyMapper.currencyToCurrencyResponse(currency));
+
+        return offerResponseWithUser;
+
+    }
+
+
+}

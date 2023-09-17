@@ -7,7 +7,20 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import com.tpe.cookerytech.dto.request.OfferItemUpdateRequest;
+import com.tpe.cookerytech.dto.request.OfferUpdateRequest;
+import com.tpe.cookerytech.dto.response.OfferItemResponse;
+import com.tpe.cookerytech.dto.request.OfferItemUpdateRequest;
+import com.tpe.cookerytech.dto.response.OfferItemResponse;
+import com.tpe.cookerytech.dto.response.OfferResponseWithUser;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.format.annotation.DateTimeFormat;
+
 import javax.validation.Valid;
+import java.time.LocalDateTime;
 
 
 @RestController
@@ -43,5 +56,29 @@ public class OfferController {
 
 
 
+    @GetMapping("/admin")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST')")
+    public ResponseEntity<Page<OfferResponseWithUser>> getOffers(@RequestParam("q")String q,
+                                                                 @RequestParam(value = "status",defaultValue = "0") byte status,
+                                                                 @RequestParam("startingDate") @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") LocalDateTime startingDate,
+                                                                 @RequestParam("endingDate") @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") LocalDateTime endingDate,
+                                                                 @RequestParam(value = "page", defaultValue = "0") int page,
+                                                                 @RequestParam(value = "size", defaultValue = "20") int size,
+                                                                 @RequestParam(value = "sort",defaultValue = "createAt") String prop,
+                                                                 @RequestParam(value = "type",required = false,defaultValue = "DESC")Sort.Direction direction
+                                                         ){
+        Pageable pageable = PageRequest.of(page,size,Sort.by(direction,prop));
+        Page<OfferResponseWithUser> offerResponseWithUsersPage = offerService.getOffers(q,pageable,startingDate,endingDate);
 
-}
+        return ResponseEntity.ok(offerResponseWithUsersPage);
+    }
+
+    @PutMapping("/{id}/admin")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST')")
+    public ResponseEntity<OfferResponseWithUser> updateOfterByIdAuthorizedPeople(@PathVariable Long id, @Valid @RequestBody OfferUpdateRequest offerUpdateRequest){
+
+        OfferResponseWithUser offerResponseWithUser = offerService.updateOfferByManagements(id,offerUpdateRequest);
+
+        return ResponseEntity.ok(offerResponseWithUser);
+
+    }
