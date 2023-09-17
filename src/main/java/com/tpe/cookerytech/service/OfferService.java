@@ -33,10 +33,10 @@ public class OfferService {
     private final ShoppingCartRepository shoppingCartRepository;
     private final ShoppingCartItemRepository shoppingCartItemRepository;
     private final OfferItemRepository offerItemRepository;
-    private final OfferItemMapper offerItemMapper;
 
 
-    public OfferService(UserService userService, OfferRepository offerRepository, OfferMapper offerMapper, CurrencyMapper currencyMapper, CurrencyRepository currencyRepository, ShoppingCartRepository shoppingCartRepository, ShoppingCartItemRepository shoppingCartItemRepository, OfferItemRepository offerItemRepository, OfferItemMapper offerItemMapper) {
+
+    public OfferService(UserService userService, OfferRepository offerRepository, OfferMapper offerMapper, CurrencyMapper currencyMapper, CurrencyRepository currencyRepository, ShoppingCartRepository shoppingCartRepository, ShoppingCartItemRepository shoppingCartItemRepository, OfferItemRepository offerItemRepository) {
         this.userService = userService;
         this.offerRepository = offerRepository;
         this.offerMapper = offerMapper;
@@ -45,7 +45,7 @@ public class OfferService {
         this.shoppingCartRepository = shoppingCartRepository;
         this.shoppingCartItemRepository = shoppingCartItemRepository;
         this.offerItemRepository = offerItemRepository;
-        this.offerItemMapper = offerItemMapper;
+
     }
 
 
@@ -135,43 +135,6 @@ public class OfferService {
 
         }
 
-    public OfferItemResponse updateOfferItemWithIdByAdmin(Long id, OfferItemUpdateRequest offerItemUpdateRequest) {
 
-        User user = userService.getCurrentUser();
-
-        OfferItem offerItem=offerItemRepository.findById(id).
-                orElseThrow(()->new ResourceNotFoundException(String.format(ErrorMessage.OFFER_ITEM_NOT_FOUND_EXCEPTION,id)));
-
-        Set<Role> roleControl = user.getRoles();
-        for(Role r:roleControl) {
-            if (r.getType().equals(RoleType.ROLE_SALES_SPECIALIST) &&
-                    (offerItem.getOffer().getStatus()==0 ||offerItem.getOffer().getStatus()==3) ) {
-
-                offerItem.setQuantity(offerItemUpdateRequest.getQuantity());
-                offerItem.setSelling_price(offerItemUpdateRequest.getSelling_price());
-                offerItem.setTax(offerItemUpdateRequest.getTax());
-
-                offerItem.getOffer().setDiscount(offerItemUpdateRequest.getDiscount());
-                offerItem.setSub_total(offerItemUpdateRequest.getSelling_price()* offerItemUpdateRequest.getQuantity()*(1+offerItemUpdateRequest.getTax()/100));
-
-                offerItemRepository.save(offerItem);
-
-                OfferItemResponse offerItemResponse=offerItemMapper.offerItemToOfferItemResponse(offerItem);
-                offerItemResponse.setDiscount(offerItem.getOffer().getDiscount());
-
-                offerItemResponse.setSku(offerItem.getSku());
-                offerItemResponse.setSubtotal(offerItem.getSub_total());
-
-                return offerItemResponse;
-
-            } else {
-
-                throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
-            }
-        }
-
-        return null;
-
-    }
 }
 
