@@ -3,16 +3,13 @@ package com.tpe.cookerytech.service;
 import com.tpe.cookerytech.domain.*;
 import com.tpe.cookerytech.domain.enums.RoleType;
 import com.tpe.cookerytech.dto.request.OfferCreateRequest;
-import com.tpe.cookerytech.dto.request.OfferItemUpdateRequest;
 import com.tpe.cookerytech.dto.request.OfferUpdateRequest;
-import com.tpe.cookerytech.dto.response.OfferItemResponse;
 import com.tpe.cookerytech.dto.response.OfferResponse;
 import com.tpe.cookerytech.dto.response.OfferResponseWithUser;
 import com.tpe.cookerytech.exception.BadRequestException;
 import com.tpe.cookerytech.exception.ResourceNotFoundException;
 import com.tpe.cookerytech.exception.message.ErrorMessage;
 import com.tpe.cookerytech.mapper.CurrencyMapper;
-import com.tpe.cookerytech.mapper.OfferItemMapper;
 import com.tpe.cookerytech.mapper.OfferMapper;
 import com.tpe.cookerytech.mapper.UserMapper;
 import com.tpe.cookerytech.repository.*;
@@ -48,8 +45,6 @@ public class OfferService {
     private final OfferItemRepository offerItemRepository;
     private final UserMapper userMapper;
     private final UserRepository userRepository;
-
-    private final OfferItemMapper offerItemMapper;
 
     private final UserMapper userMapper;
 
@@ -193,7 +188,8 @@ public class OfferService {
 
         return null;
 
-    }
+        }
+
 
     public Page<OfferResponseWithUser> getOffers(String q, Pageable pageable, LocalDateTime startingDate, LocalDateTime endingDate) {
         User user = userService.getCurrentUser();
@@ -209,7 +205,7 @@ public class OfferService {
 
             Page<OfferResponseWithUser> offerResponseWithUserPage = offerPages.map(offer -> {
                 OfferResponseWithUser offerResponse=offerMapper.offerToOfferResponsewithUser(offer);
-                offerResponse.setUserResponse(userMapper.userToUserResponse(offer.getUser()));
+                offerResponse.setUserResponse(this.userMapper.userToUserResponse(offer.getUser()));
                 offerResponse.setCurrencyResponse(currencyMapper.currencyToCurrencyResponse(offer.getCurrency()));
                 return offerResponse;
             });
@@ -262,7 +258,7 @@ public class OfferService {
 
         OfferResponseWithUser offerResponseWithUser =  offerMapper.offerToOfferResponsewithUser(offer);
 
-        offerResponseWithUser.setUserResponse(userMapper.userToUserResponse(user));
+        offerResponseWithUser.setUserResponse(this.userMapper.userToUserResponse(user));
         offerResponseWithUser.setCurrencyResponse(currencyMapper.currencyToCurrencyResponse(currency));
 
         return offerResponseWithUser;
