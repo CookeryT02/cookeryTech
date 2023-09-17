@@ -1,8 +1,8 @@
 package com.tpe.cookerytech.controller;
 
 import com.tpe.cookerytech.dto.request.OfferCreateRequest;
-import com.tpe.cookerytech.dto.response.OfferResponse;
-import com.tpe.cookerytech.dto.response.OfferResponseWithUser;
+import com.tpe.cookerytech.dto.request.OfferItemUpdateRequest;
+import com.tpe.cookerytech.dto.response.*;
 import com.tpe.cookerytech.repository.OfferRepository;
 import com.tpe.cookerytech.dto.response.OfferResponseWithUser;
 import com.tpe.cookerytech.service.OfferService;
@@ -150,4 +150,3 @@ public class OfferController {
     }
 }
 
-}
