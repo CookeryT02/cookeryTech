@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class OfferResponseWithUser {
+
     private String code;
 
     private byte status;

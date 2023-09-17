@@ -3,6 +3,9 @@ package com.tpe.cookerytech.repository;
 import com.tpe.cookerytech.domain.Offer;
 import com.tpe.cookerytech.domain.Product;
 import com.tpe.cookerytech.domain.User;
+import com.tpe.cookerytech.dto.response.OfferResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -38,4 +41,15 @@ public interface OfferRepository extends JpaRepository<Offer, Long> {
             "(:id IS NULL OR o.user.id = :id ) AND "  +
             "DATE(o.createAt) BETWEEN :date1 AND :date2 ORDER BY o.createAt")
     Page<Offer> findByUserIdBetweenOrderByCreateAt(Long id, Pageable pageable, Byte status, LocalDate date1, LocalDate date2);
+
+    @Query("SELECT o " +
+            "FROM Offer o " +
+            "JOIN User u ON o.user.id = u.id " +
+            "WHERE " +
+            "(:q IS NULL OR u.firstName LIKE CONCAT('%', :q, '%') OR u.lastName LIKE CONCAT('%', :q, '%') OR o.code LIKE CONCAT('%', :q, '%')) ")
+    Page<Offer> findFilteredOffers(
+            @Param("q") String q,
+            Pageable pageable
+    );
+
 }
