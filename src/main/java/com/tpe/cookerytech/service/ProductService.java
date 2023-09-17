@@ -354,9 +354,9 @@ public class ProductService {
         if (model.getBuilt_in()) {
             throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
         } //else if () {
-        //If any model is deleted, related records in model_property_values,, cart_items should be deleted
+        //If any model is deleted, related records in model_property_values, cart_items should be deleted
         //If the model has any related records in offer_items table, it can not be deleted and endpoint returns an error
-        //  }
+        //
         else {
             modelRepository.deleteById(id);
         }
@@ -408,15 +408,16 @@ public class ProductService {
                     .collect(Collectors.toList());
 
             // list convert to page
-            Page<Product> p = new PageImpl<Product>(productList);
+           // Page<Product> p = new PageImpl<Product>(productList);
             Page<Product> f = new PageImpl<Product>(filteredProductsCustomer);
 
 
 
             Page<Product> productPage = productRepository.getAllProductsIsActiveFalse(q, pageable, brandId, categoryId);
 
+            return f.map(productMapper::productToProductResponse);
 
-            return productPage.map(productMapper::productToProductResponse);
+           // return productPage.map(productMapper::productToProductResponse);
 
 
         } else {
