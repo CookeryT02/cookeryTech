@@ -3,15 +3,19 @@ package com.tpe.cookerytech.service;
 import com.tpe.cookerytech.domain.*;
 import com.tpe.cookerytech.dto.request.OfferCreateRequest;
 import com.tpe.cookerytech.dto.response.OfferResponse;
+import com.tpe.cookerytech.dto.response.OfferResponseWithUser;
 import com.tpe.cookerytech.exception.BadRequestException;
 import com.tpe.cookerytech.exception.ResourceNotFoundException;
 import com.tpe.cookerytech.exception.message.ErrorMessage;
 import com.tpe.cookerytech.mapper.CurrencyMapper;
 import com.tpe.cookerytech.mapper.OfferMapper;
+import com.tpe.cookerytech.mapper.UserMapper;
 import com.tpe.cookerytech.repository.*;
 import net.bytebuddy.utility.RandomString;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -31,9 +35,11 @@ public class OfferService {
     private final ShoppingCartRepository shoppingCartRepository;
     private final ShoppingCartItemRepository shoppingCartItemRepository;
     private final OfferItemRepository offerItemRepository;
+    private final UserMapper userMapper;
+    private final UserRepository userRepository;
 
 
-    public OfferService(UserService userService, OfferRepository offerRepository, OfferMapper offerMapper, CurrencyMapper currencyMapper, CurrencyRepository currencyRepository, ShoppingCartRepository shoppingCartRepository, ShoppingCartItemRepository shoppingCartItemRepository, OfferItemRepository offerItemRepository) {
+    public OfferService(UserService userService, OfferRepository offerRepository, OfferMapper offerMapper, CurrencyMapper currencyMapper, CurrencyRepository currencyRepository, ShoppingCartRepository shoppingCartRepository, ShoppingCartItemRepository shoppingCartItemRepository, OfferItemRepository offerItemRepository, UserMapper userMapper, UserRepository userRepository) {
         this.userService = userService;
         this.offerRepository = offerRepository;
         this.offerMapper = offerMapper;
@@ -42,6 +48,8 @@ public class OfferService {
         this.shoppingCartRepository = shoppingCartRepository;
         this.shoppingCartItemRepository = shoppingCartItemRepository;
         this.offerItemRepository = offerItemRepository;
+        this.userMapper = userMapper;
+        this.userRepository = userRepository;
     }
 
 
@@ -132,12 +140,49 @@ public class OfferService {
         }
 
 
-    public Page<OfferResponse> getOfferAccordingTimeAuthUser(String q, Pageable pageable, LocalDate date1, LocalDate date2) {
+    public Page<OfferResponseWithUser> getOffersAccordingTimeAuthUser(String q, Pageable pageable, LocalDate date1, LocalDate date2) {
 
-       // LocalDateTime newDate1= (LocalDateTime) date1;
-        Page<Offer> offerPage=offerRepository.findAllAuthOffers(q,pageable,date1,date2);
+        Page<Offer> offerPages = offerRepository.findByCreateAtBetweenOrderByCreateAt(q, date1, date2, pageable);
 
-        return offerPage.map(offerMapper::offerToOfferResponse);
+        Page<OfferResponseWithUser> offerWithUser= offerPages.map(offer -> {
+            OfferResponseWithUser offerResponseWithUser = offerMapper.offerToOfferResponsewithUser(offer);
+            offerResponseWithUser.setUserResponse(userMapper.userToUserResponse(offer.getUser()));
+            offerResponseWithUser.setCurrencyResponse(currencyMapper.currencyToCurrencyResponse(offer.getCurrency()));
+            return offerResponseWithUser;
+        });
+
+        return offerWithUser;
+    }
+
+    public Page<OfferResponseWithUser> getUserOfferById(Long id, Pageable pageable, Byte status, LocalDate date1, LocalDate date2) {
+
+
+
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication != null || authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))
+                || authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_SALES_SPECIALIST"))
+                || authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_SALES_MANAGER")) ) {
+
+            userRepository.findById(id).orElseThrow(
+                    () -> new BadRequestException(String.format(ErrorMessage.USER_NOT_FOUND_EXCEPTION, id)));
+
+            Page<Offer> offerPages = offerRepository.findByUserIdBetweenOrderByCreateAt(id, pageable, status, date1, date2);
+
+            Page<OfferResponseWithUser> offersWithUser= offerPages.map(offer -> {
+                OfferResponseWithUser offerResponseWithUser = offerMapper.offerToOfferResponsewithUser(offer);
+                offerResponseWithUser.setUserResponse(userMapper.userToUserResponse(offer.getUser()));
+                offerResponseWithUser.setCurrencyResponse(currencyMapper.currencyToCurrencyResponse(offer.getCurrency()));
+                return offerResponseWithUser;
+            });
+
+            return offersWithUser;
+
+        } else {
+            throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
+        }
+
     }
 }
 

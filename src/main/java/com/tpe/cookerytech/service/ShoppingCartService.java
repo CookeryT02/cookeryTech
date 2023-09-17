@@ -86,6 +86,8 @@ public class ShoppingCartService {
             shoppingCartRepository.save(shoppingCart);
 
             ShoppingCartItem shoppingCartItem=new ShoppingCartItem();
+            shoppingCartItem.setModel(model);
+            shoppingCartItem.setProduct(model.getProduct());
             shoppingCartItem.setShoppingCart(shoppingCart);
             shoppingCartItem.setCreateAt(LocalDateTime.now());
             shoppingCartItemRepository.save(shoppingCartItem);
