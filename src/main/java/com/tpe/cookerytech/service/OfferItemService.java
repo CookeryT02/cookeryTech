@@ -75,4 +75,20 @@ public class OfferItemService {
     }
 
 
+    public OfferItemResponse deleteOfferItemById(Long id) {
+
+        OfferItem offerItem =offerItemRepository.findById(id).
+                orElseThrow(()->new ResourceNotFoundException(String.format(ErrorMessage.OFFER_ITEM_NOT_FOUND_EXCEPTION,id)));
+
+        Set<Role> roles = userService.getCurrentUser().getRoles();
+
+        for (Role role : roles){
+            if(role.getType().equals(RoleType.ROLE_SALES_SPECIALIST)){
+                offerItemRepository.deleteById(id);
+                return offerItemMapper.offerItemToOfferItemResponse(offerItem);
+            }
+            else throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
+        }
+        return null;
+    }
 }
