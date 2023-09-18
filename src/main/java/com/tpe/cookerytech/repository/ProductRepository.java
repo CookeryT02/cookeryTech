@@ -25,6 +25,7 @@ public interface ProductRepository extends JpaRepository<Product,Long> {
 //            + "LOWER(p.longDescription) LIKE CONCAT('%', LOWER(:q), '%')) AND "
 //            + "(:cId IS NULL OR p.category.id = :cId) AND " + "(:bId IS NULL OR p.brand.id = :bId)")
 
+
     @Query("SELECT p FROM Product p WHERE (:q IS NULL OR LOWER(p.title) LIKE CONCAT('%', LOWER(:q), '%')) "
             + "AND (p.isActive = true) "
             + "AND (:cId IS NULL OR p.category.isActive = true AND p.category.id = :cId) "

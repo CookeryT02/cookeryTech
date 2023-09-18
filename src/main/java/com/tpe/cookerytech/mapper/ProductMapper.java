@@ -67,6 +67,10 @@ public interface ProductMapper{
 
 
 
+//    ProductObjectResponse productToProductObjectResponse(Product product);
+
+
+
 
 //    Page<ProductResponse> productsToProductResponseCustomer(List<Product> filteredProductsCustomer, Pageable pageable);
 //

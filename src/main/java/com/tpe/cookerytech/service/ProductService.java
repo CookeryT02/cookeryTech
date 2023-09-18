@@ -1,7 +1,6 @@
 package com.tpe.cookerytech.service;
 
 import com.tpe.cookerytech.domain.*;
-import com.tpe.cookerytech.domain.enums.RoleType;
 import com.tpe.cookerytech.dto.request.ModelRequest;
 import com.tpe.cookerytech.dto.request.ProductPropertyKeyRequest;
 import com.tpe.cookerytech.dto.request.ProductRequest;
@@ -15,25 +14,13 @@ import com.tpe.cookerytech.repository.CurrencyRepository;
 import com.tpe.cookerytech.repository.ModelRepository;
 import com.tpe.cookerytech.repository.ProductPropertyKeyRepository;
 import com.tpe.cookerytech.repository.ProductRepository;
-import com.tpe.cookerytech.security.SecurityUtils;
 import org.springframework.data.domain.*;
-import org.springframework.context.annotation.Bean;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.Column;
-import javax.persistence.EntityManager;
-import javax.persistence.criteria.Predicate;
-import java.lang.reflect.Field;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
-import java.util.Random;
 import java.util.stream.Collectors;
 
 
@@ -57,7 +44,11 @@ public class ProductService {
 
     private final UserService userService;
 
-    public ProductService(ProductRepository productRepository, ProductMapper productMapper, BrandService brandService, CategoryService categoryService, CurrencyService currencyService, CurrencyRepository currencyRepository, ModelMapper modelMapper, ProductPropertyKeyMapper productPropertyKeyMapper, ProductPropertyKeyRepository productPropertyKeyRepository, ModelRepository modelRepository, UserService userService) {
+    private final CategoryMapper categoryMapper;
+
+    private final BrandMapper brandMapper;
+
+    public ProductService(ProductRepository productRepository, ProductMapper productMapper, BrandService brandService, CategoryService categoryService, CurrencyService currencyService, CurrencyRepository currencyRepository, ModelMapper modelMapper, ProductPropertyKeyMapper productPropertyKeyMapper, ProductPropertyKeyRepository productPropertyKeyRepository, ModelRepository modelRepository, UserService userService, CategoryMapper categoryMapper, BrandMapper brandMapper) {
         this.productRepository = productRepository;
         this.productMapper = productMapper;
         this.brandService = brandService;
@@ -68,6 +59,8 @@ public class ProductService {
         this.productPropertyKeyRepository = productPropertyKeyRepository;
         this.modelRepository = modelRepository;
         this.userService = userService;
+        this.categoryMapper = categoryMapper;
+        this.brandMapper = brandMapper;
     }
 
     public ProductResponse createProducts(ProductRequest productRequest) {
@@ -397,7 +390,7 @@ public class ProductService {
 
         if (authentication != null && authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_CUSTOMER"))) {
 
-            List<Product> productList = (productRepository.findByIsActive(false));
+            List<Product> productList = (productRepository.findByIsActive(true));
             List<Product> filteredProductsCustomer =productList.stream()
                     .filter(p -> {
                         Brand brand = p.getBrand();
@@ -408,21 +401,32 @@ public class ProductService {
                     .collect(Collectors.toList());
 
             // list convert to page
-           // Page<Product> p = new PageImpl<Product>(productList);
+            Page<Product> p = new PageImpl<Product>(productList);
             Page<Product> f = new PageImpl<Product>(filteredProductsCustomer);
 
 
 
-            Page<Product> productPage = productRepository.getAllProductsIsActiveFalse(q, pageable, brandId, categoryId);
+            Page<Product> productPage = productRepository.getAllProductsIsActiveTrue(q, pageable, brandId, categoryId);
+//
+//
+//            Page<ProductObjectResponse> productObjectResponses = productPage.map(product -> {
+//                ProductObjectResponse productObjectResponse = productMapper.productToProductObjectResponse(product);
+//                productObjectResponse.setCategory(categoryMapper.categoryToCategoryResponse(product.getCategory()));
+//                productObjectResponse.setBrand(brandMapper.brandToBrandResponse(product.getBrand()));
+//                return productObjectResponse;
+//            });
+//
+//            return productObjectResponses;
 
-            return f.map(productMapper::productToProductResponse);
+//            return f.map(productMapper::productToProductResponse);
 
-           // return productPage.map(productMapper::productToProductResponse);
+            return productPage.map(productMapper::productToProductResponse);
 
 
         } else {
 
-            List<Product> productList = (productRepository.findByIsActive(true));
+
+            List<Product> productList = (productRepository.findByIsActive(false));
             List<Product> filteredProducts =productList.stream()
                     .filter(p -> {
                         Brand brand = p.getBrand();
@@ -436,7 +440,9 @@ public class ProductService {
             Page<Product> f = new PageImpl<Product>(filteredProducts);
 
 
-            Page<Product> productPage = productRepository.getAllProductsIsActiveTrue(q, pageable, brandId, categoryId);
+            Page<Product> productPage = productRepository.getAllProductsIsActiveFalse(q, pageable, brandId, categoryId);
+
+//            return f.map(productMapper::productToProductResponse);
 
             return productPage.map(productMapper::productToProductResponse);
 
