@@ -1,11 +1,18 @@
 package com.tpe.cookerytech.controller;
 
 import com.tpe.cookerytech.dto.request.OfferCreateRequest;
+import com.tpe.cookerytech.dto.response.OfferResponse;
+import com.tpe.cookerytech.dto.response.ProductResponse;
 import com.tpe.cookerytech.dto.request.OfferItemUpdateRequest;
 import com.tpe.cookerytech.dto.response.*;
 import com.tpe.cookerytech.repository.OfferRepository;
 import com.tpe.cookerytech.dto.response.OfferResponseWithUser;
 import com.tpe.cookerytech.service.OfferService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +26,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.Valid;
+import java.time.LocalDate;
+import java.util.List;
 import javax.websocket.server.PathParam;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -48,6 +57,38 @@ public class OfferController {
 
         return ResponseEntity.ok(offerResponse);
     }
+
+
+
+
+
+//    @GetMapping("/admin/user/{id}")
+//    @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST')")
+//    public ResponseEntity<Page<OfferResponse>> getUserOffers(
+//            @RequestParam("id") Long id,
+//            @RequestParam(value = "status") Byte status,
+//            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date1,
+//            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date2,
+//            @RequestParam(value = "page", defaultValue = "0") int page,
+//            @RequestParam(value = "size", defaultValue = "20") int size,
+//            @RequestParam(value = "sort", defaultValue = "createAt") String sort,
+//            @RequestParam(value = "type", defaultValue = "DESC") String type
+//    ) {
+//
+//
+//        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.valueOf(type), sort));
+//
+//        Page<OfferResponse> offerResponse = offerService.getUserOfferById(id,pageable,status,date1,date2);
+//
+//        return ResponseEntity.ok(offerResponse);
+//
+//
+//
+//    }
+
+
+
+
 
 
     @GetMapping("/{id}/auth")
@@ -148,5 +189,7 @@ public class OfferController {
         return ResponseEntity.ok(offerResponseWithUser);
 
     }
+
+
 }
 

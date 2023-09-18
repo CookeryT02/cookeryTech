@@ -17,7 +17,7 @@ public class OfferResponse {
 
     private String code;
 
-    private byte status;
+    private Byte status;
 
     private double subTotal;
 

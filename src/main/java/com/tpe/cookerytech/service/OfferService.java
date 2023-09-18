@@ -24,6 +24,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
@@ -31,6 +36,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -46,10 +52,13 @@ public class OfferService {
     private final ShoppingCartRepository shoppingCartRepository;
     private final ShoppingCartItemRepository shoppingCartItemRepository;
     private final OfferItemRepository offerItemRepository;
-    private final UserMapper userMapper;
+
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
     private final OfferItemMapper offerItemMapper;
+
+
 
     public OfferService(UserService userService, OfferRepository offerRepository, OfferMapper offerMapper, CurrencyMapper currencyMapper, CurrencyRepository currencyRepository, ShoppingCartRepository shoppingCartRepository, ShoppingCartItemRepository shoppingCartItemRepository, OfferItemRepository offerItemRepository, UserMapper userMapper,OfferItemMapper offerItemMapper, UserRepository userRepository) {
         this.userService = userService;
@@ -129,6 +138,75 @@ public class OfferService {
 
         return offerResponse;
     }
+
+//    public Page<OfferResponse> getUserOfferById(Long id, Pageable pageable, Byte status, LocalDate date1, LocalDate date2) {
+
+
+
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//
+//        if (authentication != null || authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))
+//                || authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_SALES_SPECIALIST"))
+//                || authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_SALES_MANAGER")) ) {
+//
+//            userRepository.findById(id).orElseThrow(
+//                    () -> new ResourceNotFoundException(String.format(ErrorMessage.RESOURCE_NOT_FOUND_EXCEPTION, id)));
+//
+//            List<Offer> offerList = (offerRepository.findByUser(id));
+//            List<Offer> filteredOffers =offerList.stream()
+//                    .filter(o -> {
+//                        User user = o.getUser();
+//                        System.out.println(o.getUser().getId().longValue());
+//                        return  user != null && user.getId().longValue() == o.getId().longValue();
+//                    })
+//                    .collect(Collectors.toList());
+//
+//
+//            Page<Offer> p = new PageImpl<Offer>(offerList);
+//            Page<Offer> f = new PageImpl<Offer>(filteredOffers);
+//
+//
+//            Page<Offer> offerPage = offerRepository.getAllUserOfferById(id, pageable, status, date1, date2);
+//
+//            return offerPage.map(offerMapper::offerToOfferResponse);
+//
+//
+//        } else {
+//            throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
+//        }
+
+//
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//
+//        if (authentication != null || authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))
+//                || authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_SALES_SPECIALIST"))
+//                || authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_SALES_MANAGER")) ) {
+//
+//            userRepository.findById(id).orElseThrow(
+//                    () -> new BadRequestException(String.format(ErrorMessage.USER_NOT_FOUND_EXCEPTION, id)));
+//
+//            Page<Offer> offerPages = offerRepository.findByUserIdBetweenOrderByCreateAt(id, pageable, status, date1, date2);
+//
+//            Page<OfferResponse> offerResponses= offerPages.map(offer -> {
+//                OfferResponse offerResponse = new OfferResponse();
+//                offerResponse = offerMapper.offerToOfferResponse(offer);
+//                offerResponse.setUserId(userMapper.userToUserResponse(offer.getUserId(id));
+//                offerResponse.setCurrencyResponse(currencyMapper.currencyToCurrencyResponse(offer.getCurrency()));
+//                return offerResponse;
+//            });
+//
+//            return offerResponses;
+//
+//
+//
+//        } else {
+//            throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
+//        }
+//
+//
+//    }
+
+
 
     public OfferResponse getOfferByAuthUser(Long id) {
         User user = userService.getCurrentUser();
