@@ -27,4 +27,13 @@ public class OfferItemController {
         return ResponseEntity.ok(offerItemResponse);
 
     }
+
+    @DeleteMapping("/{id}/admin")
+    @PreAuthorize("hasRole('SALES_SPECIALIST')")
+    public ResponseEntity<OfferItemResponse> deleteOfferItem(@PathVariable Long id){
+
+        OfferItemResponse offerItemResponse = offerItemService.deleteOfferItemById(id);
+
+        return ResponseEntity.ok(offerItemResponse);
+    }
 }

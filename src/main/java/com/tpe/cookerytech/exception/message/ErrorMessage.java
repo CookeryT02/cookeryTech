@@ -44,5 +44,7 @@ public class ErrorMessage {
     public static final String OFFER_NOT_FOUND_EXCEPTION = "Offer with id: %s not found";
     public static final String OFFER_ITEM_NOT_FOUND_EXCEPTION = "Offer Item with id: %s not found";
 
+    public static final String OFFER_ITEM_COULD_NOT_BE_DELETED = "Could not be deleted because offer status is not 0 or 3";
+
 
 }
