@@ -39,5 +39,4 @@ public class ReportService {
         reportResponse.setCustomers(users.size());
         return reportResponse ;
     }
-
 }
