@@ -407,8 +407,9 @@ public class ProductService {
                     })
                     .collect(Collectors.toList());
 
+
             // list convert to page
-           // Page<Product> p = new PageImpl<Product>(productList);
+            // Page<Product> p = new PageImpl<Product>(productList);
             Page<Product> f = new PageImpl<Product>(filteredProductsCustomer);
 
 
@@ -417,7 +418,7 @@ public class ProductService {
 
             return f.map(productMapper::productToProductResponse);
 
-           // return productPage.map(productMapper::productToProductResponse);
+            // return productPage.map(productMapper::productToProductResponse);
 
 
         } else {
