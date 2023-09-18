@@ -50,7 +50,6 @@ public class UserService {
     private final ProductMapper productMapper;
 
 
-
     public UserService(UserRepository userRepository, RoleService roleService, @Lazy PasswordEncoder passwordEncoder, UserMapper userMapper, ProductRepository productRepository, ProductMapper productMapper) {
         this.userRepository = userRepository;
         this.roleService = roleService;
@@ -114,7 +113,7 @@ public class UserService {
     public UserResponse updateUserPassword(UpdatePasswordRequest updatePasswordRequest) {
         User user = getCurrentUser();
 
-        if (user.getBuiltIn()){
+        if (user.getBuiltIn()) {
             throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
         }
 
@@ -129,68 +128,67 @@ public class UserService {
         return userMapper.userToUserResponse(user);
     }
 
-        //*****************************Yardimci Methodlar***************************************
+    //*****************************Yardimci Methodlar***************************************
 
 
+    public UserResponse getPrincipal() {
+        User user = getCurrentUser();
+        UserResponse userResponse = userMapper.userToUserResponse(user);
+        return userResponse;
+    }
 
+    public UserResponse updateUser(UserUpdateRequest userUpdateRequest) {
 
-        public UserResponse getPrincipal () {
-            User user = getCurrentUser();
-            UserResponse userResponse = userMapper.userToUserResponse(user);
-            return userResponse;
+        User user = getCurrentUser();
+
+        if (user.getBuiltIn()) {
+            throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
         }
 
-        public UserResponse updateUser (UserUpdateRequest userUpdateRequest){
+        boolean emailExist = userRepository.existsByEmail(userUpdateRequest.getEmail());
 
-            User user = getCurrentUser();
-
-            if (user.getBuiltIn()) {
-                throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
-            }
-
-            boolean emailExist = userRepository.existsByEmail(userUpdateRequest.getEmail());
-
-            if (emailExist && !userUpdateRequest.getEmail().equals(user.getEmail())) {
-                throw new ConflictException(String.format(ErrorMessage.EMAIL_ALREADY_EXIST_MESSAGE, userUpdateRequest.getEmail()));
-            }
-
-            user.setFirstName(userUpdateRequest.getFirstName());
-            user.setLastName(userUpdateRequest.getLastName());
-            user.setEmail(userUpdateRequest.getEmail());
-            user.setPhone(userUpdateRequest.getPhone());
-            user.setAddress(userUpdateRequest.getAddress());
-            user.setCity(userUpdateRequest.getCity());
-            user.setCountry(userUpdateRequest.getCountry());
-            user.setBirthDate(userUpdateRequest.getBirthDate());
-            user.setTaxNo(userUpdateRequest.getTaxNo());
-            user.setUpdateAt(LocalDateTime.now());
-
-            userRepository.save(user);
-
-
-            return userMapper.userToUserResponse(user);
-
+        if (emailExist && !userUpdateRequest.getEmail().equals(user.getEmail())) {
+            throw new ConflictException(String.format(ErrorMessage.EMAIL_ALREADY_EXIST_MESSAGE, userUpdateRequest.getEmail()));
         }
+
+        user.setFirstName(userUpdateRequest.getFirstName());
+        user.setLastName(userUpdateRequest.getLastName());
+        user.setEmail(userUpdateRequest.getEmail());
+        user.setPhone(userUpdateRequest.getPhone());
+        user.setAddress(userUpdateRequest.getAddress());
+        user.setCity(userUpdateRequest.getCity());
+        user.setCountry(userUpdateRequest.getCountry());
+        user.setBirthDate(userUpdateRequest.getBirthDate());
+        user.setTaxNo(userUpdateRequest.getTaxNo());
+        user.setUpdateAt(LocalDateTime.now());
+
+        userRepository.save(user);
+
+
+        return userMapper.userToUserResponse(user);
+
+    }
 
 
     public Page<UserResponse> getUserPage(String q, Pageable pageable) {
 
-        Page<User> userPage = userRepository.getUsers(q,pageable);
+        Page<User> userPage = userRepository.getUsers(q, pageable);
 
         return getUserResponsePage(userPage);
     }
 
     //*****************************Yardimci Methodlar***************************************
     public User getCurrentUser() {
-        String email = SecurityUtils.getCurrentUserLogin().orElseThrow(()->
+        String email = SecurityUtils.getCurrentUserLogin().orElseThrow(() ->
                 new ResourceNotFoundException(ErrorMessage.PRINCIPAL_FOUND_MESSAGE));
-        User user = getUserByEmail(email);
-        return user;
+        return getUserByEmail(email);
     }
 
-
-
-
+    // user role control method
+    public boolean roleControl(RoleType roleType) {
+        Set<Role> roles = getCurrentUser().getRoles();
+        return roles.stream().anyMatch(r -> r.getType().equals(roleType));
+    }
 
     public UserResponse getUserById(Long id) {
 
@@ -200,19 +198,18 @@ public class UserService {
         return userMapper.userToUserResponse(user);
 
     }
+
     public User getUserEntityById(Long id) {
 
-        User user = userRepository.findById(id).orElseThrow(
+        return userRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException(String.format(ErrorMessage.RESOURCE_NOT_FOUND_EXCEPTION, id)));
-
-        return user;
 
     }
 
 
     private Page<UserResponse> getUserResponsePage(Page<User> userPage) {
 
-        return userPage.map(user -> userMapper.userToUserResponse(user));
+        return userPage.map(userMapper::userToUserResponse);
     }
 
 
@@ -259,9 +256,9 @@ public class UserService {
             throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
         }
         //email kontrol
-        if(adminUserUpdateRequest.getEmail()==null){
+        if (adminUserUpdateRequest.getEmail() == null) {
             adminUserUpdateRequest.setEmail(user.getEmail());
-        }else {
+        } else {
             boolean emailExist = userRepository.existsByEmail(adminUserUpdateRequest.getEmail());
             if (emailExist && !(adminUserUpdateRequest.getEmail().equals(user.getEmail()))) {
                 throw new ConflictException(String.format(ErrorMessage.EMAIL_ALREADY_EXIST_MESSAGE, adminUserUpdateRequest.getEmail()));
@@ -332,13 +329,13 @@ public class UserService {
         User user = getCurrentUser();
 
         // built-in (kullanıcının offers tablosunda kaydı varsa silinemeyecek)
-        if (user.getBuiltIn()){
+        if (user.getBuiltIn()) {
             throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
         }
 
 
         boolean passwordsMatch = BCrypt.checkpw(password, user.getPasswordHash());
-        if (!passwordsMatch){
+        if (!passwordsMatch) {
             throw new BadRequestException(ErrorMessage.WRONG_PASSWORD_EXCEPTION);
         }
 
@@ -370,19 +367,19 @@ public class UserService {
             } else if (r.getType().equals(RoleType.ROLE_SALES_MANAGER)) {
                 user.getRoles().forEach(role -> {
                     if (role.getType().equals(RoleType.ROLE_ADMIN) ||
-                    role.getType().equals(RoleType.ROLE_PRODUCT_MANAGER)) {
+                            role.getType().equals(RoleType.ROLE_PRODUCT_MANAGER)) {
                         throw new BadRequestException(String.format(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE));
 
                     } else if (role.getType().equals(RoleType.ROLE_SALES_SPECIALIST) ||
-                    role.getType().equals(RoleType.ROLE_CUSTOMER)) {
+                            role.getType().equals(RoleType.ROLE_CUSTOMER)) {
                         userRepository.delete(user);
                     }
                 });
             } else if (r.getType().equals(RoleType.ROLE_SALES_SPECIALIST)) {
                 user.getRoles().forEach(role -> {
                     if (role.getType().equals(RoleType.ROLE_ADMIN) ||
-                    role.getType().equals(RoleType.ROLE_PRODUCT_MANAGER) ||
-                    role.getType().equals(RoleType.ROLE_SALES_MANAGER)) {
+                            role.getType().equals(RoleType.ROLE_PRODUCT_MANAGER) ||
+                            role.getType().equals(RoleType.ROLE_SALES_MANAGER)) {
                         throw new BadRequestException(String.format(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE));
 
                     } else if (role.getType().equals(RoleType.ROLE_SALES_SPECIALIST)
@@ -409,7 +406,7 @@ public class UserService {
         }
 
         User user = getUserByEmail(email);
-        if ( user == null ) {
+        if (user == null) {
             throw new ResourceNotFoundException(ErrorMessage.PRINCIPAL_FOUND_MESSAGE);
         }
 
@@ -417,8 +414,6 @@ public class UserService {
 
 
     }
-
-
 
 
 }
