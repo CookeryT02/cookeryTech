@@ -79,7 +79,7 @@ public class ReportService {
                 })
                 .collect(Collectors.toList());
         }
-    }
+
 
     public List<ReportOfferResponse> getOffersSummaries(LocalDate startDate, LocalDate endDate, String type) {
 

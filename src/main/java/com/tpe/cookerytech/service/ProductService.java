@@ -391,23 +391,6 @@ public class ProductService {
         if (authentication != null && authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_CUSTOMER"))) {
 
             List<Product> productList = (productRepository.findByIsActive(true));
-//            List<Product> filteredProductsCustomer =productList.stream()
-//                    .filter(p -> {
-//                        Brand brand = p.getBrand();
-//                        Category category = p.getCategory();
-//                        System.out.println(p.getCategory().getIsActive());
-//                        return p.getIsFeatured() && brand != null && category != null && brand.getIsActive() && category.getIsActive();
-//                    })
-//                    .collect(Collectors.toList());
-//
-//            // list convert to page
-//            Page<Product> p = new PageImpl<Product>(productList);
-//            Page<Product> f = new PageImpl<Product>(filteredProductsCustomer);
-
-
-
-            Page<Product> productPage = productRepository.getAllProductsIsActiveTrue(q, pageable, brandId, categoryId);
-            List<Product> productList = (productRepository.findByIsActive(false));
             List<Product> filteredProductsCustomer =productList.stream()
                     .filter(p -> {
                         Brand brand = p.getBrand();
@@ -417,10 +400,18 @@ public class ProductService {
                     })
                     .collect(Collectors.toList());
 
+            // list convert to page
+            Page<Product> p = new PageImpl<Product>(productList);
+            Page<Product> f = new PageImpl<Product>(filteredProductsCustomer);
+
+
+
+            Page<Product> productPage = productRepository.getAllProductsIsActiveFalse(q, pageable, brandId, categoryId);
+
 
             // list convert to page
-            // Page<Product> p = new PageImpl<Product>(productList);
-            Page<Product> f = new PageImpl<Product>(filteredProductsCustomer);
+//            Page<Product> p = new PageImpl<Product>(productList);
+//            Page<Product> f = new PageImpl<Product>(filteredProductsCustomer);
 
 
 //            Page<Product> productMap = productPage.map(product -> {
