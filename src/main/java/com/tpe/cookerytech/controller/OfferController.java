@@ -104,21 +104,6 @@ public class OfferController {
 
 
 
-
-
-    @PutMapping("/offer-items/{id}/admin")
-    @PreAuthorize("hasRole('SALES_SPECIALIST')")
-    public ResponseEntity<OfferItemResponse> updateOfferItemWithIdByAdmin(@PathVariable Long id,
-                                                                          @RequestBody OfferItemUpdateRequest offerItemUpdateRequest){
-
-        OfferItemResponse offerItemResponse= offerService.updateOfferItemWithIdByAdmin(id,offerItemUpdateRequest);
-
-        return ResponseEntity.ok(offerItemResponse);
-
-    }
-
-
-
     @GetMapping("/auth")
     @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER') or hasRole('CUSTOMER')")
     public ResponseEntity<Page<OfferResponseWithUser>> getOffersAccordingTimeAuthUser(
