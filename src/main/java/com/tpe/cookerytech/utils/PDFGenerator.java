@@ -1,4 +1,4 @@
-package com.tpe.cookerytech.init;
+package com.tpe.cookerytech.utils;
 
 import com.lowagie.text.*;
 import com.lowagie.text.pdf.*;
@@ -28,7 +28,7 @@ public class PDFGenerator {
 
     private List<ProductResponse> productList;
 
-    public void generate(HttpServletResponse response) throws DocumentException, IOException{
+    public void generate(HttpServletResponse response,String title, int count) throws DocumentException, IOException{
 
         Document document = new Document(PageSize.A4);
 
@@ -39,16 +39,16 @@ public class PDFGenerator {
         Font fontTitle = FontFactory.getFont(FontFactory.TIMES_ROMAN);
         fontTitle.setSize(20);
 
-        Paragraph paragraph = new Paragraph("List Of Un Offered Products",fontTitle);
+        Paragraph paragraph = new Paragraph(title,fontTitle);
 
         paragraph.setAlignment(Paragraph.ALIGN_CENTER);
 
         document.add(paragraph);
 
-        PdfPTable table = new PdfPTable(3);
+        PdfPTable table = new PdfPTable(5);
 
         table.setWidthPercentage(100f);
-        table.setWidths(new int[]{3,3,3});
+        table.setWidths(new int[]{3,3,3,3,3});
         table.setSpacingBefore(5);
 
         PdfPCell cell = new PdfPCell();
@@ -65,12 +65,18 @@ public class PDFGenerator {
         table.addCell(cell);
         cell.setPhrase(new Phrase("Brand",font));
         table.addCell(cell);
+        cell.setPhrase(new Phrase("Category",font));
+        table.addCell(cell);
+        cell.setPhrase(new Phrase("Offer Count",font));
+        table.addCell(cell);
+
 
         for(ProductResponse productResponse:productList){
             table.addCell(String.valueOf(productResponse.getId()));
             table.addCell(productResponse.getTitle());
             table.addCell(String.valueOf(productResponse.getBrandId()));
-
+            table.addCell(String.valueOf(productResponse.getCategoryId()));
+            table.addCell(String.valueOf(count));
         }
 
         document.add(table);

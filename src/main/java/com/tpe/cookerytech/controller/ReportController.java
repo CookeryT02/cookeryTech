@@ -2,16 +2,13 @@ package com.tpe.cookerytech.controller;
 
 import com.lowagie.text.DocumentException;
 import com.tpe.cookerytech.dto.response.ProductResponse;
-import com.tpe.cookerytech.dto.response.ReportResponse;
-import com.tpe.cookerytech.init.PDFGenerator;
+import com.tpe.cookerytech.utils.PDFGenerator;
 import com.tpe.cookerytech.service.ReportService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import reactor.netty.http.server.HttpServerResponse;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -63,7 +60,9 @@ public class ReportController {
 
         PDFGenerator generator = new PDFGenerator();
         generator.setProductList(productResponseList);
-        generator.generate(response);
+        int count =0;
+        String title = "List Of Unoffered Products";
+        generator.generate(response,title,count);
 
     }
 

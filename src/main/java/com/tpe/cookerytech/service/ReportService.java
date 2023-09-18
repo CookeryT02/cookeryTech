@@ -63,7 +63,12 @@ public class ReportService {
                 .collect(Collectors.toList());
 
         return nonMatchingProducts.stream()
-                .map(productMapper::productToProductResponse)
+                .map(product -> {
+                    ProductResponse productResponse = productMapper.productToProductResponse(product);
+                    productResponse.setBrandId(product.getBrand().getId());
+                    productResponse.setCategoryId(product.getCategory().getId());
+                    return productResponse;
+                })
                 .collect(Collectors.toList());
+        }
     }
-}
