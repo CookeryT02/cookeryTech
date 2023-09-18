@@ -7,6 +7,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/offer-items")
 public class OfferItemController {
@@ -36,4 +38,18 @@ public class OfferItemController {
 
         return ResponseEntity.ok(offerItemResponse);
     }
+
+    //--------------------------------------------------------------------------------
+    @GetMapping
+    @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST')")
+    public ResponseEntity<List<OfferItemResponse>> getAllOfferItems(){
+
+        List<OfferItemResponse> offerItemResponseList= offerItemService.getAllOfferItems();
+
+        return ResponseEntity.ok(offerItemResponseList);
+
+    }
+
+    //---------------------------------------------------------------------------------
+
 }

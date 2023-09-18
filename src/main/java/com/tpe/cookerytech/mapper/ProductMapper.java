@@ -65,6 +65,7 @@ public interface ProductMapper{
         return new PageImpl<>(productResponse,pageable,productResponse.size());
     }
 
+    ProductObjectResponse productToProductObjectResponse(Product product);
 
 
 //    ProductObjectResponse productToProductObjectResponse(Product product);

@@ -391,22 +391,34 @@ public class ProductService {
         if (authentication != null && authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_CUSTOMER"))) {
 
             List<Product> productList = (productRepository.findByIsActive(true));
-            List<Product> filteredProductsCustomer =productList.stream()
-                    .filter(p -> {
-                        Brand brand = p.getBrand();
-                        Category category = p.getCategory();
-                        System.out.println(p.getCategory().getIsActive());
-                        return p.getIsFeatured() && brand != null && category != null && brand.getIsActive() && category.getIsActive();
-                    })
-                    .collect(Collectors.toList());
-
-            // list convert to page
-            Page<Product> p = new PageImpl<Product>(productList);
-            Page<Product> f = new PageImpl<Product>(filteredProductsCustomer);
+//            List<Product> filteredProductsCustomer =productList.stream()
+//                    .filter(p -> {
+//                        Brand brand = p.getBrand();
+//                        Category category = p.getCategory();
+//                        System.out.println(p.getCategory().getIsActive());
+//                        return p.getIsFeatured() && brand != null && category != null && brand.getIsActive() && category.getIsActive();
+//                    })
+//                    .collect(Collectors.toList());
+//
+//            // list convert to page
+//            Page<Product> p = new PageImpl<Product>(productList);
+//            Page<Product> f = new PageImpl<Product>(filteredProductsCustomer);
 
 
 
             Page<Product> productPage = productRepository.getAllProductsIsActiveTrue(q, pageable, brandId, categoryId);
+
+
+//            Page<Product> productMap = productPage.map(product -> {
+//
+////                ProductObjectResponse productObjectResponse = productMapper.productToProductObjectResponse(product);
+////                productObjectResponse.setCategory(categoryMapper.categoryToCategoryResponse(product.getCategory()));
+////                productObjectResponse.setBrand(brandMapper.brandToBrandResponse(product.getBrand()));
+////                return productObjectResponse;
+////
+////            });
+
+
 //
 //
 //            Page<ProductObjectResponse> productObjectResponses = productPage.map(product -> {
@@ -420,7 +432,7 @@ public class ProductService {
 
 //            return f.map(productMapper::productToProductResponse);
 
-            return productPage.map(productMapper::productToProductResponse);
+           return productPage.map(productMapper::productToProductResponse);
 
 
         } else {

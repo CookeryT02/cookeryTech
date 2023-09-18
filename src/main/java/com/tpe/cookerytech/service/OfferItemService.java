@@ -13,7 +13,9 @@ import com.tpe.cookerytech.mapper.OfferItemMapper;
 import com.tpe.cookerytech.repository.OfferItemRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class OfferItemService {
@@ -70,5 +72,15 @@ public class OfferItemService {
         offerItemRepository.deleteById(id);
         return offerItemMapper.offerItemToOfferItemResponse(offerItem);
     }
+
+    //--------------------------------------------------
+    public List<OfferItemResponse> getAllOfferItems() {
+
+        List<OfferItem> offerItemList= offerItemRepository.findAll();
+
+        return offerItemList.stream().map(offerItemMapper::offerItemToOfferItemResponse).collect(Collectors.toList());
+    }
+
+    //--------------------------------------------------
 
 }
