@@ -10,6 +10,8 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDate;
 import java.util.List;
 
+import java.util.List;
+
 @Repository
 public interface OfferItemRepository extends JpaRepository<OfferItem,Long> {
 
@@ -18,4 +20,5 @@ public interface OfferItemRepository extends JpaRepository<OfferItem,Long> {
 
 
 //    List<OfferItem> getAllOfferItems();
+    List<OfferItem> findByOfferId( Long id );
 }

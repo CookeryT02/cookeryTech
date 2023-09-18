@@ -407,6 +407,20 @@ public class ProductService {
 
 
             Page<Product> productPage = productRepository.getAllProductsIsActiveTrue(q, pageable, brandId, categoryId);
+            List<Product> productList = (productRepository.findByIsActive(false));
+            List<Product> filteredProductsCustomer =productList.stream()
+                    .filter(p -> {
+                        Brand brand = p.getBrand();
+                        Category category = p.getCategory();
+                        System.out.println(p.getCategory().getIsActive());
+                        return p.getIsFeatured() && brand != null && category != null && brand.getIsActive() && category.getIsActive();
+                    })
+                    .collect(Collectors.toList());
+
+
+            // list convert to page
+            // Page<Product> p = new PageImpl<Product>(productList);
+            Page<Product> f = new PageImpl<Product>(filteredProductsCustomer);
 
 
 //            Page<Product> productMap = productPage.map(product -> {
@@ -433,6 +447,7 @@ public class ProductService {
 //            return f.map(productMapper::productToProductResponse);
 
            return productPage.map(productMapper::productToProductResponse);
+            // return productPage.map(productMapper::productToProductResponse);
 
 
         } else {

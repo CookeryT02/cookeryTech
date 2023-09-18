@@ -1,5 +1,6 @@
 package com.tpe.cookerytech.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.tpe.cookerytech.domain.Role;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -38,6 +39,7 @@ public class UserResponse {
 
     private byte status;
 
+    @JsonIgnore
     private String passwordHash;
 
     private String resetPasswordCode;

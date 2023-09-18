@@ -1,5 +1,6 @@
 package com.tpe.cookerytech.controller;
 
+import com.tpe.cookerytech.domain.User;
 import com.tpe.cookerytech.dto.request.OfferCreateRequest;
 import com.tpe.cookerytech.dto.response.OfferResponse;
 import com.tpe.cookerytech.dto.response.ProductResponse;
@@ -15,6 +16,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import com.tpe.cookerytech.dto.request.OfferUpdateRequest;
@@ -175,6 +177,14 @@ public class OfferController {
 
     }
 
+
+    @GetMapping("/{id}/admin")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST')")
+    public ResponseEntity<OfferResponseWithUser> getOfferByAdmin(@Valid @PathVariable("id") Long offerId){
+        OfferResponseWithUser offerResponse=offerService.getOfferByAdmin(offerId);
+
+        return ResponseEntity.ok(offerResponse);
+    }
 
 }
 
