@@ -1,12 +1,18 @@
 package com.tpe.cookerytech.controller;
 
+import com.tpe.cookerytech.dto.response.ProductResponse;
 import com.tpe.cookerytech.dto.response.ReportResponse;
 import com.tpe.cookerytech.service.ReportService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.validation.Valid;
+import javax.validation.constraints.Min;
+import java.util.List;
 
 @RestController
 @RequestMapping("/report")
@@ -28,4 +34,10 @@ public class ReportController {
     }
 
 
+    @GetMapping("/most-popular-products/{amount}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER')")
+    public ResponseEntity<List<ProductResponse>> getMostPopularProducts(@PathVariable @Min(1) int amount){
+        List<ProductResponse> listMostPopularProducts=reportService.getReportMostPopularProduct(amount);
+        return ResponseEntity.ok(listMostPopularProducts);
+    }
 }
