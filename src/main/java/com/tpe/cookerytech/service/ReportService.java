@@ -78,15 +78,25 @@ public class ReportService {
 //            return popularProducts;
 //    }
 
-    public List<ProductResponse> getReportMostPopularProduct(int amount) {
+    public Map<Long,ProductResponse> getReportMostPopularProduct(int amount) {
         List<Object[]> popularProductData = offerItemRepository.findMostPopularProducts(amount);
 
         List<ProductResponse> popularProducts = popularProductData.stream()
                 .map(rowData -> ((BigInteger) rowData[0]).longValue()) // BigInteger'ı Long'a dönüştürme
                 .map(productService::getProductById)
                 .collect(Collectors.toList());
+        List<Long> offerCount=popularProductData.stream()
+                .map(rowData -> ((BigInteger) rowData[1]).longValue())
+                .collect(Collectors.toList());
+        Comparator<Long> reverseOrder = Collections.reverseOrder();
+        Map<Long,ProductResponse> productAndCount= new TreeMap<>(reverseOrder);
+        int i=0;
+        do{
+            productAndCount.put(offerCount.get(i),popularProducts.get(i));
+            i++;
+        }while(offerCount.size()>i);
 
-        return popularProducts;
+        return productAndCount;
     }
 
 }
