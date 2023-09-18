@@ -37,7 +37,8 @@ public class ContactMessageService {
 
 
                 String content = " Hello my name is " + contactMessageRequest.getName()
-                        + "\n\n Your product interested me my phone number " + contactMessageRequest.getPhone()
+                        + "\n\n My product interested me my phone number " + contactMessageRequest.getPhone()
+                        + "\n\n My email adress " + contactMessageRequest.getEmail()
                         + "\n\n Could you please get back to me again?"
                         + "\n\n My company name : " + contactMessageRequest.getCompany()
                         + "\n\n My Message: " + contactMessageRequest.getMessage();
