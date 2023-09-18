@@ -39,7 +39,7 @@ public class PDFGenerator {
         Font fontTitle = FontFactory.getFont(FontFactory.TIMES_ROMAN);
         fontTitle.setSize(20);
 
-        Paragraph paragraph = new Paragraph("List Of Products",fontTitle);
+        Paragraph paragraph = new Paragraph("List Of Un Offered Products",fontTitle);
 
         paragraph.setAlignment(Paragraph.ALIGN_CENTER);
 
@@ -63,11 +63,13 @@ public class PDFGenerator {
         table.addCell(cell);
         cell.setPhrase(new Phrase("Product",font));
         table.addCell(cell);
-        cell.setPhrase(new Phrase("Offer",font));
+        cell.setPhrase(new Phrase("Brand",font));
         table.addCell(cell);
 
-        for(ProductResponse product:productList){
-            table.addCell(product.getTitle());
+        for(ProductResponse productResponse:productList){
+            table.addCell(String.valueOf(productResponse.getId()));
+            table.addCell(productResponse.getTitle());
+            table.addCell(String.valueOf(productResponse.getBrandId()));
 
         }
 
