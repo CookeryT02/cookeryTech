@@ -60,8 +60,7 @@ public class OfferService {
     private final OfferItemMapper offerItemMapper;
 
 
-
-    public OfferService(UserService userService, OfferRepository offerRepository, OfferMapper offerMapper, CurrencyMapper currencyMapper, CurrencyRepository currencyRepository, ShoppingCartRepository shoppingCartRepository, ShoppingCartItemRepository shoppingCartItemRepository, OfferItemRepository offerItemRepository, UserMapper userMapper,OfferItemMapper offerItemMapper, UserRepository userRepository) {
+    public OfferService(UserService userService, OfferRepository offerRepository, OfferMapper offerMapper, CurrencyMapper currencyMapper, CurrencyRepository currencyRepository, ShoppingCartRepository shoppingCartRepository, ShoppingCartItemRepository shoppingCartItemRepository, OfferItemRepository offerItemRepository, UserMapper userMapper, OfferItemMapper offerItemMapper, UserRepository userRepository) {
         this.userService = userService;
         this.offerRepository = offerRepository;
         this.offerMapper = offerMapper;
@@ -117,7 +116,7 @@ public class OfferService {
             offerItem.setProduct(shoppingCartItem.getProduct());
             offerItem.setCreateAt(LocalDateTime.now());
             offerItem.setOffer(offer);
-            offerItem.setSub_total(offerItem.getSelling_price()*offerItem.getQuantity()*(1+offerItem.getTax()/100));
+            offerItem.setSub_total(offerItem.getSelling_price() * offerItem.getQuantity() * (1 + offerItem.getTax() / 100));
             offerItemList.add(offerItem);
             offersubTotal += offerItem.getSub_total();
 
@@ -129,7 +128,7 @@ public class OfferService {
 
         offerRepository.save(offer);
 
-        for (OfferItem offerItem : offerItemList){
+        for (OfferItem offerItem : offerItemList) {
             offerItemRepository.save(offerItem);
         }
 
@@ -141,7 +140,6 @@ public class OfferService {
     }
 
 //    public Page<OfferResponse> getUserOfferById(Long id, Pageable pageable, Byte status, LocalDate date1, LocalDate date2) {
-
 
 
 //        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -208,7 +206,6 @@ public class OfferService {
 //    }
 
 
-
     public OfferResponse getOfferByAuthUser(Long id) {
         User user = userService.getCurrentUser();
 
@@ -216,15 +213,15 @@ public class OfferService {
 
         OfferResponse offerResponse = new OfferResponse();
 
-        for (Offer offer: offerList){
-            if(Objects.equals(offer.getId(), id)){
+        for (Offer offer : offerList) {
+            if (Objects.equals(offer.getId(), id)) {
                 offerResponse = offerMapper.offerToOfferResponse(offer);
                 offerResponse.setUserId(user.getId());
                 offerResponse.setCurrencyResponse(currencyMapper.currencyToCurrencyResponse(offer.getCurrency()));
                 return offerResponse;
             }
         }
-        if (offerResponse.getCode()==null) {
+        if (offerResponse.getCode() == null) {
             throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
         }
         return null;
@@ -236,16 +233,15 @@ public class OfferService {
         User user = userService.getCurrentUser();
 
         Set<Role> roleControl = user.getRoles();
-        for(Role r:roleControl)
-        {
-            Page<Offer> offerPage = offerRepository.findFilteredOffers(q,pageable);
+        for (Role r : roleControl) {
+            Page<Offer> offerPage = offerRepository.findFilteredOffers(q, pageable);
 
             List<Offer> offerLists = offerPage.getContent().stream().filter(offer -> (startingDate.isBefore(offer.getCreateAt()) && endingDate.isAfter(offer.getCreateAt()))).collect(Collectors.toList());
 
             Page<Offer> offerPages = new PageImpl<>(offerLists);
 
             Page<OfferResponseWithUser> offerResponseWithUserPage = offerPages.map(offer -> {
-                OfferResponseWithUser offerResponse=offerMapper.offerToOfferResponsewithUser(offer);
+                OfferResponseWithUser offerResponse = offerMapper.offerToOfferResponsewithUser(offer);
                 offerResponse.setUserResponse(this.userMapper.userToUserResponse(offer.getUser()));
                 offerResponse.setCurrencyResponse(currencyMapper.currencyToCurrencyResponse(offer.getCurrency()));
                 return offerResponse;
@@ -255,10 +251,10 @@ public class OfferService {
                 return offerResponseWithUserPage;
 
             } else if (r.getType().equals(RoleType.ROLE_SALES_MANAGER)) {
-                List<OfferResponseWithUser> offerResponseWithUserList= offerResponseWithUserPage.stream().filter(offer -> offer.getStatus()==1).collect(Collectors.toList());
+                List<OfferResponseWithUser> offerResponseWithUserList = offerResponseWithUserPage.stream().filter(offer -> offer.getStatus() == 1).collect(Collectors.toList());
                 return new PageImpl<>(offerResponseWithUserList);
             } else if (r.getType().equals(RoleType.ROLE_SALES_SPECIALIST)) {
-                List<OfferResponseWithUser> offerResponseWithUserList1= offerResponseWithUserPage.stream().filter(offer -> offer.getStatus()==0).collect(Collectors.toList());
+                List<OfferResponseWithUser> offerResponseWithUserList1 = offerResponseWithUserPage.stream().filter(offer -> offer.getStatus() == 0).collect(Collectors.toList());
                 return new PageImpl<>(offerResponseWithUserList1);
             } else {
                 throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
@@ -274,8 +270,8 @@ public class OfferService {
 
         String roleControl = user.getRoles().toString();
 
-        Offer offer = offerRepository.findById(id).orElseThrow(()->
-                new ResourceNotFoundException(String.format(ErrorMessage.OFFER_NOT_FOUND_EXCEPTION,id)));
+        Offer offer = offerRepository.findById(id).orElseThrow(() ->
+                new ResourceNotFoundException(String.format(ErrorMessage.OFFER_NOT_FOUND_EXCEPTION, id)));
 
         if (roleControl.contains("ROLE_SALES_SPECIALIST") && (offer.getStatus() != 0 && offer.getStatus() != 3)) {
             throw new AccessDeniedException("Sales professionals can only update quotes with status 0 or 3");
@@ -286,8 +282,8 @@ public class OfferService {
             throw new AccessDeniedException("Sales managers can only update quotes with status 1");
         }
 
-        Currency currency = currencyRepository.findById(offerUpdateRequest.getCurrencyId()).orElseThrow(()->
-                new ResourceNotFoundException(String.format(ErrorMessage.CURRENCY_NOT_FOUND_EXCEPTION,id)));
+        Currency currency = currencyRepository.findById(offerUpdateRequest.getCurrencyId()).orElseThrow(() ->
+                new ResourceNotFoundException(String.format(ErrorMessage.CURRENCY_NOT_FOUND_EXCEPTION, id)));
 
         offer.setDiscount(offerUpdateRequest.getDiscount());
         offer.setStatus(offerUpdateRequest.getStatus());
@@ -297,7 +293,7 @@ public class OfferService {
 
         offerRepository.save(offer);
 
-        OfferResponseWithUser offerResponseWithUser =  offerMapper.offerToOfferResponsewithUser(offer);
+        OfferResponseWithUser offerResponseWithUser = offerMapper.offerToOfferResponsewithUser(offer);
 
         offerResponseWithUser.setUserResponse(this.userMapper.userToUserResponse(user));
         offerResponseWithUser.setCurrencyResponse(currencyMapper.currencyToCurrencyResponse(currency));
@@ -311,7 +307,7 @@ public class OfferService {
 
         Page<Offer> offerPages = offerRepository.findByCreateAtBetweenOrderByCreateAt(q, date1, date2, pageable);
 
-        Page<OfferResponseWithUser> offerWithUser= offerPages.map(offer -> {
+        Page<OfferResponseWithUser> offerWithUser = offerPages.map(offer -> {
             OfferResponseWithUser offerResponseWithUser = offerMapper.offerToOfferResponsewithUser(offer);
             offerResponseWithUser.setUserResponse(userMapper.userToUserResponse(offer.getUser()));
             offerResponseWithUser.setCurrencyResponse(currencyMapper.currencyToCurrencyResponse(offer.getCurrency()));
@@ -324,20 +320,18 @@ public class OfferService {
     public Page<OfferResponseWithUser> getUserOfferById(Long id, Pageable pageable, Byte status, LocalDate date1, LocalDate date2) {
 
 
-
-
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication != null || authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))
                 || authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_SALES_SPECIALIST"))
-                || authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_SALES_MANAGER")) ) {
+                || authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_SALES_MANAGER"))) {
 
             userRepository.findById(id).orElseThrow(
                     () -> new BadRequestException(String.format(ErrorMessage.USER_NOT_FOUND_EXCEPTION, id)));
 
             Page<Offer> offerPages = offerRepository.findByUserIdBetweenOrderByCreateAt(id, pageable, status, date1, date2);
 
-            Page<OfferResponseWithUser> offersWithUser= offerPages.map(offer -> {
+            Page<OfferResponseWithUser> offersWithUser = offerPages.map(offer -> {
                 OfferResponseWithUser offerResponseWithUser = offerMapper.offerToOfferResponsewithUser(offer);
                 offerResponseWithUser.setUserResponse(userMapper.userToUserResponse(offer.getUser()));
                 offerResponseWithUser.setCurrencyResponse(currencyMapper.currencyToCurrencyResponse(offer.getCurrency()));
@@ -352,32 +346,32 @@ public class OfferService {
 
     }
 
-    public OfferResponseWithUser getOfferByAdmin ( Long offerId ) {
+    public OfferResponseWithUser getOfferByAdmin(Long offerId) {
         User user = userService.getCurrentUser();
-        Offer offer = offerRepository.findById( offerId ).orElseThrow( ( ) -> new ResourceNotFoundException( ErrorMessage.OFFER_NOT_FOUND_EXCEPTION ) );
+        Offer offer = offerRepository.findById(offerId).orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.OFFER_NOT_FOUND_EXCEPTION));
         User offerUser = offer.getUser();
 
         Set<Role> roleControl = user.getRoles();
 
         boolean hasRole = false;
 
-        for ( Role role : roleControl ) {
-            if ( role.getType().equals( RoleType.ROLE_ADMIN ) || role.getType().equals( RoleType.ROLE_SALES_SPECIALIST ) || role.getType().equals( RoleType.ROLE_SALES_MANAGER ) ) {
+        for (Role role : roleControl) {
+            if (role.getType().equals(RoleType.ROLE_ADMIN) || role.getType().equals(RoleType.ROLE_SALES_SPECIALIST) || role.getType().equals(RoleType.ROLE_SALES_MANAGER)) {
                 hasRole = true;
                 break;
             }
         }
-        if ( !hasRole ) {
-            throw new BadRequestException( ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE );
+        if (!hasRole) {
+            throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
         }
-        List<OfferItem> offerItems = offerItemRepository.findByOfferId( offerId );
-        List<OfferItemResponse> offerItemResponse = offerItems.stream().map( offerItemMapper::offerItemToOfferItemResponse ).collect( Collectors.toList() );
+        List<OfferItem> offerItems = offerItemRepository.findByOfferId(offerId);
+        List<OfferItemResponse> offerItemResponse = offerItems.stream().map(offerItemMapper::offerItemToOfferItemResponse).collect(Collectors.toList());
 
-        OfferResponseWithUser offerResponseWithUser = offerMapper.offerToOfferResponsewithUser( offer );
+        OfferResponseWithUser offerResponseWithUser = offerMapper.offerToOfferResponsewithUser(offer);
 
-        offerResponseWithUser.setUserResponse( userMapper.userToUserResponse( offerUser ) );
-        offerResponseWithUser.setCurrencyResponse( currencyMapper.currencyToCurrencyResponse( offer.getCurrency() ) );
-        offerResponseWithUser.setOfferItems( offerItemResponse );
+        offerResponseWithUser.setUserResponse(userMapper.userToUserResponse(offerUser));
+        offerResponseWithUser.setCurrencyResponse(currencyMapper.currencyToCurrencyResponse(offer.getCurrency()));
+        offerResponseWithUser.setOfferItems(offerItemResponse);
 
         return offerResponseWithUser;
 
