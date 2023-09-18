@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -32,4 +33,6 @@ public class OfferResponseWithUser {
     private LocalDateTime createAt;
 
     private LocalDateTime updateAt;
+
+    private List <OfferItemResponse> offerItems;
 }

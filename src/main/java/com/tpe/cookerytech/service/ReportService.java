@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
 import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,8 +27,8 @@ public class ReportService {
     private final OfferItemRepository offerItemRepository;
     private final ProductService productService;
     private final ProductMapper productMapper;
-    public ReportService(ReportRepository reportRepository, ProductRepository productRepository, BrandRepository brandRepository, OfferRepository offerRepository, CategoryRepository categoryRepository, UserRepository userRepository, OfferItemRepository offerItemRepository, ProductService productService, ProductMapper productMapper) {
 
+    public ReportService(ReportRepository reportRepository, ProductRepository productRepository, BrandRepository brandRepository, OfferRepository offerRepository, CategoryRepository categoryRepository, UserRepository userRepository,ProductService productService, OfferItemRepository offerItemRepository, ProductMapper productMapper) {
         this.reportRepository = reportRepository;
         this.productRepository = productRepository;
         this.brandRepository = brandRepository;
@@ -37,7 +39,6 @@ public class ReportService {
         this.productService = productService;
         this.productMapper = productMapper;
     }
-
     public ReportResponse getReport() {
         ReportResponse reportResponse=new ReportResponse();
         reportResponse.setCategories((int)categoryRepository.count());
@@ -49,6 +50,32 @@ public class ReportService {
         reportResponse.setCustomers(users.size());
         return reportResponse ;
     }
+
+    public List<ProductResponse> getUnOfferedProducts() {
+        List<Product> productList = productRepository.findAll();
+
+        List<OfferItem> offerItemList = offerItemRepository.findAll();
+
+        List<Product> productHasOfferList = offerItemList.stream()
+                .map(OfferItem::getProduct)
+                .collect(Collectors.toList());
+
+        List<Product> nonMatchingProducts = productList.stream()
+                .filter(product -> !productHasOfferList.contains(product))
+                .collect(Collectors.toList());
+
+        return nonMatchingProducts.stream()
+                .map(product -> {
+                    ProductResponse productResponse = productMapper.productToProductResponse(product);
+                    productResponse.setBrandId(product.getBrand().getId());
+                    productResponse.setCategoryId(product.getCategory().getId());
+                    return productResponse;
+                })
+                .collect(Collectors.toList());
+    }
+
+
+
     public Map<Long,ProductResponse> getReportMostPopularProduct(int amount) {
         List<Object[]> popularProductData = offerItemRepository.findMostPopularProducts(amount);
 

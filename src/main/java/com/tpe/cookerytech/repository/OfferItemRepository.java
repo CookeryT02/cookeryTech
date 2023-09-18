@@ -12,6 +12,7 @@ import java.util.List;
 
 @Repository
 public interface OfferItemRepository extends JpaRepository<OfferItem,Long> {
+    List<OfferItem> findByOfferId( Long id );
 
     @Query(value = "SELECT oi.product_id, COUNT(oi.id) AS offer_count " +
             "FROM t_offer_item oi " +

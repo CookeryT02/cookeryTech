@@ -2,7 +2,7 @@ package com.tpe.cookerytech.service;
 
 import com.tpe.cookerytech.domain.Currency;
 import com.tpe.cookerytech.dto.response.CurrencyResponse;
-import com.tpe.cookerytech.init.TCMBData;
+import com.tpe.cookerytech.utils.TCMBData;
 import com.tpe.cookerytech.mapper.CurrencyMapper;
 import com.tpe.cookerytech.repository.CurrencyRepository;
 import org.springframework.stereotype.Service;

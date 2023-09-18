@@ -40,6 +40,7 @@ import java.util.stream.Collectors;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.Objects;
 
 @Service
 public class OfferService {
@@ -348,6 +349,37 @@ public class OfferService {
         } else {
             throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
         }
+
+    }
+
+    public OfferResponseWithUser getOfferByAdmin ( Long offerId ) {
+        User user = userService.getCurrentUser();
+        Offer offer = offerRepository.findById( offerId ).orElseThrow( ( ) -> new ResourceNotFoundException( ErrorMessage.OFFER_NOT_FOUND_EXCEPTION ) );
+        User offerUser = offer.getUser();
+
+        Set<Role> roleControl = user.getRoles();
+
+        boolean hasRole = false;
+
+        for ( Role role : roleControl ) {
+            if ( role.getType().equals( RoleType.ROLE_ADMIN ) || role.getType().equals( RoleType.ROLE_SALES_SPECIALIST ) || role.getType().equals( RoleType.ROLE_SALES_MANAGER ) ) {
+                hasRole = true;
+                break;
+            }
+        }
+        if ( !hasRole ) {
+            throw new BadRequestException( ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE );
+        }
+        List<OfferItem> offerItems = offerItemRepository.findByOfferId( offerId );
+        List<OfferItemResponse> offerItemResponse = offerItems.stream().map( offerItemMapper::offerItemToOfferItemResponse ).collect( Collectors.toList() );
+
+        OfferResponseWithUser offerResponseWithUser = offerMapper.offerToOfferResponsewithUser( offer );
+
+        offerResponseWithUser.setUserResponse( userMapper.userToUserResponse( offerUser ) );
+        offerResponseWithUser.setCurrencyResponse( currencyMapper.currencyToCurrencyResponse( offer.getCurrency() ) );
+        offerResponseWithUser.setOfferItems( offerItemResponse );
+
+        return offerResponseWithUser;
 
     }
 }
