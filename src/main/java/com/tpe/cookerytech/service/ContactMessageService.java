@@ -2,7 +2,6 @@ package com.tpe.cookerytech.service;
 
 import com.tpe.cookerytech.dto.request.ContactMessageRequest;
 import com.tpe.cookerytech.dto.response.CkResponse;
-import com.tpe.cookerytech.repository.ContactMessageRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
