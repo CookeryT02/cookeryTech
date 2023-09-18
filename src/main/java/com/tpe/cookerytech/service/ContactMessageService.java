@@ -3,9 +3,11 @@ package com.tpe.cookerytech.service;
 import com.tpe.cookerytech.dto.request.ContactMessageRequest;
 import com.tpe.cookerytech.dto.response.CkResponse;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+
+import javax.mail.internet.MimeMessage;
 
 @Service
 public class ContactMessageService {
@@ -26,34 +28,40 @@ public class ContactMessageService {
 
 
         try {
-                // Creating a simple mail message
-                SimpleMailMessage mailMessage
-                        = new SimpleMailMessage();
+            // Creating an HTML email message
+            MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "utf-8");
 
-                // Setting up necessary details
-                mailMessage.setFrom(contactMessageRequest.getEmail());
-                mailMessage.setSubject("Contact Me");
-                mailMessage.setTo(email);
+            // Setting up necessary details
+            helper.setFrom(contactMessageRequest.getEmail());
+            helper.setTo(email);
+            helper.setSubject("Contact Me");
 
+            // Creating the HTML content
+            String content = "<html><body>" +
+                    "<h3>Hello, my name is " + contactMessageRequest.getName() + "</h3>" +
+                    "<p>Your products interested me, and here is my contact information:</p>" +
+                    "<ul>" +
+                    "<li><b>Phone Number:</b> " +contactMessageRequest.getPhone() + "</li>" +
+                    "<li><b>Email Address:</b> " + contactMessageRequest.getEmail() + "</li>" +
+                    "<li><b>Company Name:</b> " + contactMessageRequest.getCompany() + "</li>" +
+                    "</ul>" +
+                    "<p><b>Message:</b></p>" +
+                    "<p>" + contactMessageRequest.getMessage() + "</p>" +
+                    "<p>Could you please get back to me?</p>" +
+                    "</body></html>";
 
-                String content = " Hello my name is " + contactMessageRequest.getName()
-                        + "\n\n My product interested me my phone number " + contactMessageRequest.getPhone()
-                        + "\n\n My email adress " + contactMessageRequest.getEmail()
-                        + "\n\n Could you please get back to me again?"
-                        + "\n\n My company name : " + contactMessageRequest.getCompany()
-                        + "\n\n My Message: " + contactMessageRequest.getMessage();
-                mailMessage.setText(content);
-                // Sending the mail
-                javaMailSender.send(mailMessage);
+            helper.setText(content, true); // true parameter indicates HTML content
+
+            // Sending the mail
+            javaMailSender.send(mimeMessage);
 
             return new CkResponse("Contact Messages Successfully", true);
 
-        }
+        } catch (Exception e) {
 
-        // Catch block to handle the exceptions
-        catch (Exception e) {
-
-            return new CkResponse("Contact Messages Could Not Be Sent", false);
+            // Handle any exceptions that may occur during email sending
+            return new CkResponse("Error sending contact message: " + e.getMessage(), false);
 
         }
 
