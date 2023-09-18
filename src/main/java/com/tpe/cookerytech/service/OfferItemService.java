@@ -80,6 +80,10 @@ public class OfferItemService {
         OfferItem offerItem =offerItemRepository.findById(id).
                 orElseThrow(()->new ResourceNotFoundException(String.format(ErrorMessage.OFFER_ITEM_NOT_FOUND_EXCEPTION,id)));
 
+        if (offerItem.getOffer().getStatus() != 0 && offerItem.getOffer().getStatus() != 3){
+            throw new ResourceNotFoundException(ErrorMessage.OFFER_ITEM_COULD_NOT_BE_DELETED);
+        }
+
         Set<Role> roles = userService.getCurrentUser().getRoles();
 
         for (Role role : roles){
