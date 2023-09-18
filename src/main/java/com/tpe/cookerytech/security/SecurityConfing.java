@@ -35,7 +35,11 @@ public class SecurityConfing {
                 authorizeRequests().
                 antMatchers("/login",
                         "/register",
-                        "/actuator/info","/actuator/health","/forgot-password","/reset-password")
+                        "/actuator/info",
+                        "/actuator/health",
+                        "/forgot-password",
+                        "/reset-password",
+                        "/contact-messages")
                 .permitAll().anyRequest().authenticated(); // bunlar disinda gelenleri authenticated yap
         //!!!AuthTokenFilter yazdiktan sonra addFilter yazilacak
         http.addFilterBefore(authTokenFilter(), UsernamePasswordAuthenticationFilter.class); //15 standart filtreye 16. yi burda ekledik
