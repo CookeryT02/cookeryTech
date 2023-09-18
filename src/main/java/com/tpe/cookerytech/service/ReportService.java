@@ -49,35 +49,6 @@ public class ReportService {
         reportResponse.setCustomers(users.size());
         return reportResponse ;
     }
-
-//    public List<ProductResponse> getReportMostPopularProduct(int amount) {
-//
-//
-//            // Tüm teklif öğelerini al
-//            List<OfferItem> offerItems = offerItemRepository.findAll();
-//
-//            // Ürünlerin kimliklerini ve teklif sayılarını bir haritada saklayın
-//            Map<Long, Long> productOfferCounts = offerItems.stream()
-//                    .collect(Collectors.groupingBy(
-//                            offerItem -> offerItem.getProduct().getId(),
-//                            Collectors.counting()
-//                    ));
-//
-//            // Haritayı sıralayın ve en fazla teklif alınan ürünleri alın
-//            List<Long> popularProductIds = productOfferCounts.entrySet().stream()
-//                    .sorted((entry1, entry2) -> entry2.getValue().compareTo(entry1.getValue()))
-//                    .limit(amount)
-//                    .map(Map.Entry::getKey)
-//                    .collect(Collectors.toList());
-//
-//            // En fazla teklif alınan ürün kimliklerini kullanarak ürünleri getirin
-//            List<ProductResponse> popularProducts = popularProductIds.stream()
-//                    .map(productService::getProductById)
-//                    .collect(Collectors.toList());
-//
-//            return popularProducts;
-//    }
-
     public Map<Long,ProductResponse> getReportMostPopularProduct(int amount) {
         List<Object[]> popularProductData = offerItemRepository.findMostPopularProducts(amount);
 
