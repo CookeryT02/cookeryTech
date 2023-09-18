@@ -9,6 +9,7 @@ import com.tpe.cookerytech.mapper.ProductMapper;
 import com.tpe.cookerytech.repository.*;
 import org.springframework.stereotype.Service;
 
+import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -22,8 +23,9 @@ public class ReportService {
     private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
     private final OfferItemRepository offerItemRepository;
+    private final ProductService productService;
     private final ProductMapper productMapper;
-    public ReportService(ReportRepository reportRepository, ProductRepository productRepository, BrandRepository brandRepository, OfferRepository offerRepository, CategoryRepository categoryRepository, UserRepository userRepository, OfferItemRepository offerItemRepository, ProductMapper productMapper) {
+    public ReportService(ReportRepository reportRepository, ProductRepository productRepository, BrandRepository brandRepository, OfferRepository offerRepository, CategoryRepository categoryRepository, UserRepository userRepository, OfferItemRepository offerItemRepository, ProductService productService, ProductMapper productMapper) {
 
         this.reportRepository = reportRepository;
         this.productRepository = productRepository;
@@ -32,6 +34,7 @@ public class ReportService {
         this.categoryRepository = categoryRepository;
         this.userRepository = userRepository;
         this.offerItemRepository = offerItemRepository;
+        this.productService = productService;
         this.productMapper = productMapper;
     }
 
@@ -47,15 +50,43 @@ public class ReportService {
         return reportResponse ;
     }
 
+//    public List<ProductResponse> getReportMostPopularProduct(int amount) {
+//
+//
+//            // Tüm teklif öğelerini al
+//            List<OfferItem> offerItems = offerItemRepository.findAll();
+//
+//            // Ürünlerin kimliklerini ve teklif sayılarını bir haritada saklayın
+//            Map<Long, Long> productOfferCounts = offerItems.stream()
+//                    .collect(Collectors.groupingBy(
+//                            offerItem -> offerItem.getProduct().getId(),
+//                            Collectors.counting()
+//                    ));
+//
+//            // Haritayı sıralayın ve en fazla teklif alınan ürünleri alın
+//            List<Long> popularProductIds = productOfferCounts.entrySet().stream()
+//                    .sorted((entry1, entry2) -> entry2.getValue().compareTo(entry1.getValue()))
+//                    .limit(amount)
+//                    .map(Map.Entry::getKey)
+//                    .collect(Collectors.toList());
+//
+//            // En fazla teklif alınan ürün kimliklerini kullanarak ürünleri getirin
+//            List<ProductResponse> popularProducts = popularProductIds.stream()
+//                    .map(productService::getProductById)
+//                    .collect(Collectors.toList());
+//
+//            return popularProducts;
+//    }
+
     public List<ProductResponse> getReportMostPopularProduct(int amount) {
+        List<Object[]> popularProductData = offerItemRepository.findMostPopularProducts(amount);
 
+        List<ProductResponse> popularProducts = popularProductData.stream()
+                .map(rowData -> ((BigInteger) rowData[0]).longValue()) // BigInteger'ı Long'a dönüştürme
+                .map(productService::getProductById)
+                .collect(Collectors.toList());
 
-        List<Long> popularProducts = offerItemRepository.findMostPopularProducts(amount);
-        List<ProductResponse> productResponseList=new ArrayList<>();
-        for(Long id : popularProducts){
-           productResponseList.add(productMapper.productToProductResponse(productRepository.findById(id).orElseThrow()));
-        }
-        return productResponseList;
-
+        return popularProducts;
     }
+
 }

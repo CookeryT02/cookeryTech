@@ -36,7 +36,7 @@ public class ReportController {
 
     @GetMapping("/most-popular-products/{amount}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER')")
-    public ResponseEntity<List<ProductResponse>> getMostPopularProducts(@PathVariable @Min(1) int amount){
+    public ResponseEntity<List<ProductResponse>> getMostPopularProducts(@PathVariable int amount){
         List<ProductResponse> listMostPopularProducts=reportService.getReportMostPopularProduct(amount);
         return ResponseEntity.ok(listMostPopularProducts);
     }
