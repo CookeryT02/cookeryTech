@@ -372,11 +372,11 @@ public class OfferService {
 
     public OfferResponseWithUser getOfferByAdmin ( Long offerId ) {
         User user = userService.getCurrentUser();
-        Offer offer = offerRepository.findById( offerId ).orElseThrow( ( ) -> new ResourceNotFoundException( ErrorMessage.RESOURCE_NOT_FOUND_EXCEPTION ) );
+        Offer offer = offerRepository.findById( offerId ).orElseThrow( ( ) -> new ResourceNotFoundException( ErrorMessage.OFFER_NOT_FOUND_EXCEPTION ) );
         User offerUser = offer.getUser();
 
         Set<Role> roleControl = user.getRoles();
-        ;
+
         boolean hasRole = false;
 
         for ( Role role : roleControl ) {
@@ -391,16 +391,11 @@ public class OfferService {
         List<OfferItem> offerItems = offerItemRepository.findByOfferId( offerId );
         List<OfferItemResponse> offerItemResponse = offerItems.stream().map( offerItemMapper::offerItemToOfferItemResponse ).collect( Collectors.toList() );
 
-        Currency currency = currencyRepository.findById( offerId ).orElseThrow( ( ) -> new ResourceNotFoundException( String.format( ErrorMessage.CURRENCY_NOT_FOUND_EXCEPTION, offerId ) ) );
-
-
         OfferResponseWithUser offerResponseWithUser = offerMapper.offerToOfferResponsewithUser( offer );
 
-
         offerResponseWithUser.setUserResponse( userMapper.userToUserResponse( offerUser ) );
-        offerResponseWithUser.setCurrencyResponse( currencyMapper.currencyToCurrencyResponse( currency ) );
+        offerResponseWithUser.setCurrencyResponse( currencyMapper.currencyToCurrencyResponse( offer.getCurrency() ) );
         offerResponseWithUser.setOfferItems( offerItemResponse );
-
 
         return offerResponseWithUser;
 
