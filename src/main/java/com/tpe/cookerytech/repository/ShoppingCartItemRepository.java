@@ -15,4 +15,5 @@ public interface ShoppingCartItemRepository extends JpaRepository<ShoppingCartIt
     @EntityGraph(attributePaths = "id")
     List<ShoppingCartItem> findByShoppingCartId(Long id);
 
+    void deleteByProductId(Long productId);
 }
