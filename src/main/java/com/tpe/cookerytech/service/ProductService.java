@@ -1,7 +1,6 @@
 package com.tpe.cookerytech.service;
 
 import com.tpe.cookerytech.domain.*;
-import com.tpe.cookerytech.domain.enums.RoleType;
 import com.tpe.cookerytech.dto.request.ModelRequest;
 import com.tpe.cookerytech.dto.request.ProductPropertyKeyRequest;
 import com.tpe.cookerytech.dto.request.ProductRequest;
@@ -11,29 +10,14 @@ import com.tpe.cookerytech.exception.ConflictException;
 import com.tpe.cookerytech.exception.ResourceNotFoundException;
 import com.tpe.cookerytech.exception.message.ErrorMessage;
 import com.tpe.cookerytech.mapper.*;
-import com.tpe.cookerytech.repository.CurrencyRepository;
-import com.tpe.cookerytech.repository.ModelRepository;
-import com.tpe.cookerytech.repository.ProductPropertyKeyRepository;
-import com.tpe.cookerytech.repository.ProductRepository;
-import com.tpe.cookerytech.security.SecurityUtils;
+import com.tpe.cookerytech.repository.*;
 import org.springframework.data.domain.*;
-import org.springframework.context.annotation.Bean;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.Column;
-import javax.persistence.EntityManager;
-import javax.persistence.criteria.Predicate;
-import java.lang.reflect.Field;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
-import java.util.Random;
 import java.util.stream.Collectors;
 
 
@@ -53,11 +37,16 @@ public class ProductService {
     private final ProductPropertyKeyMapper productPropertyKeyMapper;
 
     private final ProductPropertyKeyRepository productPropertyKeyRepository;
+
+    private final OfferItemRepository offerItemRepository;
+
     private final ModelRepository modelRepository;
+
+    private final ShoppingCartItemRepository shoppingCartItemRepository;
 
     private final UserService userService;
 
-    public ProductService(ProductRepository productRepository, ProductMapper productMapper, BrandService brandService, CategoryService categoryService, CurrencyService currencyService, CurrencyRepository currencyRepository, ModelMapper modelMapper, ProductPropertyKeyMapper productPropertyKeyMapper, ProductPropertyKeyRepository productPropertyKeyRepository, ModelRepository modelRepository, UserService userService) {
+    public ProductService(ProductRepository productRepository, ProductMapper productMapper, BrandService brandService, CategoryService categoryService, CurrencyService currencyService, CurrencyRepository currencyRepository, ModelMapper modelMapper, ProductPropertyKeyMapper productPropertyKeyMapper, ProductPropertyKeyRepository productPropertyKeyRepository, OfferItemRepository offerItemRepository, ModelRepository modelRepository, ShoppingCartItemRepository shoppingCartItemRepository, UserService userService) {
         this.productRepository = productRepository;
         this.productMapper = productMapper;
         this.brandService = brandService;
@@ -66,7 +55,9 @@ public class ProductService {
         this.modelMapper = modelMapper;
         this.productPropertyKeyMapper = productPropertyKeyMapper;
         this.productPropertyKeyRepository = productPropertyKeyRepository;
+        this.offerItemRepository = offerItemRepository;
         this.modelRepository = modelRepository;
+        this.shoppingCartItemRepository = shoppingCartItemRepository;
         this.userService = userService;
     }
 
@@ -217,11 +208,33 @@ public class ProductService {
                 throw new BadRequestException(String.format(ErrorMessage.PRODUCT_CANNOT_DELETE_EXCEPTION, id));
             }
 
-            //TODO: Offer_Item Ürün varmı yoksa exp.
+            if (productHasRelatedOfferItems(id)) {
+                throw new BadRequestException("Ürün, ilişkili offer_items kayıtları nedeniyle silinemez.");
+            }
+
+
+            deleteRelatedRecords(id);
 
             productRepository.deleteById(id);
 
             return productMapper.productToProductResponse(product);
+
+    }
+
+    //Y.M
+    private boolean productHasRelatedOfferItems(Long productId) {
+
+        List<OfferItem> relatedOfferItems = offerItemRepository.findByProductId(productId);
+
+        return !relatedOfferItems.isEmpty();
+    }
+
+    //Y.M
+    private void deleteRelatedRecords(Long productId) {
+
+        modelRepository.deleteByProductId(productId);
+
+        shoppingCartItemRepository.deleteByProductId(productId);
 
     }
 

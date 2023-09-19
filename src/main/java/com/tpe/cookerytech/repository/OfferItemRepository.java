@@ -9,4 +9,6 @@ import java.util.List;
 @Repository
 public interface OfferItemRepository extends JpaRepository<OfferItem,Long> {
     List<OfferItem> findByOfferId( Long id );
+
+    List<OfferItem> findByProductId(Long productId);
 }
