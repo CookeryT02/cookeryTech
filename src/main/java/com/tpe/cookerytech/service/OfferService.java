@@ -88,7 +88,6 @@ public class OfferService {
                 () -> new ResourceNotFoundException(ErrorMessage.CURRENCY_NOT_FOUND_EXCEPTION)
         );
 
-
         offer.setCreateAt(LocalDateTime.now());
         offer.setUser(user);
         offer.setCode(randomCode);
@@ -122,7 +121,6 @@ public class OfferService {
             offersubTotal += offerItem.getSub_total();
 
         }
-
 
         offer.setSubTotal(offersubTotal);
         offer.setGrandTotal(offersubTotal * (1 - offer.getDiscount() / 100));

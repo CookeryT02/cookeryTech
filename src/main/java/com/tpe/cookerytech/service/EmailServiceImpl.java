@@ -1,6 +1,7 @@
 package com.tpe.cookerytech.service;
 
 import com.tpe.cookerytech.domain.User;
+import com.tpe.cookerytech.dto.response.OfferResponse;
 import com.tpe.cookerytech.exception.BadRequestException;
 import com.tpe.cookerytech.exception.ResourceNotFoundException;
 import com.tpe.cookerytech.exception.message.ErrorMessage;
@@ -9,9 +10,11 @@ import net.bytebuddy.utility.RandomString;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.mail.internet.MimeMessage;
 
 
 @Service
@@ -98,6 +101,49 @@ public class EmailServiceImpl implements EmailService{
         }
         //user.setResetPasswordCode(null);
         userRepository.save(user);
+    }
+
+    @Override
+    public void sendOfferEmail(OfferResponse offerResponse) {
+        User user = userRepository.findById(offerResponse.getUserId()).orElseThrow(()-> new
+                ResourceNotFoundException(String.format(ErrorMessage.USER_NOT_FOUND_EXCEPTION)));
+
+        try {
+
+            if(user!=null) {
+                MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+                MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "utf-8");
+
+
+                helper.setFrom(sender);
+                helper.setSubject("Offer Information");
+                helper.setTo(user.getEmail());
+
+                String content = "<!DOCTYPE html>"
+                        + "<html><body>"
+                        + "<h2>Hello,</h2>"
+                        + "<p>Below are the details of the requested offer:</p>"
+                        + "<ul>"
+                        + "<li>User Full Name: " + user.getFirstName() + " " + user.getLastName() + "</li>"
+                        + "<li>Offer Code: " + offerResponse.getCode() + "</li>"
+                        + "<li>Offer Discount: " + offerResponse.getDiscount() + "</li>"
+                        + "<li>Offer Status: " + offerResponse.getStatus() + "</li>"
+                        + "<li>Offer Currency: " + offerResponse.getCurrencyResponse().getCode() + "</li>"
+                        + "<li>Offer Grand Total: " + offerResponse.getGrandTotal() + "</li>"
+                        + "<li>Offer Create Date: " + offerResponse.getCreateAt() + "</li>"
+                        + "<li>Offer Delivery Date: " + offerResponse.getDeliveryAt() + "</li>"
+                        + "</ul>"
+                        + "</body></html>";
+
+                helper.setText(content,true);
+
+
+                javaMailSender.send(mimeMessage);
+            }
+        }
+        catch (Exception e) {
+           throw new BadRequestException(e.getMessage());
+        }
     }
 
 

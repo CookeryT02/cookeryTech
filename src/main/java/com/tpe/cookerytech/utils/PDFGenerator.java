@@ -90,8 +90,6 @@ public class PDFGenerator {
             }
         }
 
-
-
         document.add(table);
         document.close();
     }
