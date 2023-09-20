@@ -1,10 +1,13 @@
 package com.tpe.cookerytech.service;
 
+import com.tpe.cookerytech.domain.Role;
 import com.tpe.cookerytech.domain.User;
+import com.tpe.cookerytech.domain.enums.RoleType;
 import com.tpe.cookerytech.dto.response.OfferResponse;
 import com.tpe.cookerytech.exception.BadRequestException;
 import com.tpe.cookerytech.exception.ResourceNotFoundException;
 import com.tpe.cookerytech.exception.message.ErrorMessage;
+import com.tpe.cookerytech.repository.RoleRepository;
 import com.tpe.cookerytech.repository.UserRepository;
 import net.bytebuddy.utility.RandomString;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,6 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.mail.internet.MimeMessage;
+import java.util.List;
 
 
 @Service
@@ -28,11 +32,14 @@ public class EmailServiceImpl implements EmailService{
 
     private final UserService userService;
 
-    public EmailServiceImpl(JavaMailSender javaMailSender, UserRepository userRepository, PasswordEncoder passwordEncoder, UserService userService) {
+    private final RoleRepository roleRepository;
+
+    public EmailServiceImpl(JavaMailSender javaMailSender, UserRepository userRepository, PasswordEncoder passwordEncoder, UserService userService, RoleRepository roleRepository) {
         this.javaMailSender = javaMailSender;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.userService = userService;
+        this.roleRepository = roleRepository;
     }
 
     @Value("${spring.mail.username}")
@@ -108,6 +115,11 @@ public class EmailServiceImpl implements EmailService{
         User user = userRepository.findById(offerResponse.getUserId()).orElseThrow(()-> new
                 ResourceNotFoundException(String.format(ErrorMessage.USER_NOT_FOUND_EXCEPTION)));
 
+        Role salesSpecialistRole = roleRepository.findByType(RoleType.ROLE_SALES_SPECIALIST).orElseThrow(()->
+                new ResourceNotFoundException(ErrorMessage.ROLE_NOT_FOUND_EXCEPTION));
+
+            List<User> SSList = userRepository.findByRoles(salesSpecialistRole);
+
         try {
 
             if(user!=null) {
@@ -118,6 +130,9 @@ public class EmailServiceImpl implements EmailService{
                 helper.setFrom(sender);
                 helper.setSubject("Offer Information");
                 helper.setTo(user.getEmail());
+                for (User SS: SSList){
+                    helper.addTo(SS.getEmail());
+                }
 
                 String content = "<!DOCTYPE html>"
                         + "<html><body>"

@@ -1,5 +1,6 @@
 package com.tpe.cookerytech.repository;
 
+import com.tpe.cookerytech.domain.Role;
 import com.tpe.cookerytech.domain.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,4 +30,10 @@ public interface UserRepository  extends JpaRepository<User,Long> {
     void deleteByEmail(String email);
 
     List<User> findByRoles(String customer);
+
+
+    List<User> findByRoles(Role role);
+
+
+
 }
