@@ -230,7 +230,7 @@ public class ProductController {
 
 
 
-    //*****************************Yardimci Method**************************************************
+    //************************************* Helper Methods **********************************************
 
     @GetMapping("/{id}/models")
     @PreAuthorize("hasRole('ADMIN') or hasRole('PRODUCT_MANAGER')")

@@ -530,7 +530,7 @@ public class ProductService {
     }
 
 
-    //****************************************** Yardimci Method ************************************************
+    //************************************* Helper Methods **********************************************
 
     private boolean productHasRelatedOfferItems(Long productId) {
 
