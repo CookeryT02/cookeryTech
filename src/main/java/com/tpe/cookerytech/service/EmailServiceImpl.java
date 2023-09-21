@@ -113,7 +113,7 @@ public class EmailServiceImpl implements EmailService{
     @Override
     public void sendOfferEmail(OfferResponse offerResponse) {
         User user = userRepository.findById(offerResponse.getUserId()).orElseThrow(()-> new
-                ResourceNotFoundException(String.format(ErrorMessage.USER_NOT_FOUND_EXCEPTION)));
+                ResourceNotFoundException(String.format(ErrorMessage.USER_NOT_FOUND_EXCEPTION,offerResponse.getUserId())));
 
         Role salesSpecialistRole = roleRepository.findByType(RoleType.ROLE_SALES_SPECIALIST).orElseThrow(()->
                 new ResourceNotFoundException(ErrorMessage.ROLE_NOT_FOUND_EXCEPTION));
@@ -125,7 +125,6 @@ public class EmailServiceImpl implements EmailService{
             if(user!=null) {
                 MimeMessage mimeMessage = javaMailSender.createMimeMessage();
                 MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "utf-8");
-
 
                 helper.setFrom(sender);
                 helper.setSubject("Offer Information");
@@ -151,7 +150,6 @@ public class EmailServiceImpl implements EmailService{
                         + "</body></html>";
 
                 helper.setText(content,true);
-
 
                 javaMailSender.send(mimeMessage);
             }

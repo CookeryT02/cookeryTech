@@ -4,21 +4,26 @@ import com.tpe.cookerytech.domain.OfferItem;
 import com.tpe.cookerytech.domain.Product;
 import com.tpe.cookerytech.domain.User;
 import com.tpe.cookerytech.dto.response.ProductResponse;
+import com.tpe.cookerytech.dto.response.ReportOfferResponse;
 import com.tpe.cookerytech.dto.response.ReportResponse;
+import com.tpe.cookerytech.mapper.OfferItemMapper;
 import com.tpe.cookerytech.mapper.ProductMapper;
 import com.tpe.cookerytech.repository.*;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
+import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.time.LocalDateTime;
 import java.util.*;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 public class ReportService {
 
-    private final ReportRepository reportRepository;
+
     private final ProductRepository productRepository;
     private final BrandRepository brandRepository;
     private final OfferRepository offerRepository;
@@ -28,8 +33,11 @@ public class ReportService {
     private final ProductService productService;
     private final ProductMapper productMapper;
 
-    public ReportService(ReportRepository reportRepository, ProductRepository productRepository, BrandRepository brandRepository, OfferRepository offerRepository, CategoryRepository categoryRepository, UserRepository userRepository,ProductService productService, OfferItemRepository offerItemRepository, ProductMapper productMapper) {
-        this.reportRepository = reportRepository;
+    private final OfferItemMapper offerItemMapper;
+
+    private EntityManager entityManager;
+
+    public ReportService( ProductRepository productRepository, BrandRepository brandRepository, OfferRepository offerRepository, CategoryRepository categoryRepository, UserRepository userRepository, ProductService productService, OfferItemRepository offerItemRepository, ProductMapper productMapper, OfferItemMapper offerItemMapper, EntityManager entityManager) {
         this.productRepository = productRepository;
         this.brandRepository = brandRepository;
         this.offerRepository = offerRepository;
@@ -38,6 +46,8 @@ public class ReportService {
         this.offerItemRepository = offerItemRepository;
         this.productService = productService;
         this.productMapper = productMapper;
+        this.offerItemMapper = offerItemMapper;
+        this.entityManager = entityManager;
     }
     public ReportResponse getReport() {
         ReportResponse reportResponse=new ReportResponse();
@@ -96,5 +106,6 @@ public class ReportService {
 
         return productAndCount;
     }
+
 
 }

@@ -31,7 +31,7 @@ public class ImageFile {
     private long length;
 
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name="model_id",referencedColumnName = "id")
     private Model model;
 
