@@ -146,34 +146,11 @@ public class ProductController {
 
 
 
-//        @GetMapping
-//        @PreAuthorize("hasRole('CUSTOMER') or hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER')")
-//        public ResponseEntity<Page<ProductResponse>> getAllProductsWithPage(
-//                @RequestParam(required = false,defaultValue = "",name = "q") String q,
-//                @RequestParam(required = false) Long brandId,
-//                @RequestParam(required = false) Long categoryId,
-//                @RequestParam(required = false,defaultValue = "0",name = "page") int page,
-//                @RequestParam(required = false,defaultValue = "20",name = "size") int size,
-//                @RequestParam(required = false,defaultValue = "categoryId",name = "sort") String sort,
-//                @RequestParam(required = false,defaultValue = "DESC",name = "type") String type){
-//
-//
-//            Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.valueOf(type), sort));
-//
-//            Page<ProductResponse> productResponse = productService.allProducts(q,pageable,brandId,categoryId);
-//
-//            return ResponseEntity.ok(productResponse);
-//
-//
-//
-//        }
 
     @GetMapping
     @PreAuthorize("hasRole('CUSTOMER') or hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER')")
     public ResponseEntity<Page<ProductResponse>> getAllProductsWithPage(
             @RequestParam(required = false,defaultValue = "",name="q") String q,
-            @RequestParam(required = false) Long brandId,
-            @RequestParam(required = false) Long categoryId,
             @RequestParam(required = false,defaultValue = "0",name = "page") int page,
             @RequestParam(required = false,defaultValue = "20",name = "size") int size,
             @RequestParam(required = false,defaultValue = "category",name = "sort") String sort,
@@ -182,7 +159,7 @@ public class ProductController {
 
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.valueOf(type), sort));
 
-        Page<ProductResponse> productResponse = productService.allProducts(q,pageable,brandId,categoryId);
+        Page<ProductResponse> productResponse = productService.allProducts(q,pageable);
 
         return ResponseEntity.ok(productResponse);
 

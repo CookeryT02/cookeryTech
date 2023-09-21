@@ -15,8 +15,30 @@ import java.util.List;
 @Repository
 public interface OfferItemRepository extends JpaRepository<OfferItem,Long> {
 
-    @Query("SELECT o FROM OfferItem o WHERE DATE(o.createAt) BETWEEN :startDate AND :endDate ORDER BY o.createAt")
-    List<ReportOfferResponse> findAllOffersBetweenD1ToD2(LocalDate startDate, LocalDate endDate);
+//    @Query("SELECT o FROM OfferItem o WHERE DATE(o.createAt) BETWEEN :startDate AND :endDate ORDER BY o.createAt")
+
+//    @Query("SELECT period, totalProduct, totalAmount FROM your_table_name WHERE period BETWEEN '2023-09-01' AND '2023-10-01' ORDER BY period;")
+
+    /*SELECT
+    period,
+    SUM(totalProduct) AS totalProduct,
+    SUM(totalAmount) AS totalAmount
+FROM
+    your_table_name
+WHERE
+    period BETWEEN '2023-09-01' AND '2023-10-01'
+GROUP BY
+    period
+ORDER BY
+    period;*/
+//    @Query("SELECT o FROM OfferItem o WHERE DATE(o.createAt) BETWEEN :startDate AND :endDate ORDER BY o.createAt"
+//            + "AND "
+//    )
+
+//    @Query("SELECT r FROM ReportOffer r WHERE DATE(r.createAt) BETWEEN :startDate AND :endDate ORDER BY r.createAt"
+//            + "AND  "
+//                    )
+    List<ReportOfferResponse> findAllOffersBetweenD1ToD2(LocalDate startDate, LocalDate endDate, String type);
 
 
 //    List<OfferItem> getAllOfferItems();

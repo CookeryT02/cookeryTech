@@ -28,22 +28,26 @@ public interface ProductRepository extends JpaRepository<Product,Long> {
 
     @Query("SELECT p FROM Product p WHERE (:q IS NULL OR LOWER(p.title) LIKE CONCAT('%', LOWER(:q), '%')) "
             + "AND (p.isActive = true) "
-            + "AND (:cId IS NULL OR p.category.isActive = true AND p.category.id = :cId) "
-            + "AND (:bId IS NULL OR p.brand.isActive = true AND p.brand.id = :bId)")
-    Page<Product> getAllProductsIsActiveTrue( @Param("q") String query, Pageable pageable, @Param("bId") Long brandId, @Param("cId") Long categoryId );
+//            + "AND (:id IS NULL OR o.brand.id = :id )"
+//            + "AND (:id IS NULL OR o.category.id = :id )"
+    )
+    Page<Product> getAllProductsIsActiveTrue( @Param("q") String query, Pageable pageable);
 
 //    @Query("SELECT p FROM Product p WHERE (LOWER(p.title) LIKE CONCAT('%', LOWER(:q), '%') OR "
 //            + "LOWER(p.isActive=false) LIKE CONCAT('%', LOWER(:q), '%') OR  "
 //            + "LOWER(p.shortDescription) LIKE CONCAT('%', LOWER(:q), '%') OR "
 //            + "LOWER(p.longDescription) LIKE CONCAT('%', LOWER(:q), '%')) AND "
 //            + "(:cId IS NULL OR p.category.id = :cId) AND " + "(:bId IS NULL OR p.brand.id = :bId)")
-    // selam
+    // selam aleykümselam
 
     @Query("SELECT p FROM Product p WHERE (:q IS NULL OR LOWER(p.title) LIKE CONCAT('%', LOWER(:q), '%')) "
-            + "AND (p.isActive = false) "
-            + "AND (:cId IS NULL OR p.category.isActive = false AND p.category.id = :cId) "
-            + "AND (:bId IS NULL OR p.brand.isActive = false AND p.brand.id = :bId)")
-    Page<Product> getAllProductsIsActiveFalse( @Param("q") String query, Pageable pageable, @Param("bId") Long brandId, @Param("cId") Long categoryId );
+            + "AND (p.isActive = false)"
+//            + "AND (:id IS NULL OR o.brand.id = :id )"
+//            + "AND (:id IS NULL OR o.category.id = :id )"
+    )
+    Page<Product> getAllProductsIsActiveFalse( @Param("q") String query, Pageable pageable);
+
+
 
 
 

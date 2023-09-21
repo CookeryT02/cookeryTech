@@ -73,13 +73,14 @@ public class ReportController {
     @GetMapping("/offers")
     @PreAuthorize("hasRole('ADMIN')")
     public List<ReportOfferResponse> getOffersSummaries(
-            @PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
-            @PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
-            @PathVariable String type) {
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
+            @RequestParam String type) {
 
         return reportService.getOffersSummaries(startDate, endDate, type);
 
 
     }
+
 
 }

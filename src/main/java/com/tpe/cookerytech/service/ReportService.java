@@ -85,7 +85,7 @@ public class ReportService {
 
         List<OfferItem> allOfferItemsList = offerItemRepository.findAll();
 
-        List<ReportOfferResponse> offerResponse = offerItemRepository.findAllOffersBetweenD1ToD2(startDate, endDate);
+        List<ReportOfferResponse> offerResponse = offerItemRepository.findAllOffersBetweenD1ToD2(startDate, endDate, type);
 
         return offerResponse;
 

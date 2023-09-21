@@ -10,10 +10,7 @@ import com.tpe.cookerytech.exception.ConflictException;
 import com.tpe.cookerytech.exception.ResourceNotFoundException;
 import com.tpe.cookerytech.exception.message.ErrorMessage;
 import com.tpe.cookerytech.mapper.*;
-import com.tpe.cookerytech.repository.CurrencyRepository;
-import com.tpe.cookerytech.repository.ModelRepository;
-import com.tpe.cookerytech.repository.ProductPropertyKeyRepository;
-import com.tpe.cookerytech.repository.ProductRepository;
+import com.tpe.cookerytech.repository.*;
 import org.springframework.data.domain.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -48,7 +45,13 @@ public class ProductService {
 
     private final BrandMapper brandMapper;
 
-    public ProductService(ProductRepository productRepository, ProductMapper productMapper, BrandService brandService, CategoryService categoryService, CurrencyService currencyService, CurrencyRepository currencyRepository, ModelMapper modelMapper, ProductPropertyKeyMapper productPropertyKeyMapper, ProductPropertyKeyRepository productPropertyKeyRepository, ModelRepository modelRepository, UserService userService, CategoryMapper categoryMapper, BrandMapper brandMapper) {
+    private final CategoryRepository categoryRepository;
+
+    private final BrandRepository brandRepository;
+
+
+
+    public ProductService(ProductRepository productRepository, ProductMapper productMapper, BrandService brandService, CategoryService categoryService, CurrencyService currencyService, CurrencyRepository currencyRepository, ModelMapper modelMapper, ProductPropertyKeyMapper productPropertyKeyMapper, ProductPropertyKeyRepository productPropertyKeyRepository, ModelRepository modelRepository, UserService userService, CategoryMapper categoryMapper, BrandMapper brandMapper, CategoryRepository categoryRepository, BrandRepository brandRepository) {
         this.productRepository = productRepository;
         this.productMapper = productMapper;
         this.brandService = brandService;
@@ -61,6 +64,8 @@ public class ProductService {
         this.userService = userService;
         this.categoryMapper = categoryMapper;
         this.brandMapper = brandMapper;
+        this.categoryRepository = categoryRepository;
+        this.brandRepository = brandRepository;
     }
 
     public ProductResponse createProducts(ProductRequest productRequest) {
@@ -380,7 +385,7 @@ public class ProductService {
 
 
 
-    public Page<ProductResponse> allProducts(String q ,Pageable pageable, Long brandId, Long categoryId) {
+    public Page<ProductResponse> allProducts(String q ,Pageable pageable) {
 
 //        User user = userService.getUserForRoleAuthUser();
 //        User user = userService.getCurrentUser();
@@ -390,58 +395,52 @@ public class ProductService {
 
         if (authentication != null && authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_CUSTOMER"))) {
 
+
             List<Product> productList = (productRepository.findByIsActive(true));
             List<Product> filteredProductsCustomer =productList.stream()
                     .filter(p -> {
                         Brand brand = p.getBrand();
                         Category category = p.getCategory();
-                        System.out.println(p.getCategory().getIsActive());
-                        return p.getIsFeatured() && brand != null && category != null && brand.getIsActive() && category.getIsActive();
+                        return brand.getIsActive() && category.getIsActive();
                     })
                     .collect(Collectors.toList());
 
-            // list convert to page
             Page<Product> p = new PageImpl<Product>(productList);
             Page<Product> f = new PageImpl<Product>(filteredProductsCustomer);
 
-
-
-            Page<Product> productPage = productRepository.getAllProductsIsActiveFalse(q, pageable, brandId, categoryId);
-
-
-            // list convert to page
-//            Page<Product> p = new PageImpl<Product>(productList);
-//            Page<Product> f = new PageImpl<Product>(filteredProductsCustomer);
-
-
-//            Page<Product> productMap = productPage.map(product -> {
+//            categoryRepository.findCategoryById(id).orElseThrow(
+//                    () -> new BadRequestException(String.format(ErrorMessage.CATEGORY_NOT_FOUND_EXCEPTION, categoryId)));
 //
-////                ProductObjectResponse productObjectResponse = productMapper.productToProductObjectResponse(product);
-////                productObjectResponse.setCategory(categoryMapper.categoryToCategoryResponse(product.getCategory()));
-////                productObjectResponse.setBrand(brandMapper.brandToBrandResponse(product.getBrand()));
-////                return productObjectResponse;
-////
-////            });
+//            brandRepository.findById(brandId).orElseThrow(
+//                    () -> new BadRequestException(String.format(ErrorMessage.BRAND_NOT_FOUND_EXCEPTION, brandId)));
 
 
-//
-//
-//            Page<ProductObjectResponse> productObjectResponses = productPage.map(product -> {
-//                ProductObjectResponse productObjectResponse = productMapper.productToProductObjectResponse(product);
-//                productObjectResponse.setCategory(categoryMapper.categoryToCategoryResponse(product.getCategory()));
-//                productObjectResponse.setBrand(brandMapper.brandToBrandResponse(product.getBrand()));
-//                return productObjectResponse;
-//            });
-//
-//            return productObjectResponses;
+            Page<Product> productPages = productRepository.getAllProductsIsActiveTrue(q, pageable);
+
+
+            Page<ProductResponse> productResponse = productPages.map(product -> {
+
+                ProductResponse productResponses = new ProductResponse();
+                productResponses.setBrandId(product.getBrand().getId());
+                productResponses.setCategoryId(product.getCategory().getId());
+
+                return productResponses;
+            });
+
+
+            return productPages.map(productMapper::productToProductResponse);
+
+
+
 
 //            return f.map(productMapper::productToProductResponse);
 
-           return productPage.map(productMapper::productToProductResponse);
-            // return productPage.map(productMapper::productToProductResponse);
+          // return productPage.map(productMapper::productToProductResponse);
+
 
 
         } else {
+
 
 
             List<Product> productList = (productRepository.findByIsActive(false));
@@ -449,21 +448,33 @@ public class ProductService {
                     .filter(p -> {
                         Brand brand = p.getBrand();
                         Category category = p.getCategory();
-                        System.out.println(p.getCategory().getIsActive());
-                        return p.getIsFeatured() && brand != null && category != null && brand.getIsActive() && category.getIsActive();
+                        return brand.getIsActive() && category.getIsActive();
                     })
                     .collect(Collectors.toList());
 
             Page<Product> p = new PageImpl<Product>(productList);
             Page<Product> f = new PageImpl<Product>(filteredProducts);
 
+//            categoryRepository.findCategoryById(categoryId).orElseThrow(
+//                    () -> new BadRequestException(String.format(ErrorMessage.CATEGORY_NOT_FOUND_EXCEPTION, categoryId)));
+//
+//            brandRepository.findById(brandId).orElseThrow(
+//                    () -> new BadRequestException(String.format(ErrorMessage.BRAND_NOT_FOUND_EXCEPTION, brandId)));
 
-            Page<Product> productPage = productRepository.getAllProductsIsActiveFalse(q, pageable, brandId, categoryId);
+            Page<Product> productPages = productRepository.getAllProductsIsActiveFalse(q, pageable);
 
-//            return f.map(productMapper::productToProductResponse);
 
-            return productPage.map(productMapper::productToProductResponse);
+            Page<ProductResponse> productResponse = productPages.map(product -> {
 
+                ProductResponse productResponses = new ProductResponse();
+                productResponses.setBrandId(product.getBrand().getId());
+                productResponses.setCategoryId(product.getCategory().getId());
+
+                return productResponses;
+            });
+
+
+            return productPages.map(productMapper::productToProductResponse);
 
 
         }
@@ -472,6 +483,22 @@ public class ProductService {
 
 
 
+    }
+
+
+
+    private Brand findBrandById(Long brandId) {
+        Brand brand = brandRepository.findById(brandId).orElseThrow(()->
+                new ResourceNotFoundException(ErrorMessage.BRAND_NOT_FOUND_EXCEPTION));
+
+        return brand;
+    }
+
+    private Category findCategoryById(Long categoryId) {
+        Category category = categoryRepository.findById(categoryId).orElseThrow(()->
+                new ResourceNotFoundException(ErrorMessage.CATEGORY_NOT_FOUND_EXCEPTION));
+
+        return category;
     }
 
 
