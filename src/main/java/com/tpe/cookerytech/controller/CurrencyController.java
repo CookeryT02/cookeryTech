@@ -22,6 +22,7 @@ public class CurrencyController {
         this.currencyService = currencyService;
     }
 
+
     @GetMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER') or hasRole('CUSTOMER')")
     public ResponseEntity<List<CurrencyResponse>> getAllCurrencies() {
