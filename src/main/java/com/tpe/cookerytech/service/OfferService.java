@@ -295,6 +295,21 @@ public class OfferService {
 
         offerRepository.save(offer);
 
+        //offer.getStatus() => 0: Created 1:Waiting for approval 2: Approved 3: Rejected 4: Paid
+
+        Log log =new Log();
+        log.setUser(user);
+        log.setOffer(offer);
+        log.setCreateAt(LocalDateTime.now());
+        if(offer.getStatus()==3) {
+            log.setLog(LogType.DECLINED);
+        }else if(offer.getStatus()==2){
+            log.setLog(LogType.APPROVED);
+        }else{
+            log.setLog(LogType.UPDATED);
+        }
+        logRepository.save(log);
+
         OfferResponseWithUser offerResponseWithUser =  offerMapper.offerToOfferResponsewithUser(offer);
 
         offerResponseWithUser.setUserResponse(this.userMapper.userToUserResponse(user));

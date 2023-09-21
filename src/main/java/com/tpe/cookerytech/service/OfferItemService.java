@@ -47,6 +47,17 @@ public class OfferItemService {
         offerItem.getOffer().setDiscount(offerItemUpdateRequest.getDiscount());
         offerItem.setSub_total(offerItemUpdateRequest.getSelling_price() * offerItemUpdateRequest.getQuantity() * (1 + offerItemUpdateRequest.getTax() / 100));
 
+        Log log = new Log();
+        log.setUser(offerItem.getOffer().getUser());
+        log.setOffer(offerItem.getOffer());
+        log.setCreateAt(LocalDateTime.now());
+        if (offerItem.getOffer().getStatus() == 1){
+            log.setLog(LogType.UPDATED);
+        }else if(offerItem.getOffer().getStatus()==3){
+            log.setLog(LogType.DECLINED);
+        }
+        logRepository.save(log);
+
         offerItemRepository.save(offerItem);
 
         OfferItemResponse offerItemResponse = offerItemMapper.offerItemToOfferItemResponse(offerItem);
