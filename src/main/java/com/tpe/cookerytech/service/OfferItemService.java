@@ -17,11 +17,8 @@ import java.time.LocalDateTime;
 public class OfferItemService {
 
     private final UserService userService;
-
     private final OfferItemRepository offerItemRepository;
-
     private final OfferItemMapper offerItemMapper;
-
     private final LogRepository logRepository;
 
     public OfferItemService(UserService userService, OfferItemRepository offerItemRepository, OfferItemMapper offerItemMapper, LogRepository logRepository) {
@@ -31,6 +28,9 @@ public class OfferItemService {
         this.logRepository = logRepository;
     }
 
+
+
+    //E08
     public OfferItemResponse updateOfferItemWithIdByAdmin(Long id, OfferItemUpdateRequest offerItemUpdateRequest) {
 
         OfferItem offerItem = offerItemRepository.findById(id).
@@ -70,6 +70,9 @@ public class OfferItemService {
     }
 
 
+
+
+    //E09
     public OfferItemResponse deleteOfferItemById(Long id) {
         User user = userService.getCurrentUser();
 
@@ -89,5 +92,4 @@ public class OfferItemService {
         offerItemRepository.deleteById(id);
         return offerItemMapper.offerItemToOfferItemResponse(offerItem);
     }
-
 }

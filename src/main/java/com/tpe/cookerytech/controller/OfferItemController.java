@@ -10,13 +10,15 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/offer-items")
 public class OfferItemController {
-
     private final OfferItemService offerItemService;
 
     public OfferItemController(OfferItemService offerItemService) {
         this.offerItemService = offerItemService;
     }
 
+
+
+    //E08 -> It will update the offer item    Page:64
     @PutMapping("/{id}/admin")
     @PreAuthorize("hasRole('SALES_SPECIALIST')")
     public ResponseEntity<OfferItemResponse> updateOfferItemWithIdByAdmin(@PathVariable Long id,
@@ -25,9 +27,12 @@ public class OfferItemController {
         OfferItemResponse offerItemResponse= offerItemService.updateOfferItemWithIdByAdmin(id,offerItemUpdateRequest);
 
         return ResponseEntity.ok(offerItemResponse);
-
     }
 
+
+
+
+    //E09 -> It willwilldeletethe offer item
     @DeleteMapping("/{id}/admin")
     @PreAuthorize("hasRole('SALES_SPECIALIST')")
     public ResponseEntity<OfferItemResponse> deleteOfferItem(@PathVariable Long id){

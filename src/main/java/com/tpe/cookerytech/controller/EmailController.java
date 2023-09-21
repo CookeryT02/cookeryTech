@@ -20,26 +20,19 @@ public class EmailController {
     }
 
 
+
+    //F03 -> It will generate and email reset password code            Page:69
     @PostMapping("/forgot-password")
     public ResponseEntity<String> forgotPassword(@RequestParam String email) {
-
 
         String status = emailService.sendSimpleMail(email);
 
         return ResponseEntity.ok(status);
     }
 
-    // Sending email with attachment
-//    @PostMapping("/sendMailWithAttachment")
-//    public String sendMailWithAttachment(
-//            @RequestBody EmailDetails details)
-//    {
-//        String status
-//                = emailService.sendMailWithAttachment(details);
-//
-//        return status;
-//    }
 
+
+    //F04 -> It will update password
     @PostMapping("/reset-password")
     //@PreAuthorize("hasRole('CUSTOMER')")
     public ResponseEntity<CkResponse> resetPassword(@Valid @RequestBody ResetRequestPassword resetRequestPassword) {

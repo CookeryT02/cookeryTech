@@ -27,6 +27,4 @@ public interface OfferItemRepository extends JpaRepository<OfferItem,Long> {
             "LIMIT :amount", nativeQuery = true)
     List<Object[]> findMostPopularProducts(@Param("amount") int amount);
 
-
-
 }

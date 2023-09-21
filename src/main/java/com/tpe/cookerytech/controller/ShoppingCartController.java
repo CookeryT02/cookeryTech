@@ -21,6 +21,8 @@ public class ShoppingCartController {
         this.shoppingCartService = shoppingCartService;
     }
 
+
+    //D01 -> It should return authenticated user´s cart items
     @GetMapping("/auth")
     @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER') or hasRole('CUSTOMER')")
     public ResponseEntity<List<ShoppingCartItemResponse>> getCartItemsAuthUser(){
@@ -29,6 +31,9 @@ public class ShoppingCartController {
         return ResponseEntity.ok(shoppingCartItemResponseList);
     }
 
+
+
+    //D02 -> It should create , update or delete a cart item
     @PostMapping("/auth")
     @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER') or hasRole('CUSTOMER')")
     public ResponseEntity<ShoppingCartItemResponse> updateCartItems(@Valid @RequestBody CartItemUpdateRequest cartItemUpdateRequest){
@@ -36,8 +41,5 @@ public class ShoppingCartController {
         ShoppingCartItemResponse shoppingCartItemResponse = shoppingCartService.updateCartItems(cartItemUpdateRequest);
 
         return ResponseEntity.ok(shoppingCartItemResponse);
-
     }
-
-
 }
