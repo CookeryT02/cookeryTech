@@ -2,10 +2,14 @@ package com.tpe.cookerytech.service;
 
 import com.tpe.cookerytech.domain.Currency;
 import com.tpe.cookerytech.dto.response.CurrencyResponse;
+import com.tpe.cookerytech.exception.BadRequestException;
+import com.tpe.cookerytech.exception.message.ErrorMessage;
 import com.tpe.cookerytech.utils.TCMBData;
 import com.tpe.cookerytech.mapper.CurrencyMapper;
 import com.tpe.cookerytech.repository.CurrencyRepository;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
 import java.util.List;
 
 
@@ -32,21 +36,27 @@ public class CurrencyService {
 
     public List<CurrencyResponse> getAllCurrenciesAdmin() {
 
+        LocalDate lastUpdateDate = LocalDate.from(currencyRepository.findById(2L).orElseThrow(
+                () -> new BadRequestException(ErrorMessage.CURRENCY_NOT_FOUND_EXCEPTION)).getUpdateAt());
+
+        if (lastUpdateDate != null && lastUpdateDate.isEqual(LocalDate.now())) {
+            throw new BadRequestException(ErrorMessage.SAME_DAY_EXCEPTION);
+        }
+
         updateCurrencies(currencyRepository.findAll());
 
         List<Currency> currencies = currencyRepository.findAll();
 
         return currencyMapper.currenciesToCurrencyResponseList(currencies);
+
     }
 
     // *******************************  YARDIMCI METOT ***************************************
     private void updateCurrencies(List<Currency> currencies) {
-        for (Currency currency: currencies) {
+        for (Currency currency : currencies) {
             currency.setValue(tcmbData.getExchangeRate(currency.getCode()));
             currencyRepository.save(currency);
         }
     }
-
-
 
 }

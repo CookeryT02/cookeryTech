@@ -34,10 +34,6 @@ public class ModelRequest {
     @NotNull
     private int seq=0;
 
-//    @OneToMany(orphanRemoval = true)
-//    @JoinColumn(name="model_id")
-//    private Set<ImageFile> image;
-
     @NotNull
     private double buying_price; //decimal
 

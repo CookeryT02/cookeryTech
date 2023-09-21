@@ -19,6 +19,8 @@ public interface ModelRepository extends JpaRepository <Model, Long> {
 
     List<Model> findByIsActive(boolean isActive);
 
+    void deleteByProductId(Long productId);
+
 
 //    List<ModelResponse> findByIsActive(Integer isActive);
 //

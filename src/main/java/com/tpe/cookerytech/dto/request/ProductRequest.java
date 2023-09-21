@@ -34,8 +34,6 @@ public class ProductRequest {
     @NotNull(message = "Please provide product category id")
     private Long categoryId;
 
-//    private Set<ImageFile> image;
-
     @NotNull(message = "Please provide product sequence")
     private int sequence = 0;
 

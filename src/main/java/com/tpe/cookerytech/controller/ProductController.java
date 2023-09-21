@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.swing.table.JTableHeader;
 import javax.validation.Valid;
@@ -104,9 +105,12 @@ public class ProductController {
 
     @PostMapping("/models")
     @PreAuthorize("hasRole('ADMIN') or hasRole('PRODUCT_MANAGER')")
-    public ResponseEntity<ModelResponse> createProductModel(@Valid @RequestBody ModelRequest modelRequest) {
+    public ResponseEntity<ModelResponse> createProductModel(@RequestPart("file") MultipartFile file, @RequestPart("modelRequest") ModelRequest modelRequest
+                                                               // @RequestParam("file") MultipartFile file,
+                                                           // @RequestBody ModelRequest modelRequest
+                                                            ) {
 
-        ModelResponse modelResponse = productService.createProductModels(modelRequest);
+        ModelResponse modelResponse = productService.createProductModels(modelRequest,file);
 
         return ResponseEntity.ok(modelResponse);
 

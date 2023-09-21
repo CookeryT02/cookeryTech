@@ -4,6 +4,7 @@ import com.tpe.cookerytech.domain.Currency;
 import com.tpe.cookerytech.dto.response.CurrencyResponse;
 import org.mapstruct.Mapper;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,7 +16,7 @@ public interface CurrencyMapper {
         for (Currency currency : currencies){
             CurrencyResponse currencyResponse = currencyToCurrencyResponse(currency);
             currencyResponseList.add(currencyResponse);
-
+            currency.setUpdateAt(LocalDateTime.now());
         }
         return currencyResponseList;
     }

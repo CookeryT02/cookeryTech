@@ -15,9 +15,16 @@ import org.springframework.data.domain.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 
@@ -37,10 +44,16 @@ public class ProductService {
     private final ProductPropertyKeyMapper productPropertyKeyMapper;
 
     private final ProductPropertyKeyRepository productPropertyKeyRepository;
+
+    private final OfferItemRepository offerItemRepository;
+
     private final ModelRepository modelRepository;
 
-    private final UserService userService;
+    private final ShoppingCartItemRepository shoppingCartItemRepository;
 
+    private final ImageFileRepository imageFileRepository;
+
+    public ProductService(ProductRepository productRepository, ProductMapper productMapper, BrandService brandService, CategoryService categoryService, CurrencyRepository currencyRepository, ModelMapper modelMapper, ProductPropertyKeyMapper productPropertyKeyMapper, ProductPropertyKeyRepository productPropertyKeyRepository, OfferItemRepository offerItemRepository, ModelRepository modelRepository, ShoppingCartItemRepository shoppingCartItemRepository, ImageFileRepository imageFileRepository) {
     private final CategoryMapper categoryMapper;
 
     private final BrandMapper brandMapper;
@@ -60,13 +73,17 @@ public class ProductService {
         this.modelMapper = modelMapper;
         this.productPropertyKeyMapper = productPropertyKeyMapper;
         this.productPropertyKeyRepository = productPropertyKeyRepository;
+        this.offerItemRepository = offerItemRepository;
         this.modelRepository = modelRepository;
+        this.shoppingCartItemRepository = shoppingCartItemRepository;
+        this.imageFileRepository = imageFileRepository;
         this.userService = userService;
         this.categoryMapper = categoryMapper;
         this.brandMapper = brandMapper;
         this.categoryRepository = categoryRepository;
         this.brandRepository = brandRepository;
     }
+
 
     public ProductResponse createProducts(ProductRequest productRequest) {
 
@@ -111,7 +128,6 @@ public class ProductService {
         product.setIsActive(productRequest.getIsActive());
         product.setBrand(brandService.findBrandById(productRequest.getBrandId()));
         product.setCategory(categoryService.findCategoryById(productRequest.getCategoryId()));
-        // product.setImage(productRequest.getImage());
         product.setUpdatedAt(LocalDateTime.now());
         product.setSequence(productRequest.getSequence());
         product.setBuiltIn(productRequest.getBuiltIn());
@@ -167,9 +183,18 @@ public class ProductService {
             Product product = productRepository.findById(id).orElseThrow(()->
                     new ResourceNotFoundException(String.format(ErrorMessage.PRODUCT_NOT_FOUND_EXCEPTION,id)));
 
+
+            List<Model> models = modelRepository.findByProductId(id).orElseThrow(()->
+                    new ResourceNotFoundException(ErrorMessage.MODEL_NOT_FOUND_EXCEPTION));
+
+            Set<ImageFile> modelImages = models.get(0).getImage();
+            ImageFile imageFile = modelImages.iterator().next();
+
+
             ProductResponse productResponse = productMapper.productToProductResponse(product);
             productResponse.setBrandId(product.getBrand().getId());
             productResponse.setCategoryId(product.getCategory().getId());
+            productResponse.setImage(ImageFileService.convertToResponse(imageFile));
 
             return productResponse;
     }
@@ -215,11 +240,33 @@ public class ProductService {
                 throw new BadRequestException(String.format(ErrorMessage.PRODUCT_CANNOT_DELETE_EXCEPTION, id));
             }
 
-            //TODO: Offer_Item Ürün varmı yoksa exp.
+            if (productHasRelatedOfferItems(id)) {
+                throw new BadRequestException("Ürün, ilişkili offer_items kayıtları nedeniyle silinemez.");
+            }
+
+
+            deleteRelatedRecords(id);
 
             productRepository.deleteById(id);
 
             return productMapper.productToProductResponse(product);
+
+    }
+
+    //Y.M
+    private boolean productHasRelatedOfferItems(Long productId) {
+
+        List<OfferItem> relatedOfferItems = offerItemRepository.findByProductId(productId);
+
+        return !relatedOfferItems.isEmpty();
+    }
+
+    //Y.M
+    private void deleteRelatedRecords(Long productId) {
+
+        modelRepository.deleteByProductId(productId);
+
+        shoppingCartItemRepository.deleteByProductId(productId);
 
     }
 
@@ -242,7 +289,24 @@ public class ProductService {
         return productPropertyKeyResponse;
     }
 
-    public ModelResponse createProductModels(ModelRequest modelRequest) {
+   // @Transactional
+    public ModelResponse createProductModels(ModelRequest modelRequest, MultipartFile file) {
+        isSkuUnique(modelRequest.getSku());
+
+        ImageFile imageFile = null;
+
+        String fileName = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
+
+        try {
+            ImageData imageData = new ImageData(file.getBytes());
+            imageFile = new ImageFile(fileName,file.getContentType(),imageData);
+        } catch (IOException e) {
+            throw new RuntimeException(e.getMessage());
+        }
+        Model model = modelMapper.modelRequestToModel(modelRequest);
+        imageFile.setModel(model);
+        imageFileRepository.save(imageFile);
+
 
         Product product= productRepository.findById(modelRequest.getProductId()).orElseThrow(()->
                 new ResourceNotFoundException(String.format(ErrorMessage.PRODUCT_NOT_FOUND_EXCEPTION,modelRequest.getProductId())));
@@ -250,18 +314,24 @@ public class ProductService {
         Currency currency = currencyRepository.findById(modelRequest.getCurrencyId()).orElseThrow(()->
                 new ResourceNotFoundException(ErrorMessage.CURRENCY_NOT_FOUND_EXCEPTION));
 
-        Model model = modelMapper.modelRequestToModel(modelRequest);
+        Set<ImageFile> imageFiles =new HashSet<>();
+        imageFiles.add(imageFile);
 
-        isSkuUnique(modelRequest.getSku());
+       Set<ImageFileResponse> imageFileResponses =new HashSet<>();
+       imageFileResponses.add(ImageFileService.convertToResponse(imageFile));
+
 
         model.setSku(modelRequest.getSku());
         model.setProduct(product);
         model.setCurrency(currency);
+        model.setImage(imageFiles);
         model.setCreate_at(LocalDateTime.now());
         modelRepository.save(model);
+
         ModelResponse modelResponse = modelMapper.modelToModelResponse(model);
         modelResponse.setProductId(product.getId());
         modelResponse.setCurrencyId(currency.getId());
+        modelResponse.setImage(imageFileResponses);
         return modelResponse;
     }
 
@@ -309,7 +379,7 @@ public class ProductService {
         if (sku != null && id != null) {
             Model model= modelRepository.findBySku(sku);
             //Aşağıdaki kod eski sku ile kıyaslamayı engellemek için yazıldı
-            if(model!=null && model.getId()!=id)  { throw new BadRequestException(ErrorMessage.NOT_CREATED_SKU_MESSAGE);}
+            if(model!=null && !Objects.equals(model.getId(), id))  { throw new BadRequestException(ErrorMessage.NOT_CREATED_SKU_MESSAGE);}
         }
     }
 

@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+
 import java.time.LocalDateTime;
 
 @Data
@@ -13,6 +14,11 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class ReportOfferResponse {
 
+    private String dailyDate;
+
+    private int totalProduct;
+
+    private double totalAmount;
     private LocalDateTime period;
 
     private int totalProduct;

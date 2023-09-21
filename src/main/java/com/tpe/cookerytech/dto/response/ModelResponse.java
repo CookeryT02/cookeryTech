@@ -31,7 +31,7 @@ public class ModelResponse {
     private int seq=0;
 
 
-   // private Set<ImageFile> image;
+    private Set<ImageFileResponse> image;
 
     private double buying_price; //decimal
 
