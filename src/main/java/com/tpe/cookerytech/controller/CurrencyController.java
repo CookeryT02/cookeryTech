@@ -1,7 +1,6 @@
 package com.tpe.cookerytech.controller;
 
 import com.tpe.cookerytech.dto.response.CurrencyResponse;
-import com.tpe.cookerytech.dto.response.ProductObjectResponse;
 import com.tpe.cookerytech.service.CurrencyService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;

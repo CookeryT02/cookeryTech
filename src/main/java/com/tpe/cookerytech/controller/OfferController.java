@@ -1,13 +1,10 @@
 package com.tpe.cookerytech.controller;
 
-import com.tpe.cookerytech.domain.User;
 import com.tpe.cookerytech.dto.request.OfferCreateRequest;
 import com.tpe.cookerytech.dto.response.OfferResponse;
-import com.tpe.cookerytech.dto.response.ProductResponse;
-import com.tpe.cookerytech.dto.request.OfferItemUpdateRequest;
-import com.tpe.cookerytech.dto.response.*;
 import com.tpe.cookerytech.repository.OfferRepository;
 import com.tpe.cookerytech.dto.response.OfferResponseWithUser;
+import com.tpe.cookerytech.service.EmailService;
 import com.tpe.cookerytech.service.OfferService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -16,24 +13,12 @@ import org.springframework.data.domain.Sort;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import com.tpe.cookerytech.dto.request.OfferUpdateRequest;
-import com.tpe.cookerytech.dto.response.OfferResponseWithUser;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.Valid;
 import java.time.LocalDate;
-import java.util.List;
-import javax.websocket.server.PathParam;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.LocalDateTime;
 
 
@@ -43,12 +28,15 @@ public class OfferController {
 
 
     private final OfferService offerService;
-    public final OfferRepository offerRepository;
+    private final OfferRepository offerRepository;
+
+    private final EmailService emailService;
 
 
-    public OfferController(OfferService offerService, OfferRepository offerRepository) {
+    public OfferController(OfferService offerService, OfferRepository offerRepository, EmailService emailService) {
         this.offerService = offerService;
         this.offerRepository = offerRepository;
+        this.emailService = emailService;
     }
 
     @PostMapping("/auth")
@@ -56,6 +44,8 @@ public class OfferController {
     public ResponseEntity<OfferResponse> createOfferAuthUser(@RequestBody OfferCreateRequest offerCreateRequest) {
 
         OfferResponse offerResponse = offerService.createOfferAuthUser(offerCreateRequest);
+
+        emailService.sendOfferEmail(offerResponse);
 
         return ResponseEntity.ok(offerResponse);
     }

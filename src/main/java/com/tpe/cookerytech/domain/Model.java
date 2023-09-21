@@ -28,7 +28,7 @@ public class Model {
     @Size(min = 5, max = 150, message = "Title must be between 5 and 150 characters")
     private String title;
 
-    @Column(nullable = false)
+    @Column(nullable = false,unique = true)
     @Size(min = 10, max = 100, message = "sku must be between 10 and 100 characters")
     private String sku;
 
@@ -64,7 +64,7 @@ public class Model {
     @JoinColumn(name = "product_id",referencedColumnName = "id")
     private Product product;
 
-    @Column(nullable = false)
+   // @Column(nullable = false)
     private LocalDateTime create_at;
 
     @Column(nullable = true)

@@ -1,21 +1,20 @@
 package com.tpe.cookerytech.controller;
 
-import com.tpe.cookerytech.dto.response.ProductResponse;
-import com.tpe.cookerytech.dto.response.ProductResponsePDF;
-import com.tpe.cookerytech.dto.response.ReportResponse;
+import com.tpe.cookerytech.dto.response.*;
 import com.lowagie.text.DocumentException;
 import com.tpe.cookerytech.dto.response.ProductResponse;
 import com.tpe.cookerytech.utils.PDFGenerator;
 import com.tpe.cookerytech.service.ReportService;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 import javax.servlet.http.HttpServletResponse;
@@ -129,4 +128,7 @@ public class ReportController {
         return ResponseEntity.ok(listMostPopularProducts);
 
     }
+
+
+
 }

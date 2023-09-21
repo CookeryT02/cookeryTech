@@ -38,7 +38,7 @@ public class ProductResponse {
 
     private Long categoryId;
 
-//    private Set<ImageFile> image;
+    private ImageFileResponse image;
 
     private int sequence = 0;
 
