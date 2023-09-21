@@ -1,5 +1,6 @@
 package com.tpe.cookerytech.domain;
 
+import com.tpe.cookerytech.domain.enums.LogType;
 import lombok.*;
 
 import javax.persistence.*;
@@ -18,7 +19,10 @@ public class Log {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    private String log;
+
+
+    @Enumerated(EnumType.STRING)
+    private LogType log;
 
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")

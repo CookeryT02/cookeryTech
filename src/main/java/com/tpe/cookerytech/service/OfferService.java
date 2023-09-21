@@ -1,9 +1,10 @@
 package com.tpe.cookerytech.service;
 
 import com.tpe.cookerytech.domain.*;
+import com.tpe.cookerytech.domain.Currency;
+import com.tpe.cookerytech.domain.enums.LogType;
 import com.tpe.cookerytech.domain.enums.RoleType;
 import com.tpe.cookerytech.dto.request.OfferCreateRequest;
-import com.tpe.cookerytech.dto.request.OfferItemUpdateRequest;
 import com.tpe.cookerytech.dto.request.OfferUpdateRequest;
 import com.tpe.cookerytech.dto.response.OfferItemResponse;
 import com.tpe.cookerytech.dto.response.OfferResponse;
@@ -21,24 +22,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.Objects;
 
@@ -59,9 +49,10 @@ public class OfferService {
 
     private final OfferItemMapper offerItemMapper;
 
+    private final LogRepository logRepository;
 
 
-    public OfferService(UserService userService, OfferRepository offerRepository, OfferMapper offerMapper, CurrencyMapper currencyMapper, CurrencyRepository currencyRepository, ShoppingCartRepository shoppingCartRepository, ShoppingCartItemRepository shoppingCartItemRepository, OfferItemRepository offerItemRepository, UserMapper userMapper,OfferItemMapper offerItemMapper, UserRepository userRepository) {
+    public OfferService(UserService userService, OfferRepository offerRepository, OfferMapper offerMapper, CurrencyMapper currencyMapper, CurrencyRepository currencyRepository, ShoppingCartRepository shoppingCartRepository, ShoppingCartItemRepository shoppingCartItemRepository, OfferItemRepository offerItemRepository, UserMapper userMapper, OfferItemMapper offerItemMapper, UserRepository userRepository, LogRepository logRepository) {
         this.userService = userService;
         this.offerRepository = offerRepository;
         this.offerMapper = offerMapper;
@@ -73,6 +64,7 @@ public class OfferService {
         this.userRepository = userRepository;
         this.offerItemMapper = offerItemMapper;
         this.userMapper = userMapper;
+        this.logRepository = logRepository;
     }
 
 
@@ -96,9 +88,15 @@ public class OfferService {
         offer.setCurrency(currency);
         offer.setDiscount(0);
 
+
+        Log log =new Log();
+        log.setUser(user);
+        log.setOffer(offer);
+        log.setCreateAt(LocalDateTime.now());
+        log.setLog(LogType.CREATED);
+
         offerRepository.save(offer);
-
-
+        logRepository.save(log);
         ShoppingCart shoppingCart = shoppingCartRepository.findByUserId(user.getId()).orElseThrow(() ->
                 new ResourceNotFoundException(ErrorMessage.SHOPPING_CART_NOT_FOUND));
         List<ShoppingCartItem> shoppingCartItemList = shoppingCartItemRepository.findByShoppingCartId(shoppingCart.getId());
