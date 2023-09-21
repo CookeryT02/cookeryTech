@@ -14,28 +14,15 @@ import java.util.List;
 @RestController
 @RequestMapping("/favorites")
 public class FavoritesController {
-
     private final FavoritesService favoritesService;
-
 
     public FavoritesController(FavoritesService favoritesService) {
         this.favoritesService = favoritesService;
     }
 
 
-    @PostMapping("/auth")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER') or hasRole('CUSTOMER')")
-    public ResponseEntity<ModelResponse> updateAuthUserFavorites(@RequestBody FavoritesRequest favoritesRequest){
-        ModelResponse modelResponse = favoritesService.updateAuthUserFavorites(favoritesRequest.getId());
-        return ResponseEntity.ok(modelResponse);
-    }
 
-    @DeleteMapping("/auth")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER') or hasRole('CUSTOMER')")
-    public void deleteAllFavorites(){
-        favoritesService.deleteAllFavoritesAuthUser();
-    }
-
+    //K01 -> It will get authenticated user`s favorites    Page:91
     @GetMapping("/auth")
     @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER') or hasRole('CUSTOMER')")
     public ResponseEntity<List<ModelResponse>> getAllAuthUserFavorites(){
@@ -43,9 +30,32 @@ public class FavoritesController {
         List<ModelResponse> modelResponseList = favoritesService.getAllAuthUserFavorites();
 
         return ResponseEntity.ok(modelResponseList);
-
     }
 
+
+
+    //K02 -> It will update authenticated user`s favorites
+    @PostMapping("/auth")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER') or hasRole('CUSTOMER')")
+    public ResponseEntity<ModelResponse> updateAuthUserFavorites(@RequestBody FavoritesRequest favoritesRequest){
+        ModelResponse modelResponse = favoritesService.updateAuthUserFavorites(favoritesRequest.getId());
+        return ResponseEntity.ok(modelResponse);
+    }
+
+
+
+
+    //K03 -> It will remove all favorites of authenticated user
+    @DeleteMapping("/auth")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER') or hasRole('CUSTOMER')")
+    public void deleteAllFavorites(){
+        favoritesService.deleteAllFavoritesAuthUser();
+    }
+
+
+
+
+    //K04 -> It will move all favorites of authenticated user to cart
     @PutMapping("/auth")
     @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER') or hasRole('CUSTOMER')")
     public ResponseEntity<CkResponse> moveFavoritesToCart(){
@@ -53,7 +63,5 @@ public class FavoritesController {
         CkResponse ckResponse = favoritesService.moveAllFavoritesToShoppingCart();
 
         return ResponseEntity.ok(ckResponse);
-
     }
-
 }

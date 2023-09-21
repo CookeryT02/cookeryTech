@@ -4,8 +4,6 @@ import com.tpe.cookerytech.domain.ImageData;
 import com.tpe.cookerytech.domain.ImageFile;
 import com.tpe.cookerytech.domain.Model;
 import com.tpe.cookerytech.dto.response.ImageFileResponse;
-import com.tpe.cookerytech.dto.response.ImageSavedResponse;
-import com.tpe.cookerytech.dto.response.ResponseMessage;
 import com.tpe.cookerytech.exception.ResourceNotFoundException;
 import com.tpe.cookerytech.exception.message.ErrorMessage;
 import com.tpe.cookerytech.repository.ImageFileRepository;
@@ -17,15 +15,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @Service
 public class ImageFileService {
-
 
     private final ImageFileRepository imageFileRepository;
 
@@ -37,6 +32,26 @@ public class ImageFileService {
         this.modelRepository = modelRepository;
     }
 
+
+
+    //H01
+    public List<ImageFileResponse> getProductImages(Long modelId) {
+
+        Model model = modelRepository.findById(modelId).orElseThrow(()->
+                new ResourceNotFoundException(String.format(ErrorMessage.MODEL_NOT_FOUND_EXCEPTION, modelId)));
+
+        List<ImageFileResponse> imageResponses = new ArrayList<>();
+
+        for (ImageFile imageFile : model.getImage()) {
+            ImageFileResponse imageFileResponse = convertToResponse(imageFile);
+            imageResponses.add(imageFileResponse);
+        }
+        return imageResponses;
+    }
+
+
+
+    //H02
     public String saveImage(MultipartFile file,Long id) {
         ImageFile imageFile = null;
 
@@ -56,33 +71,25 @@ public class ImageFileService {
         return imageFile.getId();
     }
 
-//    public List<ImageSavedResponse> saveImages(MultipartFile[] files, Long modelId) {
-//        List<ImageSavedResponse> responses = new ArrayList<>();
-//        for (MultipartFile file:files){
-//            String imageId = saveImage(file,modelId);
-//            ImageSavedResponse response = new ImageSavedResponse(imageId, ResponseMessage.IMAGE_SAVED_RESPONSE_MESSAGE,true);
-//            responses.add(response);
-//        }
-//        return responses;
-//    }
 
-    public List<ImageFileResponse> getProductImages(Long modelId) {
 
-        Model model = modelRepository.findById(modelId).orElseThrow(()->
-                new ResourceNotFoundException(String.format(ErrorMessage.MODEL_NOT_FOUND_EXCEPTION, modelId)));
 
-        List<ImageFileResponse> imageResponses = new ArrayList<>();
+    //H03
+    public Boolean removeById(String id) {
+        ImageFile imageFile =  getImageById(id);
 
-        for (ImageFile imageFile : model.getImage()) {
-            ImageFileResponse imageFileResponse = convertToResponse(imageFile);
-            imageResponses.add(imageFileResponse);
+        if(imageFileRepository.existsById(id)){
+            imageFileRepository.delete(imageFile);
+            return true;
+        }else {
+            return false;
         }
-
-        return imageResponses;
-
-
     }
 
+
+
+
+    //**************************************** HELPER METHODS *****************************************
     public static ImageFileResponse convertToResponse(ImageFile imageFile) {
 
         ImageFileResponse response = new ImageFileResponse();
@@ -100,24 +107,10 @@ public class ImageFileService {
         return response;
     }
 
-    public Boolean removeById(String id) {
-        ImageFile imageFile =  getImageById(id);
-
-        if(imageFileRepository.existsById(id)){
-            imageFileRepository.delete(imageFile);
-            return true;
-        }else {
-            return false;
-        }
-    }
-
     public ImageFile getImageById(String id) {
         ImageFile imageFile = imageFileRepository.findById(id).orElseThrow(()->
                 new ResourceNotFoundException(
                         String.format(ErrorMessage.IMAGE_NOT_FOUND_MESSAGE,id)));
         return imageFile ;
     }
-
-
-
 }

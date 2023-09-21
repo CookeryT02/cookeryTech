@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ReportOfferResponse {
 
-    private String dailyDate;
+    private String period;
 
     private int totalProduct;
 

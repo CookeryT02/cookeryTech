@@ -23,6 +23,8 @@ public class CurrencyController {
     }
 
 
+
+    //L01 -> It will getgetcurrent currency rates for TRY, USD, EUR from currencies table    Page:96
     @GetMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER') or hasRole('CUSTOMER')")
     public ResponseEntity<List<CurrencyResponse>> getAllCurrencies() {
@@ -30,6 +32,11 @@ public class CurrencyController {
         return ResponseEntity.ok(allCurrencies);
     }
 
+
+
+
+    //L02 -> It will getgetcurrent currency rates for TRY, USD, EUR from
+    // https://www.tcmb.gov.tr/kurlar/today.xml and update currencies table
     @GetMapping("/admin")
     @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER')")
     public ResponseEntity<List<CurrencyResponse>> getAllCurrenciesAdmin() {
