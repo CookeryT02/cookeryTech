@@ -53,7 +53,7 @@ public class ProductService {
 
     private final ImageFileRepository imageFileRepository;
 
-    public ProductService(ProductRepository productRepository, ProductMapper productMapper, BrandService brandService, CategoryService categoryService, CurrencyRepository currencyRepository, ModelMapper modelMapper, ProductPropertyKeyMapper productPropertyKeyMapper, ProductPropertyKeyRepository productPropertyKeyRepository, OfferItemRepository offerItemRepository, ModelRepository modelRepository, ShoppingCartItemRepository shoppingCartItemRepository, ImageFileRepository imageFileRepository) {
+
     private final CategoryMapper categoryMapper;
 
     private final BrandMapper brandMapper;
@@ -61,10 +61,10 @@ public class ProductService {
     private final CategoryRepository categoryRepository;
 
     private final BrandRepository brandRepository;
+    private final UserService userService;
 
 
-
-    public ProductService(ProductRepository productRepository, ProductMapper productMapper, BrandService brandService, CategoryService categoryService, CurrencyService currencyService, CurrencyRepository currencyRepository, ModelMapper modelMapper, ProductPropertyKeyMapper productPropertyKeyMapper, ProductPropertyKeyRepository productPropertyKeyRepository, ModelRepository modelRepository, UserService userService, CategoryMapper categoryMapper, BrandMapper brandMapper, CategoryRepository categoryRepository, BrandRepository brandRepository) {
+    public ProductService(ProductRepository productRepository, ProductMapper productMapper, BrandService brandService, CategoryService categoryService, CurrencyService currencyService, CurrencyRepository currencyRepository, ModelMapper modelMapper, ProductPropertyKeyMapper productPropertyKeyMapper, ProductPropertyKeyRepository productPropertyKeyRepository, ModelRepository modelRepository, UserService userService, CategoryMapper categoryMapper, BrandMapper brandMapper, CategoryRepository categoryRepository, BrandRepository brandRepository, OfferItemRepository offerItemRepository, ShoppingCartItemRepository shoppingCartItemRepository, ImageFileRepository imageFileRepository) {
         this.productRepository = productRepository;
         this.productMapper = productMapper;
         this.brandService = brandService;

@@ -19,11 +19,8 @@ public class ReportOfferResponse {
     private int totalProduct;
 
     private double totalAmount;
+
     private LocalDateTime period;
-
-    private int totalProduct;
-
-    private int totalAmount;
 
     private Product product;
 
