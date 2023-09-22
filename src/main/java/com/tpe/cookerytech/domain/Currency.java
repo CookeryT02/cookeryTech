@@ -25,7 +25,7 @@ public class Currency {
 
     private double value;
 
-    @Column(nullable = false)
+    @Column
     private LocalDateTime updateAt;
 
 

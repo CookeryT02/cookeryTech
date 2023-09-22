@@ -2,33 +2,36 @@ package com.tpe.cookerytech.utils;
 
 import com.lowagie.text.*;
 import com.lowagie.text.pdf.*;
-import com.tpe.cookerytech.domain.Product;
 import com.tpe.cookerytech.dto.response.ProductResponse;
+import com.tpe.cookerytech.dto.response.ProductResponsePDF;
+import com.tpe.cookerytech.dto.response.ReportOfferResponse;
 import com.tpe.cookerytech.mapper.ProductMapper;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import reactor.netty.http.server.HttpServerResponse;
+
 
 import javax.servlet.http.HttpServletResponse;
 
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.List;
+
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class PDFGenerator {
 
-    @Autowired
-    private  ProductMapper productMapper;
+
 
     private List<ProductResponse> productList;
 
-    public void generate(HttpServletResponse response,String title, int count) throws DocumentException, IOException{
+    private List<ProductResponsePDF> productResponsePDFS;
+
+
+    public void generate(HttpServletResponse response,String title, int count,int a) throws DocumentException, IOException{
 
         Document document = new Document(PageSize.A4);
 
@@ -70,13 +73,23 @@ public class PDFGenerator {
         cell.setPhrase(new Phrase("Offer Count",font));
         table.addCell(cell);
 
-
-        for(ProductResponse productResponse:productList){
-            table.addCell(String.valueOf(productResponse.getId()));
-            table.addCell(productResponse.getTitle());
-            table.addCell(String.valueOf(productResponse.getBrandId()));
-            table.addCell(String.valueOf(productResponse.getCategoryId()));
-            table.addCell(String.valueOf(count));
+        if (a==2){
+            for (ProductResponsePDF productResponsePDF:productResponsePDFS){
+                table.addCell(String.valueOf(productResponsePDF.getId()));
+                table.addCell(productResponsePDF.getTitle());
+                table.addCell(String.valueOf(productResponsePDF.getBrandId()));
+                table.addCell(String.valueOf(productResponsePDF.getCategoryId()));
+                table.addCell(String.valueOf(productResponsePDF.getCount()));
+            }
+        }
+        if(a==1) {
+            for(ProductResponse productResponse:productList){
+                table.addCell(String.valueOf(productResponse.getId()));
+                table.addCell(productResponse.getTitle());
+                table.addCell(String.valueOf(productResponse.getBrandId()));
+                table.addCell(String.valueOf(productResponse.getCategoryId()));
+                table.addCell(String.valueOf(count));
+            }
         }
 
         document.add(table);

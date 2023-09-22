@@ -1,14 +1,7 @@
 package com.tpe.cookerytech.repository;
 
 import com.tpe.cookerytech.domain.Offer;
-import com.tpe.cookerytech.domain.Product;
 import com.tpe.cookerytech.domain.User;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.EntityGraph;
-import com.tpe.cookerytech.dto.response.OfferResponse;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -20,10 +13,6 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDate;
 import java.util.List;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface OfferRepository extends JpaRepository<Offer, Long> {
@@ -31,18 +20,6 @@ public interface OfferRepository extends JpaRepository<Offer, Long> {
     static boolean existByUser(User user) {
         return false;
     }
-
-
-//    @EntityGraph(attributePaths = {"user"})
-//    @EntityGraph(attributePaths = "id")
-//    List<Offer> findByUser(Long id);
-
-
-
-
-
-
-
 
 
     @EntityGraph(attributePaths = "id")
@@ -69,15 +46,4 @@ public interface OfferRepository extends JpaRepository<Offer, Long> {
             @Param("q") String q,
             Pageable pageable
     );
-
-
-
-//    @Query("SELECT o FROM Offer o WHERE " +
-//            "(:status IS NULL OR o.status = :status) AND " +
-//            "(:id IS NULL OR o.user.id = :id ) AND "  +
-//            "DATE(o.createAt) BETWEEN :date1 AND :date2 ORDER BY o.createAt")
-//    Page<Offer> findByUserIdBetweenOrderByCreateAt(Long id, Pageable pageable, Byte status, LocalDate date1, LocalDate date2);
-
-
-    
 }

@@ -1,7 +1,6 @@
 package com.tpe.cookerytech.service;
 
 import com.tpe.cookerytech.domain.*;
-import com.tpe.cookerytech.domain.enums.RoleType;
 import com.tpe.cookerytech.dto.request.CategoryRequest;
 import com.tpe.cookerytech.dto.response.CategoryResponse;
 import com.tpe.cookerytech.dto.response.ProductResponse;
@@ -17,137 +16,28 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 
 @Service
 public class CategoryService {
     private final CategoryMapper categoryMapper;
-
     private final CategoryRepository categoryRepository;
-
     private final ProductMapper productMapper;
-
     private final ProductRepository productRepository;
 
-    private final UserService userService;
 
 
-    public CategoryService(CategoryMapper categoryMapper, CategoryRepository categoryRepository, ProductMapper productMapper, ProductRepository productRepository, UserService userService) {
+    public CategoryService(CategoryMapper categoryMapper, CategoryRepository categoryRepository, ProductMapper productMapper, ProductRepository productRepository) {
         this.categoryMapper = categoryMapper;
         this.categoryRepository = categoryRepository;
         this.productMapper = productMapper;
         this.productRepository = productRepository;
-        this.userService = userService;
-    }
-
-    public CategoryResponse createCategory(CategoryRequest categoryRequest) {
-
-
-        Category category = categoryMapper.categoryRequestToCategory(categoryRequest);
-
-        if(isTitleUnique(category.getTitle())){
-            throw new ConflictException(String.format(ErrorMessage.CATEGORY_ALREADY_EXIST_EXCEPTION, category.getTitle()));
-        }
-
-        String title=category.getTitle();
-        String slug=  generateSlugFromTitle(title);
-        category.setSlug(slug);
-        category.setCreateAt(LocalDateTime.now());
-        category.setUpdateAt(null);
-        categoryRepository.save(category);
-
-
-
-        return categoryMapper.categoryToCategoryResponse(category);
-    }
-
-
-    public boolean isTitleUnique(String title) {
-        return categoryRepository.existsByTitle(title);
-    }
-
-
-    public CategoryResponse removeCategoryById(Long id) {
-
-        Category category = findCategoryById(id);
-        CategoryResponse categoryResponse = categoryMapper.categoryToCategoryResponse(category);
-
-        //Built-in
-        if (category.getBuilt_in()) {
-            throw new ResourceNotFoundException(String.format(ErrorMessage.CATEGORY_NOT_FOUND_EXCEPTION, id));
-        }
-
-        // Category product var mı kontrol et !!!
-
-//        if (!(category.getProductList().size() == 0)) {
-//            throw new BadRequestException(String.format(ErrorMessage.CATEGORY_CANNOT_DELETE_EXCEPTION, id));
-//        }
-
-
-        categoryRepository.delete(category);
-
-        return categoryResponse;
     }
 
 
 
-    // YARDIMCI METHEDLAR
-    private String generateSlugFromTitle(String title) {
-        // Türkçe karakterleri çıkartma işlemi
-        String normalizedTitle = removeTurkishCharacters(title);
-
-        // Diğer özel karakterleri çıkartma işlemi
-        String cleanedText = normalizedTitle.replaceAll("[^a-zA-Z0-9 -]", "");
-
-        // Boşlukları '-' ile değiştirme
-        String slug = cleanedText.replaceAll(" ", "-");
-
-        return slug.toLowerCase();
-    }
-
-
-
-
-    public CategoryResponse updateCategory(Long id, CategoryRequest categoryRequest) {
-
-        Category category = getCategory(id);
-
-        if(category.getBuilt_in()){
-            throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
-        }
-
-
-        category.setTitle(categoryRequest.getTitle());
-        category.setDescription(categoryRequest.getDescription());
-        category.setSeq(categoryRequest.getSeq());
-        category.setSlug(categoryRequest.getSlug());
-        category.setIsActive(categoryRequest.getIsActive());
-        category.setUpdateAt(LocalDateTime.now());
-
-        CategoryResponse categoryResponse = categoryMapper.categoryToCategoryResponse(category);
-
-        categoryRepository.save(category);
-
-        return categoryResponse;
-    }
-
-    private Category getCategory(Long id) {
-
-        Category category = categoryRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException(String.format(ErrorMessage.RESOURCE_NOT_FOUND_EXCEPTION,id)));
-
-        return category;
-
-    }
-//    private boolean isCategoryExist(String categoryName) {
-//
-//        return categoryRepository.existsBy(categoryName);
-//
-//    }
-
-
+    //B01
     public List<CategoryResponse> getAllCategory() {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -167,13 +57,12 @@ public class CategoryService {
             List<CategoryResponse> categoryResponses = categoryMapper.map(categories);
 
             return categoryResponses;
-
-
         }
-
     }
-    
- // get category as response
+
+
+
+    //B02
     public CategoryResponse getOneCategory(Long categoryId) {
 
         Category category = findCategoryById(categoryId);
@@ -187,11 +76,118 @@ public class CategoryService {
         if (!isAdmin && !category.getIsActive()) {
             throw new ResourceNotFoundException(String.format(ErrorMessage.CATEGORY_NOT_FOUND_EXCEPTION, categoryId));
         }
+        return categoryMapper.categoryToCategoryResponse(category);
+    }
+
+
+
+
+    //B03
+    public CategoryResponse createCategory(CategoryRequest categoryRequest) {
+
+        Category category = categoryMapper.categoryRequestToCategory(categoryRequest);
+
+        if(isTitleUnique(category.getTitle())){
+            throw new ConflictException(String.format(ErrorMessage.CATEGORY_ALREADY_EXIST_EXCEPTION, category.getTitle()));
+        }
+
+        String title=category.getTitle();
+        String slug=  generateSlugFromTitle(title);
+        category.setSlug(slug);
+        category.setCreateAt(LocalDateTime.now());
+        category.setUpdateAt(null);
+        categoryRepository.save(category);
 
         return categoryMapper.categoryToCategoryResponse(category);
+    }
+
+
+
+    //B04
+    public CategoryResponse updateCategory(Long id, CategoryRequest categoryRequest) {
+
+        Category category = getCategory(id);
+
+        if(category.getBuilt_in()){
+            throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
+        }
+
+        category.setTitle(categoryRequest.getTitle());
+        category.setDescription(categoryRequest.getDescription());
+        category.setSeq(categoryRequest.getSeq());
+        category.setSlug(categoryRequest.getSlug());
+        category.setIsActive(categoryRequest.getIsActive());
+        category.setUpdateAt(LocalDateTime.now());
+
+        CategoryResponse categoryResponse = categoryMapper.categoryToCategoryResponse(category);
+
+        categoryRepository.save(category);
+
+        return categoryResponse;
+    }
+
+
+
+    //B05
+    public CategoryResponse removeCategoryById(Long id) {
+
+        Category category = findCategoryById(id);
+        CategoryResponse categoryResponse = categoryMapper.categoryToCategoryResponse(category);
+
+        //Built-in
+        if (category.getBuilt_in()) {
+            throw new ResourceNotFoundException(String.format(ErrorMessage.CATEGORY_NOT_FOUND_EXCEPTION, id));
+        }
+
+        if(!productRepository.findByCategoryId(id).isEmpty()){
+            throw new BadRequestException(String.format(ErrorMessage.CATEGORY_CANNOT_DELETE_EXCEPTION, id));
+        }
+        categoryRepository.delete(category);
+
+        return categoryResponse;
+    }
+
+
+
+
+    //B06
+    public List<ProductResponse> getActiveProductsByCategoryId(Long id) {
+
+        List<Product> productIdCategory = productRepository.findByCategoryIdAndIsActiveTrue(id);
+
+        return productMapper.productsToProductResponses(productIdCategory);
+    }
+
+
+
+
+    //************************************* Helper Methods **********************************************
+
+    public boolean isTitleUnique(String title) {
+        return categoryRepository.existsByTitle(title);
+    }
+
+    private String generateSlugFromTitle(String title) {
+        // Türkçe karakterleri çıkartma işlemi
+        String normalizedTitle = removeTurkishCharacters(title);
+
+        // Diğer özel karakterleri çıkartma işlemi
+        String cleanedText = normalizedTitle.replaceAll("[^a-zA-Z0-9 -]", "");
+
+        // Boşlukları '-' ile değiştirme
+        String slug = cleanedText.replaceAll(" ", "-");
+
+        return slug.toLowerCase();
+    }
+
+    private Category getCategory(Long id) {
+
+        Category category = categoryRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException(String.format(ErrorMessage.RESOURCE_NOT_FOUND_EXCEPTION,id)));
+
+        return category;
 
     }
-    
 
     public Category findCategoryById(Long categoryId) {
 
@@ -200,7 +196,6 @@ public class CategoryService {
 
         return category;
     }
-
 
     private String removeTurkishCharacters(String input) {
         if (input == null) {
@@ -215,16 +210,6 @@ public class CategoryService {
                 .replaceAll("ü", "u").replaceAll("Ü", "U");
 
         return input;
-    }
-
-
-    public List<ProductResponse> getActiveProductsByCategoryId(Long id) {
-
-        List<Product> productIdCategory = productRepository.findByCategoryIdAndIsActiveTrue(id);
-
-        return productMapper.productsToProductResponses(productIdCategory);
-
-
     }
 }
 

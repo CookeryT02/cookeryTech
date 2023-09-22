@@ -47,4 +47,7 @@ public class ErrorMessage {
     public static final String OFFER_ITEM_COULD_NOT_BE_DELETED = "Could not be deleted because offer status is not 0 or 3";
 
 
+    public static final String LOG_NOT_FOUND_EXCEPTION = "Log : %s not found";
+    public static final String SAME_DAY_EXCEPTION = "This process cannot be done on the same day";
+    public static final String CATEGORY_CANNOT_DELETE_EXCEPTION = "Category cannot be deleted";
 }

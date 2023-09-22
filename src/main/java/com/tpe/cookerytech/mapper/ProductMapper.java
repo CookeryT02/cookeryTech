@@ -1,9 +1,7 @@
 package com.tpe.cookerytech.mapper;
 
 import com.tpe.cookerytech.domain.Product;
-import com.tpe.cookerytech.domain.User;
 import com.tpe.cookerytech.dto.request.ProductRequest;
-import com.tpe.cookerytech.dto.response.ModelResponse;
 import com.tpe.cookerytech.dto.response.ProductObjectResponse;
 import com.tpe.cookerytech.dto.response.ProductResponse;
 import org.mapstruct.Mapper;
@@ -14,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
 
 @Mapper(componentModel = "spring")
 public interface ProductMapper{
@@ -45,12 +44,6 @@ public interface ProductMapper{
         }
         return productResponses;
     }
-
-
-//    User productsToProductResponsePage(List<Product> productList);
-    List<ProductObjectResponse> productsToProductObjectResponses(List<Product> productList);
-
-
     default Page<ProductResponse> productsToProductResponseCustomer(List<Product> filteredProductsCustomer, Pageable pageable){
 
         List<ProductResponse> productResponse = filteredProductsCustomer.stream().map(this::productToProductResponse).collect(Collectors.toList());
@@ -65,12 +58,8 @@ public interface ProductMapper{
         return new PageImpl<>(productResponse,pageable,productResponse.size());
     }
 
+    List<ProductObjectResponse> productsToProductObjectResponses(List<Product> productList);
 
+    ProductObjectResponse productToProductObjectResponse(Product product);
 
-
-//    Page<ProductResponse> productsToProductResponseCustomer(List<Product> filteredProductsCustomer, Pageable pageable);
-//
-//    Page<ProductResponse> productsToProductResponseTrue(List<Product> filteredProducts, Pageable pageable);
-
-//    Page<ProductResponse> pageProductToResponsePageProduct(Page<Product> productPage);
 }

@@ -43,7 +43,6 @@ public class OfferItem {
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime createAt;
 
-
     private LocalDateTime updateAt;
 
 }

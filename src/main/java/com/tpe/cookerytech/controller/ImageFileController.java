@@ -1,6 +1,5 @@
 package com.tpe.cookerytech.controller;
 
-import com.tpe.cookerytech.domain.ImageFile;
 import com.tpe.cookerytech.dto.response.CkResponse;
 import com.tpe.cookerytech.dto.response.ImageFileResponse;
 import com.tpe.cookerytech.dto.response.ImageSavedResponse;
@@ -11,9 +10,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @RestController
 @RequestMapping("/images")
@@ -26,6 +23,25 @@ public class ImageFileController {
         this.imageFileService = imageFileService;
     }
 
+
+
+    //H01 -> It will get an image of a product    Page:85
+    @GetMapping("/{modelId}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER') or hasRole('CUSTOMER')")
+    public ResponseEntity<List<ImageFileResponse>> getProductImages(@PathVariable Long modelId) {
+
+        List<ImageFileResponse> images = imageFileService.getProductImages(modelId);
+        if (images.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(images);
+    }
+
+
+
+
+
+    //H02 -> It will upload image(s) of a product
     @PostMapping("/{modelId}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ImageSavedResponse> uploadFile(@RequestParam("file")MultipartFile file,
@@ -38,17 +54,10 @@ public class ImageFileController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/{modelId}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER') or hasRole('CUSTOMER')")
-    public ResponseEntity<List<ImageFileResponse>> getProductImages(@PathVariable Long modelId) {
 
-        List<ImageFileResponse> images = imageFileService.getProductImages(modelId);
-        if (images.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(images);
-    }
 
+
+    //H03 -> It will delete an image
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CkResponse> deleteImageFile(@PathVariable String id) {

@@ -9,8 +9,6 @@ import com.tpe.cookerytech.exception.ResourceNotFoundException;
 import com.tpe.cookerytech.exception.message.ErrorMessage;
 import com.tpe.cookerytech.mapper.BrandMapper;
 import com.tpe.cookerytech.repository.BrandRepository;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import com.tpe.cookerytech.repository.ProductRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -34,6 +32,31 @@ public class BrandService {
         this.productRepository = productRepository;
     }
 
+
+
+    //C01
+    public Page<BrandResponse> findAllWithPage(Pageable pageable) {
+
+        Page<Brand> brandPage= brandRepository.findAll(pageable);
+
+        return brandPage.map(brandMapper::brandToBrandResponse);
+    }
+
+
+
+
+    //C02
+    public BrandResponse getBrandById(Long id) {
+
+        Brand brand = brandRepository.findById(id).orElseThrow(()->
+                new ResourceNotFoundException(ErrorMessage.BRAND_NOT_FOUND_EXCEPTION));
+
+        return brandMapper.brandToBrandResponse(brand);
+    }
+
+
+
+    //C03
     public BrandResponse createBrand(BrandRequest brandRequest) {
 
        Brand brand = brandMapper.brandRequestToBrand(brandRequest);
@@ -44,17 +67,11 @@ public class BrandService {
        brandRepository.save(brand);
 
        return brandMapper.brandToBrandResponse(brand);
-
     }
 
-    public BrandResponse getBrandById(Long id) {
 
-        Brand brand = brandRepository.findById(id).orElseThrow(()->
-                new ResourceNotFoundException(ErrorMessage.BRAND_NOT_FOUND_EXCEPTION));
 
-        return brandMapper.brandToBrandResponse(brand);
-    }
-
+    //C04
     public BrandResponse updateBrandById(Long id, BrandRequest brandRequest) {
 
         Brand brand = brandRepository.findById(id).orElseThrow(() ->
@@ -75,6 +92,10 @@ public class BrandService {
         return brandMapper.brandToBrandResponse(brand);
     }
 
+
+
+
+    //C05
     public BrandResponse deleteBrandById(Long id) {
 
         Brand brand = brandRepository.findById(id).orElseThrow(()->
@@ -84,39 +105,24 @@ public class BrandService {
             throw  new BadRequestException(String.format(ErrorMessage.BRAND_CANNOT_DELETE_EXCEPTION,id));
         }
 
-        ///////Checking Products///////
-//        Product product= productRepository.findByBrandId(id);
-//
-//         if(product.getBrand().getId()==null){
-//           brandRepository.deleteBrandById(brand);
-//         } else {
-//             throw new BadRequestException(String.format(ErrorMessage.BRAND_CANNOT_DELETE_EXCEPTION,id));
-//         }
+         if(!productRepository.findByBrandId(id).isEmpty()){
+             throw new BadRequestException(String.format(ErrorMessage.BRAND_CANNOT_DELETE_EXCEPTION,id));
+         }
 
         brandRepository.deleteById(id);
 
         return brandMapper.brandToBrandResponse(brand);
-
     }
 
 
 
+
+    //************************************ HELPER METHODS ***************************************
     public Brand findBrandById(Long brandId) {
 
         Brand brand = brandRepository.findById(brandId).orElseThrow(()->
                 new ResourceNotFoundException(ErrorMessage.BRAND_NOT_FOUND_EXCEPTION));
 
         return brand;
-
-    }
-
-
-
-    public Page<BrandResponse> findAllWithPage(Pageable pageable) {
-
-        Page<Brand> brandPage= brandRepository.findAll(pageable);
-
-        return brandPage.map(brandMapper::brandToBrandResponse);
-
     }
 }
