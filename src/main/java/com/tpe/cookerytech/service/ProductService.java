@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.transaction.Transactional;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -285,10 +286,9 @@ public class ProductService {
             throw new BadRequestException(String.format(ErrorMessage.PRODUCT_CANNOT_DELETE_EXCEPTION, id));
         }
 
-        if (productHasRelatedOfferItems(id)) {
-            throw new BadRequestException("Ürün, ilişkili offer_items kayıtları nedeniyle silinemez.");
+        if (offerItemRepository.findByProductId(id).size()!=0) {
+            throw new BadRequestException(String.format(ErrorMessage.PRODUCT_CANNOT_DELETE_EXCEPTION, id));
         }
-
 
         deleteRelatedRecords(id);
 
@@ -571,13 +571,6 @@ public class ProductService {
 
 
     //************************************* Helper Methods **********************************************
-
-    private boolean productHasRelatedOfferItems(Long productId) {
-
-        List<OfferItem> relatedOfferItems = offerItemRepository.findByProductId(productId);
-
-        return !relatedOfferItems.isEmpty();
-    }
 
     private void deleteRelatedRecords(Long productId) {
 
