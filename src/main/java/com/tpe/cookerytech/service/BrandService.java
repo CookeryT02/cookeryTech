@@ -1,6 +1,7 @@
 package com.tpe.cookerytech.service;
 
 import com.tpe.cookerytech.domain.Brand;
+import com.tpe.cookerytech.domain.Product;
 import com.tpe.cookerytech.dto.request.BrandRequest;
 import com.tpe.cookerytech.dto.response.BrandResponse;
 import com.tpe.cookerytech.exception.BadRequestException;
@@ -8,6 +9,7 @@ import com.tpe.cookerytech.exception.ResourceNotFoundException;
 import com.tpe.cookerytech.exception.message.ErrorMessage;
 import com.tpe.cookerytech.mapper.BrandMapper;
 import com.tpe.cookerytech.repository.BrandRepository;
+import com.tpe.cookerytech.repository.ProductRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -22,11 +24,12 @@ public class BrandService {
 
     private final BrandMapper brandMapper;
 
+    private final ProductRepository productRepository;
 
-
-    public BrandService(BrandRepository brandRepository, BrandMapper brandMapper) {
+    public BrandService(BrandRepository brandRepository, BrandMapper brandMapper, ProductRepository productRepository) {
         this.brandRepository = brandRepository;
         this.brandMapper = brandMapper;
+        this.productRepository = productRepository;
     }
 
 
@@ -102,14 +105,9 @@ public class BrandService {
             throw  new BadRequestException(String.format(ErrorMessage.BRAND_CANNOT_DELETE_EXCEPTION,id));
         }
 
-        ///////Checking Products///////
-//        Product product= productRepository.findByBrandId(id);
-//
-//         if(product.getBrand().getId()==null){
-//           brandRepository.deleteBrandById(brand);
-//         } else {
-//             throw new BadRequestException(String.format(ErrorMessage.BRAND_CANNOT_DELETE_EXCEPTION,id));
-//         }
+         if(productRepository.findByBrandId(id).size()!=0){
+             throw new BadRequestException(String.format(ErrorMessage.BRAND_CANNOT_DELETE_EXCEPTION,id));
+         }
 
         brandRepository.deleteById(id);
 

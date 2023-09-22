@@ -139,11 +139,9 @@ public class CategoryService {
             throw new ResourceNotFoundException(String.format(ErrorMessage.CATEGORY_NOT_FOUND_EXCEPTION, id));
         }
 
-        // Category product var mı kontrol et !!!
-
-//        if (!(category.getProductList().size() == 0)) {
-//            throw new BadRequestException(String.format(ErrorMessage.CATEGORY_CANNOT_DELETE_EXCEPTION, id));
-//        }
+        if(productRepository.findByCategoryId(id).size()!=0){
+            throw new BadRequestException(String.format(ErrorMessage.CATEGORY_CANNOT_DELETE_EXCEPTION, id));
+        }
         categoryRepository.delete(category);
 
         return categoryResponse;

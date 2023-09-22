@@ -1,6 +1,8 @@
 package com.tpe.cookerytech.controller;
 
 import com.tpe.cookerytech.dto.response.*;
+import com.tpe.cookerytech.dto.response.ReportOfferResponse;
+import com.tpe.cookerytech.dto.response.ReportResponse;
 import com.lowagie.text.DocumentException;
 import com.tpe.cookerytech.dto.response.ProductResponse;
 import com.tpe.cookerytech.utils.PDFGenerator;
@@ -14,6 +16,10 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
+import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
+import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -153,6 +159,18 @@ public class ReportController {
        return ResponseEntity.ok(productResponseList);
     }
 
+
+//    @GetMapping("/offers")
+//    @PreAuthorize("hasRole('ADMIN')")
+//    public List<ReportOfferResponse> getOffersSummaries(
+//            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+//            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
+//            @RequestParam String type) {
+//
+//        return reportService.getOffersSummaries(startDate, endDate, type);
+//
+//
+//    }
 
 
     //G04 - PDF

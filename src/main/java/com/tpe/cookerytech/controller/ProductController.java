@@ -37,23 +37,22 @@ public class ProductController {
     //A01 -> It should return products depending on query and paging parameters Page:26
     @GetMapping
     @PreAuthorize("hasRole('CUSTOMER') or hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER')")
-    public ResponseEntity<Page<ProductResponse>> getAllProductsWithPage(
-            @RequestParam(required = false,defaultValue = "",name = "q") String q,
-            @RequestParam(required = false) Long brandId,
-            @RequestParam(required = false) Long categoryId,
+    public ResponseEntity<Page<ProductObjectResponse>> getAllProductsWithPage(
+            @RequestParam(required = false,defaultValue = "",name="q") String q,
             @RequestParam(required = false,defaultValue = "0",name = "page") int page,
             @RequestParam(required = false,defaultValue = "20",name = "size") int size,
-            @RequestParam(required = false,defaultValue = "id",name = "sort") String sort,
+            @RequestParam(required = false,defaultValue = "category",name = "sort") String sort,
             @RequestParam(required = false,defaultValue = "DESC",name = "type") String type){
 
 
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.valueOf(type), sort));
 
-        Page<ProductResponse> productResponse = productService.allProducts(q,pageable,brandId,categoryId);
+        Page<ProductObjectResponse> productObjectResponse = productService.allProducts(q,pageable);
 
-        return ResponseEntity.ok(productResponse);
+        return ResponseEntity.ok(productObjectResponse);
+
+
     }
-
 
 
     //A02 -> It should return categories and products whose “featured” field has a value of 1.
@@ -93,7 +92,7 @@ public class ProductController {
 
 
     //A05 -> It should update a product
-    @PutMapping("/{id}/admin")
+    @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('PRODUCT_MANAGER')")
     public ResponseEntity<ProductResponse> updateProduct(@PathVariable Long id,
                                                          @Valid @RequestBody ProductRequest productRequest) {
@@ -106,7 +105,7 @@ public class ProductController {
 
 
     //A06 -> It should delete a product
-    @DeleteMapping("/{id}/admin")
+    @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('PRODUCT_MANAGER')")
     public ResponseEntity<ProductResponse> deleteProductById(@PathVariable Long id){
 

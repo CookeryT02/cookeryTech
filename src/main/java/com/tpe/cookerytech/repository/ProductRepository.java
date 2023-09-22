@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 
 
 @Repository
@@ -19,17 +20,18 @@ public interface ProductRepository extends JpaRepository<Product,Long> {
     List<Product> findByCategoryIdAndIsActiveTrue(Long categoryId);
 
     @Query("SELECT p FROM Product p WHERE (:q IS NULL OR LOWER(p.title) LIKE CONCAT('%', LOWER(:q), '%')) "
-            + "AND (p.isActive = true) "
-            + "AND (:cId IS NULL OR p.category.isActive = true AND p.category.id = :cId) "
-            + "AND (:bId IS NULL OR p.brand.isActive = true AND p.brand.id = :bId)")
-    Page<Product> getAllProductsIsActiveTrue( @Param("q") String query, Pageable pageable, @Param("bId") Long brandId, @Param("cId") Long categoryId );
-
+            + "AND (p.isActive = true) ")
+    Page<Product> getAllProductsIsActiveTrue( @Param("q") String query, Pageable pageable);
 
     @Query("SELECT p FROM Product p WHERE (:q IS NULL OR LOWER(p.title) LIKE CONCAT('%', LOWER(:q), '%')) "
-            + "AND (p.isActive = false) "
-            + "AND (:cId IS NULL OR p.category.isActive = false AND p.category.id = :cId) "
-            + "AND (:bId IS NULL OR p.brand.isActive = false AND p.brand.id = :bId)")
-    Page<Product> getAllProductsIsActiveFalse( @Param("q") String query, Pageable pageable, @Param("bId") Long brandId, @Param("cId") Long categoryId );
+            + "AND (p.isActive = false)")
+    Page<Product> getAllProductsIsActiveFalse( @Param("q") String query, Pageable pageable);
 
+
+
+
+    List<Product> findByCategoryId(Long id);
+
+    List<Product> findByBrandId(Long id);
 
 }

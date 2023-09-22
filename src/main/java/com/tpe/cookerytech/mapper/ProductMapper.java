@@ -5,9 +5,13 @@ import com.tpe.cookerytech.dto.request.ProductRequest;
 import com.tpe.cookerytech.dto.response.ProductObjectResponse;
 import com.tpe.cookerytech.dto.response.ProductResponse;
 import org.mapstruct.Mapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Mapper(componentModel = "spring")
@@ -40,8 +44,22 @@ public interface ProductMapper{
         }
         return productResponses;
     }
+    default Page<ProductResponse> productsToProductResponseCustomer(List<Product> filteredProductsCustomer, Pageable pageable){
 
+        List<ProductResponse> productResponse = filteredProductsCustomer.stream().map(this::productToProductResponse).collect(Collectors.toList());
+
+        return new PageImpl<>(productResponse,pageable,productResponse.size());
+    }
+
+    default Page<ProductResponse> productsToProductResponseTrue(List<Product> filteredProductsTrue, Pageable pageable){
+
+        List<ProductResponse> productResponse = filteredProductsTrue.stream().map(this::productToProductResponse).collect(Collectors.toList());
+
+        return new PageImpl<>(productResponse,pageable,productResponse.size());
+    }
 
     List<ProductObjectResponse> productsToProductObjectResponses(List<Product> productList);
+
+    ProductObjectResponse productToProductObjectResponse(Product product);
 
 }
