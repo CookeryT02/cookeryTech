@@ -42,10 +42,12 @@ public class ProductService {
     private final ModelRepository modelRepository;
     private final ShoppingCartItemRepository shoppingCartItemRepository;
     private final ImageFileRepository imageFileRepository;
+    private final BrandMapper brandMapper;
+    private final CategoryMapper categoryMapper;
 
 
 
-    public ProductService(ProductRepository productRepository, ProductMapper productMapper, BrandService brandService, CategoryService categoryService, CurrencyRepository currencyRepository, ModelMapper modelMapper, ProductPropertyKeyMapper productPropertyKeyMapper, ProductPropertyKeyRepository productPropertyKeyRepository, OfferItemRepository offerItemRepository, ModelRepository modelRepository, ShoppingCartItemRepository shoppingCartItemRepository, ImageFileRepository imageFileRepository) {
+    public ProductService(ProductRepository productRepository, ProductMapper productMapper, BrandService brandService, CategoryService categoryService, CurrencyRepository currencyRepository, ModelMapper modelMapper, ProductPropertyKeyMapper productPropertyKeyMapper, ProductPropertyKeyRepository productPropertyKeyRepository, OfferItemRepository offerItemRepository, ModelRepository modelRepository, ShoppingCartItemRepository shoppingCartItemRepository, ImageFileRepository imageFileRepository, BrandMapper brandMapper, CategoryMapper categoryMapper) {
         this.productRepository = productRepository;
         this.productMapper = productMapper;
         this.brandService = brandService;
@@ -58,51 +60,69 @@ public class ProductService {
         this.modelRepository = modelRepository;
         this.shoppingCartItemRepository = shoppingCartItemRepository;
         this.imageFileRepository = imageFileRepository;
+        this.brandMapper = brandMapper;
+        this.categoryMapper = categoryMapper;
     }
 
 
     //A01
-    public Page<ProductResponse> allProducts(String q ,Pageable pageable, Long brandId, Long categoryId) {
+    public Page<ProductObjectResponse> allProducts(String q ,Pageable pageable) {
 
-//        User user = userService.getUserForRoleAuthUser();
-//        User user = userService.getCurrentUser();
+
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        if (authentication != null && authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_CUSTOMER"))) {
+        if (authentication != null || authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_CUSTOMER"))
+                || authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_PRODUCT_MANAGER"))
+                || authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_SALES_SPECIALIST"))
+                || authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_SALES_MANAGER"))
+                || authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))
+        ) {
 
-            List<Product> productList = (productRepository.findByIsActive(false));
+
+            List<Product> productList = (productRepository.findByIsActive(true));
             List<Product> filteredProductsCustomer =productList.stream()
                     .filter(p -> {
                         Brand brand = p.getBrand();
                         Category category = p.getCategory();
-                        System.out.println(p.getCategory().getIsActive());
-                        return p.getIsFeatured() && brand != null && category != null && brand.getIsActive() && category.getIsActive();
+                        return brand.getIsActive() && category.getIsActive();
                     })
                     .collect(Collectors.toList());
 
-
-            // list convert to page
-            // Page<Product> p = new PageImpl<Product>(productList);
+            Page<Product> p = new PageImpl<Product>(productList);
             Page<Product> f = new PageImpl<Product>(filteredProductsCustomer);
 
 
 
-            Page<Product> productPage = productRepository.getAllProductsIsActiveFalse(q, pageable, brandId, categoryId);
+            Page<Product> productPages = productRepository.getAllProductsIsActiveTrue(q, pageable);
 
-            return f.map(productMapper::productToProductResponse);
 
-            // return productPage.map(productMapper::productToProductResponse);
+            Page<ProductObjectResponse> productObjectResponse = productPages.map(product -> {
+
+                ProductObjectResponse productObjectResponses = new ProductObjectResponse();
+                productObjectResponses.setBrand(brandMapper.brandToBrandResponse(product.getBrand()));
+                productObjectResponses.setCategory(categoryMapper.categoryToCategoryResponse(product.getCategory()));
+
+                return productObjectResponses;
+            });
+
+
+            return productPages.map(productMapper::productToProductObjectResponse);
+
+
 
 
         } else {
 
-            List<Product> productList = (productRepository.findByIsActive(true));
+
+
+
+
+            List<Product> productList = (productRepository.findByIsActive(false));
             List<Product> filteredProducts =productList.stream()
                     .filter(p -> {
                         Brand brand = p.getBrand();
                         Category category = p.getCategory();
-                        System.out.println(p.getCategory().getIsActive());
-                        return p.getIsFeatured() && brand != null && category != null && brand.getIsActive() && category.getIsActive();
+                        return brand.getIsActive() && category.getIsActive();
                     })
                     .collect(Collectors.toList());
 
@@ -110,12 +130,33 @@ public class ProductService {
             Page<Product> f = new PageImpl<Product>(filteredProducts);
 
 
-            Page<Product> productPage = productRepository.getAllProductsIsActiveTrue(q, pageable, brandId, categoryId);
+            Page<Product> productPages = productRepository.getAllProductsIsActiveFalse(q, pageable);
 
-            return productPage.map(productMapper::productToProductResponse);
+
+            Page<ProductObjectResponse> productObjectResponse = productPages.map(product -> {
+
+                ProductObjectResponse productObjectResponses = new ProductObjectResponse();
+                productObjectResponses.setBrand(brandMapper.brandToBrandResponse(product.getBrand()));
+                productObjectResponses.setCategory(categoryMapper.categoryToCategoryResponse(product.getCategory()));
+
+                return productObjectResponses;
+            });
+
+
+            return productPages.map(productMapper::productToProductObjectResponse);
+
+
+
+
         }
 
+
+
+
+
     }
+
+
 
 
     //A02
