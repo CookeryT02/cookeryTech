@@ -52,19 +52,6 @@ public class ReportController {
     //G02 -> It will get reports
     @GetMapping("/offers")
     @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER')")
-    public ResponseEntity<List<ReportOfferResponse>> getOffersSummaries(
-            @RequestParam("startDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
-            @RequestParam("endDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
-            @RequestParam("type") String type) {
-
-        return ResponseEntity.ok(reportService.getOffersSummaries(startDate, endDate, type));
-    }
-
-
-
-    //G02
-    @GetMapping("/pdf/offerSummery")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER')")
     public ResponseEntity<List<ReportOfferResponse>> generateOfferSummeryPdf(HttpServletResponse response,
                                                                              @RequestParam("startDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
                                                                              @RequestParam("endDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
@@ -82,7 +69,7 @@ public class ReportController {
         PDFGeneratorReportSummery pdfGeneratorReportSummery = new PDFGeneratorReportSummery();
         pdfGeneratorReportSummery.setReportOfferResponseList(reportOfferResponseList);
         int count =0;
-        String title = "List of Offer Summery";
+        String title = "List of Offers "+type.substring(0, 1).toUpperCase() + type.substring(1)+"ly Summary";
         pdfGeneratorReportSummery.generate(response,title,count);
 
         return ResponseEntity.ok(reportOfferResponseList);
@@ -91,23 +78,8 @@ public class ReportController {
 
 
 
-    //G03 -> It will get reports -LIST
+    //G03 -> It will get reports -LIST PDF
     @GetMapping("/most-popular-products/{amount}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER')")
-    public ResponseEntity<Map<Long, ProductResponse>> getMostPopularProducts(@PathVariable int amount){
-
-        Map<Long,ProductResponse> listMostPopularProducts=reportService.getReportMostPopularProduct(amount);
-
-        //Set<ProductResponse> keys = listMostPopularProducts.keySet();
-
-        return ResponseEntity.ok(listMostPopularProducts);
-    }
-
-
-
-
-    //G03 -> PDF
-    @GetMapping("/pdf/products/mostPopular/{amount}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER')")
     public ResponseEntity<Map<Long,ProductResponse>> generatePdfMostPopularOffers(@PathVariable int amount,HttpServletResponse response) throws DocumentException, IOException {
 
@@ -149,21 +121,8 @@ public class ReportController {
 
 
 
-    //G04 -> It will get reports - LIST
+    //G04 -> It will get reports - LIST PDF
     @GetMapping("/unoffered-products")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER')")
-    public ResponseEntity<List<ProductResponse>> getUnOfferedProducts(){
-
-       List<ProductResponse> productResponseList = reportService.getUnOfferedProducts();
-
-       return ResponseEntity.ok(productResponseList);
-    }
-
-
-
-
-    //G04 - PDF
-    @GetMapping("/pdf/products")
     @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER')")
     public ResponseEntity<List<ProductResponse>> generatePdf(HttpServletResponse response) throws DocumentException, IOException {
 

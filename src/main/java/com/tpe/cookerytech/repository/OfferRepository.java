@@ -11,6 +11,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -46,4 +47,8 @@ public interface OfferRepository extends JpaRepository<Offer, Long> {
             @Param("q") String q,
             Pageable pageable
     );
+
+    @Query("SELECT o FROM Offer o WHERE o.createAt >= :currentDayStart AND o.createAt <= :currentDayEnd ORDER BY o.createAt")
+    List<Offer> getCurrentOfferCount(@Param("currentDayStart") LocalDateTime currentDayStart, @Param("currentDayEnd") LocalDateTime currentDayEnd);
+
 }

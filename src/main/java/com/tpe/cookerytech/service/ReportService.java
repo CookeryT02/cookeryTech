@@ -1,5 +1,6 @@
 package com.tpe.cookerytech.service;
 
+import com.tpe.cookerytech.domain.Offer;
 import com.tpe.cookerytech.domain.OfferItem;
 import com.tpe.cookerytech.domain.Product;
 import com.tpe.cookerytech.domain.User;
@@ -8,6 +9,7 @@ import com.tpe.cookerytech.dto.response.ReportOfferResponse;
 import com.tpe.cookerytech.dto.response.ReportResponse;
 import com.tpe.cookerytech.mapper.ProductMapper;
 import com.tpe.cookerytech.repository.*;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 
 
@@ -15,6 +17,7 @@ import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -51,7 +54,12 @@ public class ReportService {
         reportResponse.setCategories((int)categoryRepository.count());
         reportResponse.setBrands((int)brandRepository.count());
         reportResponse.setProducts((int) productRepository.count());
-        reportResponse.setOffers((int) offerRepository.count());
+
+        LocalDateTime currentDayStart = LocalDate.now().atStartOfDay();
+        LocalDateTime currentDayEnd = LocalDateTime.now().with(LocalTime.MAX);
+        List<Offer> offerCount= offerRepository.getCurrentOfferCount(currentDayStart,currentDayEnd);
+
+        reportResponse.setOffers(offerCount.size());
         List<User> users = userRepository.findAll();
         users.stream().filter(t->t.getRoles().equals("Customer")).collect(Collectors.toList());
         reportResponse.setCustomers(users.size());
@@ -65,8 +73,7 @@ public class ReportService {
     public List<ReportOfferResponse> getOffersSummaries(LocalDate startDate, LocalDate endDate, String type) {
 
         LocalDateTime D1 = startDate.atStartOfDay();
-        LocalDateTime D2 = LocalDateTime.of(endDate.getYear(), endDate.getMonth(), endDate.getDayOfMonth(), 23, 59, 59, 999999);
-
+        LocalDateTime D2 = endDate.atTime(23, 59, 59, 999999);
         List<Object[]> allOffersSummaries = offerItemRepository.findAllOffersBetweenD1ToD2(D1, D2, type);
 
         List<ReportOfferResponse> reportList = new ArrayList<>();
