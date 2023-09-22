@@ -117,15 +117,15 @@ public class ReportService {
         }
 
 
-    public List<ReportOfferResponse> getOffersSummaries(LocalDate startDate, LocalDate endDate, String type) {
-
-        List<OfferItem> allOfferItemsList = offerItemRepository.findAll();
-
-        List<ReportOfferResponse> offerResponse = offerItemRepository.findAllOffersBetweenD1ToD2(startDate, endDate, type);
-
-        return offerResponse;
-
-    }
+//    public List<ReportOfferResponse> getOffersSummaries(LocalDate startDate, LocalDate endDate, String type) {
+//
+//        List<OfferItem> allOfferItemsList = offerItemRepository.findAll();
+//
+//        List<ReportOfferResponse> offerResponse = offerItemRepository.findAllOffersBetweenD1ToD2(startDate, endDate, type);
+//
+//        return offerResponse;
+//
+//    }
 
 
 }

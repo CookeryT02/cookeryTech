@@ -28,8 +28,8 @@ public interface ProductRepository extends JpaRepository<Product,Long> {
 
     @Query("SELECT p FROM Product p WHERE (:q IS NULL OR LOWER(p.title) LIKE CONCAT('%', LOWER(:q), '%')) "
             + "AND (p.isActive = true) "
-//            + "AND (:id IS NULL OR o.brand.id = :id )"
-//            + "AND (:id IS NULL OR o.category.id = :id )"
+//            + "AND (p.brand.isActive = true) "
+//            + "AND (p.category.isActive = true) "
     )
     Page<Product> getAllProductsIsActiveTrue( @Param("q") String query, Pageable pageable);
 
@@ -42,8 +42,8 @@ public interface ProductRepository extends JpaRepository<Product,Long> {
 
     @Query("SELECT p FROM Product p WHERE (:q IS NULL OR LOWER(p.title) LIKE CONCAT('%', LOWER(:q), '%')) "
             + "AND (p.isActive = false)"
-//            + "AND (:id IS NULL OR o.brand.id = :id )"
-//            + "AND (:id IS NULL OR o.category.id = :id )"
+//            + "AND (p.brand.isActive = false) "
+//            + "AND (p.category.isActive = false) "
     )
     Page<Product> getAllProductsIsActiveFalse( @Param("q") String query, Pageable pageable);
 

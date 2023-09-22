@@ -46,7 +46,7 @@ ORDER BY
 //    @Query("SELECT r FROM ReportOffer r WHERE DATE(r.createAt) BETWEEN :startDate AND :endDate ORDER BY r.createAt"
 //            + "AND  "
 //                    )
-    List<ReportOfferResponse> findAllOffersBetweenD1ToD2(LocalDate startDate, LocalDate endDate, String type);
+//    List<ReportOfferResponse> findAllOffersBetweenD1ToD2(LocalDate startDate, LocalDate endDate, String type);
 
 
 //    List<OfferItem> getAllOfferItems();

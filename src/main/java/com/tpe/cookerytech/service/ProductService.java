@@ -455,7 +455,7 @@ public class ProductService {
 
 
 
-    public Page<ProductResponse> allProducts(String q ,Pageable pageable) {
+    public Page<ProductObjectResponse> allProducts(String q ,Pageable pageable) {
 
 //        User user = userService.getUserForRoleAuthUser();
 //        User user = userService.getCurrentUser();
@@ -463,7 +463,12 @@ public class ProductService {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        if (authentication != null && authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_CUSTOMER"))) {
+        if (authentication != null || authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_CUSTOMER"))
+                || authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_PRODUCT_MANAGER"))
+                || authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_SALES_SPECIALIST"))
+                || authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_SALES_MANAGER"))
+                || authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))
+        ) {
 
 
             List<Product> productList = (productRepository.findByIsActive(true));
@@ -488,17 +493,17 @@ public class ProductService {
             Page<Product> productPages = productRepository.getAllProductsIsActiveTrue(q, pageable);
 
 
-            Page<ProductResponse> productResponse = productPages.map(product -> {
+            Page<ProductObjectResponse> productObjectResponse = productPages.map(product -> {
 
-                ProductResponse productResponses = new ProductResponse();
-                productResponses.setBrandId(product.getBrand().getId());
-                productResponses.setCategoryId(product.getCategory().getId());
+                ProductObjectResponse productObjectResponses = new ProductObjectResponse();
+                productObjectResponses.setBrand(brandMapper.brandToBrandResponse(product.getBrand()));
+                productObjectResponses.setCategory(categoryMapper.categoryToCategoryResponse(product.getCategory()));
 
-                return productResponses;
+                return productObjectResponses;
             });
 
 
-            return productPages.map(productMapper::productToProductResponse);
+            return productPages.map(productMapper::productToProductObjectResponse);
 
 
 
@@ -510,6 +515,8 @@ public class ProductService {
 
 
         } else {
+
+
 
 
 
@@ -534,17 +541,19 @@ public class ProductService {
             Page<Product> productPages = productRepository.getAllProductsIsActiveFalse(q, pageable);
 
 
-            Page<ProductResponse> productResponse = productPages.map(product -> {
+            Page<ProductObjectResponse> productObjectResponse = productPages.map(product -> {
 
-                ProductResponse productResponses = new ProductResponse();
-                productResponses.setBrandId(product.getBrand().getId());
-                productResponses.setCategoryId(product.getCategory().getId());
+                ProductObjectResponse productObjectResponses = new ProductObjectResponse();
+                productObjectResponses.setBrand(brandMapper.brandToBrandResponse(product.getBrand()));
+                productObjectResponses.setCategory(categoryMapper.categoryToCategoryResponse(product.getCategory()));
 
-                return productResponses;
+                return productObjectResponses;
             });
 
 
-            return productPages.map(productMapper::productToProductResponse);
+            return productPages.map(productMapper::productToProductObjectResponse);
+
+
 
 
         }

@@ -153,7 +153,7 @@ public class ProductController {
 
     @GetMapping
     @PreAuthorize("hasRole('CUSTOMER') or hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER')")
-    public ResponseEntity<Page<ProductResponse>> getAllProductsWithPage(
+    public ResponseEntity<Page<ProductObjectResponse>> getAllProductsWithPage(
             @RequestParam(required = false,defaultValue = "",name="q") String q,
             @RequestParam(required = false,defaultValue = "0",name = "page") int page,
             @RequestParam(required = false,defaultValue = "20",name = "size") int size,
@@ -163,9 +163,9 @@ public class ProductController {
 
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.valueOf(type), sort));
 
-        Page<ProductResponse> productResponse = productService.allProducts(q,pageable);
+        Page<ProductObjectResponse> productObjectResponse = productService.allProducts(q,pageable);
 
-        return ResponseEntity.ok(productResponse);
+        return ResponseEntity.ok(productObjectResponse);
 
 
 
