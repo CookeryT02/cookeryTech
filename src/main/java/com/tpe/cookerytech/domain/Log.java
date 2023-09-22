@@ -19,8 +19,6 @@ public class Log {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-
-
     @Enumerated(EnumType.STRING)
     private LogType log;
 

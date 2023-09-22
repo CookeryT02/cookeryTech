@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 
 
 @Repository
@@ -31,5 +32,9 @@ public interface ProductRepository extends JpaRepository<Product,Long> {
             + "AND (:bId IS NULL OR p.brand.isActive = false AND p.brand.id = :bId)")
     Page<Product> getAllProductsIsActiveFalse( @Param("q") String query, Pageable pageable, @Param("bId") Long brandId, @Param("cId") Long categoryId );
 
+
+    List<Product> findByCategoryId(Long id);
+
+    List<Product> findByBrandId(Long id);
 
 }

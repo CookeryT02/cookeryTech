@@ -129,7 +129,6 @@ public class ProductService {
 
             List<ProductObjectResponse> listObjectResponse=productMapper.productsToProductObjectResponses(productList);
 
-
             return listObjectResponse;
 
         } else {

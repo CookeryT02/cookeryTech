@@ -49,4 +49,5 @@ public class ErrorMessage {
 
     public static final String LOG_NOT_FOUND_EXCEPTION = "Log : %s not found";
     public static final String SAME_DAY_EXCEPTION = "This process cannot be done on the same day";
+    public static final String CATEGORY_CANNOT_DELETE_EXCEPTION = "Category cannot be deleted";
 }

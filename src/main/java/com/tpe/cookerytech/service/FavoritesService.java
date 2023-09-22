@@ -119,12 +119,6 @@ public class FavoritesService {
                     newCart.setCreateAt(LocalDateTime.now());
                     return shoppingCartRepository.save(newCart);
                 });
-        List<Long> modelIdList = new ArrayList<>();
-
-        for (Favorites favorites: favoritesListAuthUser){
-
-            modelIdList.add(favorites.getModel().getId());
-        }
 
         List<ShoppingCartItem> shoppingCartItemList = shoppingCartItemRepository.findByShoppingCartId(shoppingCart.getId());
 
