@@ -59,7 +59,5 @@ public class UserResponse {
         });
 
         this.roles=roleStr;
-
     }
-
 }

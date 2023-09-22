@@ -7,16 +7,10 @@ import com.lowagie.text.DocumentException;
 import com.tpe.cookerytech.dto.response.ProductResponse;
 import com.tpe.cookerytech.utils.PDFGenerator;
 import com.tpe.cookerytech.service.ReportService;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Min;
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.*;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,7 +28,6 @@ import java.util.stream.Collectors;
 @RequestMapping("/report")
 public class ReportController {
 
-
     private final ReportService reportService;
 
 
@@ -42,6 +35,9 @@ public class ReportController {
         this.reportService = reportService;
     }
 
+
+
+    //G01 -> It will get some statistics        Page:80
     @GetMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER')")
     public String generateStatistics(){
@@ -49,39 +45,23 @@ public class ReportController {
         return reportService.getReport().toString();
     }
 
-    @GetMapping("/unoffered-products")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER')")
-    public ResponseEntity<List<ProductResponse>> getUnOfferedProducts(){
-
-       List<ProductResponse> productResponseList = reportService.getUnOfferedProducts();
-
-       return ResponseEntity.ok(productResponseList);
-    }
-
-    @GetMapping("/pdf/products")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER')")
-    public ResponseEntity<List<ProductResponse>> generatePdf(HttpServletResponse response) throws DocumentException, IOException {
-
-        response.setContentType("application/pdf");
-        DateFormat dateFormat = new SimpleDateFormat("YYYY-MM-DD:HH:MM:SS");
-        String currentDateTime = dateFormat.format(new Date());
-        String headerkey = "Content-Disposition";
-        String headervalue = "attachment; filename=pdf_" + currentDateTime + ".pdf";
-        response.setHeader(headerkey, headervalue);
-
-        List<ProductResponse> productResponseList = reportService.getUnOfferedProducts();
-
-        PDFGenerator generator = new PDFGenerator();
-        generator.setProductList(productResponseList);
-        int count =0;
-        String title = "List Of Unoffered Products";
-        int a=1;
-        generator.generate(response,title,count,a);
-
-        return ResponseEntity.ok(productResponseList);
-    }
 
 
+    //G02 -> It will get reports
+
+
+
+
+
+
+
+
+
+
+
+
+
+    //G03 -> It will get reports -LIST
     @GetMapping("/most-popular-products/{amount}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER')")
     public ResponseEntity<Map<Long, ProductResponse>> getMostPopularProducts(@PathVariable int amount){
@@ -93,6 +73,10 @@ public class ReportController {
         return ResponseEntity.ok(listMostPopularProducts);
     }
 
+
+
+
+    //G03 -> PDF
     @GetMapping("/pdf/products/mostPopular/{amount}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER')")
     public ResponseEntity<Map<Long,ProductResponse>> generatePdfMostPopularOffers(@PathVariable int amount,HttpServletResponse response) throws DocumentException, IOException {
@@ -122,8 +106,6 @@ public class ReportController {
             productResponsePDFS.add(productResponsePDF);
         }
 
-
-
         PDFGenerator generator = new PDFGenerator();
         generator.setProductResponsePDFS(productResponsePDFS);
         int count =0;
@@ -132,7 +114,19 @@ public class ReportController {
         generator.generate(response,title,count,a);
 
         return ResponseEntity.ok(listMostPopularProducts);
+    }
 
+
+
+
+    //G04 -> It will get reports - LIST
+    @GetMapping("/unoffered-products")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER')")
+    public ResponseEntity<List<ProductResponse>> getUnOfferedProducts(){
+
+       List<ProductResponse> productResponseList = reportService.getUnOfferedProducts();
+
+       return ResponseEntity.ok(productResponseList);
     }
 
 
@@ -149,4 +143,27 @@ public class ReportController {
 //    }
 
 
+    //G04 - PDF
+    @GetMapping("/pdf/products")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER')")
+    public ResponseEntity<List<ProductResponse>> generatePdf(HttpServletResponse response) throws DocumentException, IOException {
+
+        response.setContentType("application/pdf");
+        DateFormat dateFormat = new SimpleDateFormat("YYYY-MM-DD:HH:MM:SS");
+        String currentDateTime = dateFormat.format(new Date());
+        String headerkey = "Content-Disposition";
+        String headervalue = "attachment; filename=pdf_" + currentDateTime + ".pdf";
+        response.setHeader(headerkey, headervalue);
+
+        List<ProductResponse> productResponseList = reportService.getUnOfferedProducts();
+
+        PDFGenerator generator = new PDFGenerator();
+        generator.setProductList(productResponseList);
+        int count =0;
+        String title = "List Of Unoffered Products";
+        int a=1;
+        generator.generate(response,title,count,a);
+
+        return ResponseEntity.ok(productResponseList);
+    }
 }

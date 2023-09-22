@@ -12,17 +12,13 @@ import com.tpe.cookerytech.exception.ConflictException;
 import com.tpe.cookerytech.exception.PasswordValidator;
 import com.tpe.cookerytech.exception.ResourceNotFoundException;
 import com.tpe.cookerytech.exception.message.ErrorMessage;
-import com.tpe.cookerytech.mapper.ProductMapper;
 import com.tpe.cookerytech.mapper.UserMapper;
 import com.tpe.cookerytech.repository.OfferRepository;
-import com.tpe.cookerytech.repository.ProductRepository;
 import com.tpe.cookerytech.repository.UserRepository;
 import org.springframework.context.annotation.Lazy;
 import com.tpe.cookerytech.security.SecurityUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -30,7 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 
@@ -45,28 +40,18 @@ public class UserService {
 
     private final UserMapper userMapper;
 
-    private final ProductRepository productRepository;
-
-    private final ProductMapper productMapper;
 
 
-    public UserService(UserRepository userRepository, RoleService roleService, @Lazy PasswordEncoder passwordEncoder, UserMapper userMapper, ProductRepository productRepository, ProductMapper productMapper) {
+    public UserService(UserRepository userRepository, RoleService roleService, @Lazy PasswordEncoder passwordEncoder, UserMapper userMapper) {
         this.userRepository = userRepository;
         this.roleService = roleService;
         this.passwordEncoder = passwordEncoder;
         this.userMapper = userMapper;
-        this.productRepository = productRepository;
-        this.productMapper = productMapper;
     }
 
-    public User getUserByEmail(String email) {
-        User user = userRepository.findByEmail(email).orElseThrow(() ->
-                new ResourceNotFoundException(
-                        String.format(ErrorMessage.USER_NOT_FOUND_EXCEPTION, email)));
 
-        return user;
-    }
 
+    //F02
     public UserResponse saveUser(RegisterRequest registerRequest) {
         if (userRepository.existsByEmail(registerRequest.getEmail())) {
             throw new ConflictException(
@@ -75,7 +60,6 @@ public class UserService {
             );
 
         }
-
 
         Role role = roleService.findByType(RoleType.ROLE_CUSTOMER);
         Set<Role> roles = new HashSet<>();
@@ -100,43 +84,21 @@ public class UserService {
 
         userRepository.save(user);
 
-
-        return userMapper.userToUserResponse(user);
-
-    }
-
-    public boolean isPasswordValid(String password) {
-        return PasswordValidator.containsSpecialChars(password);
-    }
-
-
-    public UserResponse updateUserPassword(UpdatePasswordRequest updatePasswordRequest) {
-        User user = getCurrentUser();
-
-        if (user.getBuiltIn()) {
-            throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
-        }
-
-        // !!! Forma girilen OldPassword doğru mu
-        if (!passwordEncoder.matches(updatePasswordRequest.getOldPassword(), user.getPasswordHash())) {
-            throw new BadRequestException(ErrorMessage.PASSWORD_NOT_MATCHED_MESSAGE);
-        }
-        // !!! yeni gelen şifreyi encode edilecek
-        String hashedPassword = passwordEncoder.encode(updatePasswordRequest.getNewPassword());
-        user.setPasswordHash(hashedPassword);
-        userRepository.save(user);
         return userMapper.userToUserResponse(user);
     }
 
-    //*****************************Yardimci Methodlar***************************************
 
 
+    //F05     Page:71
     public UserResponse getPrincipal() {
         User user = getCurrentUser();
         UserResponse userResponse = userMapper.userToUserResponse(user);
         return userResponse;
     }
 
+
+
+    //F05     Page:72
     public UserResponse updateUser(UserUpdateRequest userUpdateRequest) {
 
         User user = getCurrentUser();
@@ -164,12 +126,55 @@ public class UserService {
 
         userRepository.save(user);
 
-
         return userMapper.userToUserResponse(user);
-
     }
 
 
+
+
+    //F06
+    public UserResponse updateUserPassword(UpdatePasswordRequest updatePasswordRequest) {
+        User user = getCurrentUser();
+
+        if (user.getBuiltIn()) {
+            throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
+        }
+
+        // !!! Forma girilen OldPassword doğru mu
+        if (!passwordEncoder.matches(updatePasswordRequest.getOldPassword(), user.getPasswordHash())) {
+            throw new BadRequestException(ErrorMessage.PASSWORD_NOT_MATCHED_MESSAGE);
+        }
+        // !!! yeni gelen şifreyi encode edilecek
+        String hashedPassword = passwordEncoder.encode(updatePasswordRequest.getNewPassword());
+        user.setPasswordHash(hashedPassword);
+        userRepository.save(user);
+        return userMapper.userToUserResponse(user);
+    }
+
+
+
+
+    //F07
+    @Transactional
+    public void deleteCurrentUser(String password) {
+
+        User user = getCurrentUser();
+
+        // built-in (kullanıcının offers tablosunda kaydı varsa silinemeyecek)
+        if (user.getBuiltIn()) {
+            throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
+        }
+
+        boolean passwordsMatch = BCrypt.checkpw(password, user.getPasswordHash());
+        if (!passwordsMatch) {
+            throw new BadRequestException(ErrorMessage.WRONG_PASSWORD_EXCEPTION);
+        }
+        userRepository.deleteByEmail(user.getEmail());
+    }
+
+
+
+    //F08
     public Page<UserResponse> getUserPage(String q, Pageable pageable) {
 
         Page<User> userPage = userRepository.getUsers(q, pageable);
@@ -177,19 +182,10 @@ public class UserService {
         return getUserResponsePage(userPage);
     }
 
-    //*****************************Yardimci Methodlar***************************************
-    public User getCurrentUser() {
-        String email = SecurityUtils.getCurrentUserLogin().orElseThrow(() ->
-                new ResourceNotFoundException(ErrorMessage.PRINCIPAL_FOUND_MESSAGE));
-        return getUserByEmail(email);
-    }
 
-    // user role control method
-    public boolean roleControl(RoleType roleType) {
-        Set<Role> roles = getCurrentUser().getRoles();
-        return roles.stream().anyMatch(r -> r.getType().equals(roleType));
-    }
 
+
+    //F09
     public UserResponse getUserById(Long id) {
 
         User user = userRepository.findById(id).orElseThrow(
@@ -199,20 +195,10 @@ public class UserService {
 
     }
 
-    public User getUserEntityById(Long id) {
-
-        return userRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException(String.format(ErrorMessage.RESOURCE_NOT_FOUND_EXCEPTION, id)));
-
-    }
 
 
-    private Page<UserResponse> getUserResponsePage(Page<User> userPage) {
 
-        return userPage.map(userMapper::userToUserResponse);
-    }
-
-
+    //F10
     public UserResponse updateUserById(Long id, AdminUserUpdateRequest adminUserUpdateRequest) {
 
         User user = getUserEntityById(id);
@@ -247,7 +233,99 @@ public class UserService {
                 }
         );
         return userMapper.userToUserResponse(user);
+    }
 
+
+
+
+    //F11
+    @Transactional
+    public UserResponse deleteUser(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMessage.PRINCIPAL_FOUND_MESSAGE)));
+
+        if (OfferRepository.existByUser(user)) {
+            throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
+        }
+
+        if (user.getBuiltIn()) {
+            throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
+        }
+
+        User currentUser = getCurrentUser();
+        Set<Role> currentUserRole = currentUser.getRoles();
+        // Check if the current user has the necessary role or permission to delete the target user.
+        currentUserRole.forEach(r -> {
+            if (r.getType().equals(RoleType.ROLE_ADMIN)) {
+                userRepository.delete(user);
+
+            } else if (r.getType().equals(RoleType.ROLE_SALES_MANAGER)) {
+                user.getRoles().forEach(role -> {
+                    if (role.getType().equals(RoleType.ROLE_ADMIN) ||
+                            role.getType().equals(RoleType.ROLE_PRODUCT_MANAGER)) {
+                        throw new BadRequestException(String.format(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE));
+
+                    } else if (role.getType().equals(RoleType.ROLE_SALES_SPECIALIST) ||
+                            role.getType().equals(RoleType.ROLE_CUSTOMER)) {
+                        userRepository.delete(user);
+                    }
+                });
+            } else if (r.getType().equals(RoleType.ROLE_SALES_SPECIALIST)) {
+                user.getRoles().forEach(role -> {
+                    if (role.getType().equals(RoleType.ROLE_ADMIN) ||
+                            role.getType().equals(RoleType.ROLE_PRODUCT_MANAGER) ||
+                            role.getType().equals(RoleType.ROLE_SALES_MANAGER)) {
+                        throw new BadRequestException(String.format(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE));
+
+                    } else if (role.getType().equals(RoleType.ROLE_SALES_SPECIALIST)
+                            || role.getType().equals(RoleType.ROLE_CUSTOMER)) {
+                        userRepository.delete(user);
+                    }
+                });
+            } else {
+                throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
+
+            }
+        });
+
+        return userMapper.userToUserResponse(user);
+    }
+
+
+
+
+
+    //********************************** HELPER METHODS ******************************************
+
+
+    public User getUserByEmail(String email) {
+        User user = userRepository.findByEmail(email).orElseThrow(() ->
+                new ResourceNotFoundException(
+                        String.format(ErrorMessage.USER_NOT_FOUND_EXCEPTION, email)));
+
+        return user;
+    }
+
+    public boolean isPasswordValid(String password) {
+        return PasswordValidator.containsSpecialChars(password);
+    }
+
+
+    public User getCurrentUser() {
+        String email = SecurityUtils.getCurrentUserLogin().orElseThrow(() ->
+                new ResourceNotFoundException(ErrorMessage.PRINCIPAL_FOUND_MESSAGE));
+        return getUserByEmail(email);
+    }
+
+    public User getUserEntityById(Long id) {
+
+        return userRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException(String.format(ErrorMessage.RESOURCE_NOT_FOUND_EXCEPTION, id)));
+    }
+
+    private Page<UserResponse> getUserResponsePage(Page<User> userPage) {
+
+        return userPage.map(userMapper::userToUserResponse);
     }
 
     private void userSetting(User user, AdminUserUpdateRequest adminUserUpdateRequest) {
@@ -322,99 +400,5 @@ public class UserService {
         }
         return newRoles;
     }
-
-    @Transactional
-    public void deleteCurrentUser(String password) {
-
-        User user = getCurrentUser();
-
-        // built-in (kullanıcının offers tablosunda kaydı varsa silinemeyecek)
-        if (user.getBuiltIn()) {
-            throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
-        }
-
-
-        boolean passwordsMatch = BCrypt.checkpw(password, user.getPasswordHash());
-        if (!passwordsMatch) {
-            throw new BadRequestException(ErrorMessage.WRONG_PASSWORD_EXCEPTION);
-        }
-
-        userRepository.deleteByEmail(user.getEmail());
-        // SecurityContextHolder.clearContext(); (oturumu kapatmak için)
-
-    }
-
-    @Transactional
-    public UserResponse deleteUser(Long id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMessage.PRINCIPAL_FOUND_MESSAGE)));
-
-        if (OfferRepository.existByUser(user)) {
-            throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
-        }
-
-        if (user.getBuiltIn()) {
-            throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
-        }
-
-        User currentUser = getCurrentUser();
-        Set<Role> currentUserRole = currentUser.getRoles();
-        // Check if the current user has the necessary role or permission to delete the target user.
-        currentUserRole.forEach(r -> {
-            if (r.getType().equals(RoleType.ROLE_ADMIN)) {
-                userRepository.delete(user);
-
-            } else if (r.getType().equals(RoleType.ROLE_SALES_MANAGER)) {
-                user.getRoles().forEach(role -> {
-                    if (role.getType().equals(RoleType.ROLE_ADMIN) ||
-                            role.getType().equals(RoleType.ROLE_PRODUCT_MANAGER)) {
-                        throw new BadRequestException(String.format(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE));
-
-                    } else if (role.getType().equals(RoleType.ROLE_SALES_SPECIALIST) ||
-                            role.getType().equals(RoleType.ROLE_CUSTOMER)) {
-                        userRepository.delete(user);
-                    }
-                });
-            } else if (r.getType().equals(RoleType.ROLE_SALES_SPECIALIST)) {
-                user.getRoles().forEach(role -> {
-                    if (role.getType().equals(RoleType.ROLE_ADMIN) ||
-                            role.getType().equals(RoleType.ROLE_PRODUCT_MANAGER) ||
-                            role.getType().equals(RoleType.ROLE_SALES_MANAGER)) {
-                        throw new BadRequestException(String.format(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE));
-
-                    } else if (role.getType().equals(RoleType.ROLE_SALES_SPECIALIST)
-                            || role.getType().equals(RoleType.ROLE_CUSTOMER)) {
-                        userRepository.delete(user);
-                    }
-                });
-            } else {
-                throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
-
-            }
-        });
-
-        return userMapper.userToUserResponse(user);
-    }
-
-
-    public User getUserForRoleAuthUser() {
-
-        String email = SecurityUtils.getCurrentUserLogin().orElse(null);
-
-        if (email.equals("anonymousUser")) {
-            return null;
-        }
-
-        User user = getUserByEmail(email);
-        if (user == null) {
-            throw new ResourceNotFoundException(ErrorMessage.PRINCIPAL_FOUND_MESSAGE);
-        }
-
-        return user;
-
-
-    }
-
-
 }
 

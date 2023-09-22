@@ -26,25 +26,13 @@ public class UserController {
 
     private final UserService userService;
 
-
     public UserController(UserService userService) {
         this.userService = userService;
     }
 
 
-    @PatchMapping("/auth")
-    @PreAuthorize("hasRole('CUSTOMER') or hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER')")
-    public ResponseEntity<CkResponse>
-    updateUserPassword(@Valid @RequestBody UpdatePasswordRequest updatePasswordRequest) {
-        userService.updateUserPassword(updatePasswordRequest);
 
-
-        CkResponse ckResponse = new CkResponse();
-        ckResponse.setMessage(ResponseMessage.PASSWORD_CHANGED_RESPONSE_MESSAGE);
-        ckResponse.setSuccess(true);
-
-        return ResponseEntity.ok(ckResponse);
-    }
+    //F05 -> It will return authenticated user object    Page:71
     @GetMapping("/auth")
     @PreAuthorize("hasRole('CUSTOMER') or hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER')")
     public ResponseEntity<UserResponse> getAuthUser(){
@@ -53,7 +41,10 @@ public class UserController {
         return ResponseEntity.ok(userResponse);
     }
 
-    //UPDATE
+
+
+
+    //F05 -> It will update the authenticated user        Page:72
     @PutMapping("/auth")
     @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER') or hasRole('CUSTOMER')")
     public ResponseEntity<UserResponse> updateUser(@Valid @RequestBody UserUpdateRequest userUpdateRequest){
@@ -61,23 +52,38 @@ public class UserController {
         UserResponse userResponse = userService.updateUser(userUpdateRequest);
 
         return ResponseEntity.ok(userResponse);
-
     }
 
 
-    // USERBYID
-    @GetMapping("/{id}/auth")
+
+
+    //F06 -> It will update the authenticated user’s password
+    @PatchMapping("/auth")
+    @PreAuthorize("hasRole('CUSTOMER') or hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER')")
+    public ResponseEntity<CkResponse>
+    updateUserPassword(@Valid @RequestBody UpdatePasswordRequest updatePasswordRequest) {
+        userService.updateUserPassword(updatePasswordRequest);
+
+        CkResponse ckResponse = new CkResponse();
+        ckResponse.setMessage(ResponseMessage.PASSWORD_CHANGED_RESPONSE_MESSAGE);
+        ckResponse.setSuccess(true);
+
+        return ResponseEntity.ok(ckResponse);
+    }
+
+
+
+
+    //F07 -> It will delete authenticated user
+    @DeleteMapping("/auth")
     @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER') or hasRole('CUSTOMER')")
-    public ResponseEntity<UserResponse> getUserById(@PathVariable Long id){
-
-        UserResponse userResponse = userService.getUserById(id);
-
-
-            return ResponseEntity.ok(userResponse);
-
-
+    public void deleteAuthUser(@RequestParam("password") String password){
+        userService.deleteCurrentUser(password);
     }
 
+
+
+    //F08 -> It will return users
     @GetMapping("/admin")
     @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST')")
     public ResponseEntity<Page<UserResponse>> getAllUsersByPage(
@@ -93,6 +99,22 @@ public class UserController {
     }
 
 
+
+
+    //F09 -> It will return a user
+    @GetMapping("/{id}/auth")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER') or hasRole('CUSTOMER')")
+    public ResponseEntity<UserResponse> getUserById(@PathVariable Long id){
+
+        UserResponse userResponse = userService.getUserById(id);
+
+            return ResponseEntity.ok(userResponse);
+    }
+
+
+
+
+    //F10 -> It will update the user
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST')")
     public ResponseEntity<UserResponse> updateUserById(@PathVariable Long id,
@@ -103,15 +125,9 @@ public class UserController {
     }
 
 
-    @DeleteMapping("/auth")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER') or hasRole('CUSTOMER')")
-    public void deleteAuthUser(@RequestParam("password") String password){
-        userService.deleteCurrentUser(password);
-
-    }
 
 
-    //Delete user
+    //F11 -> It will delete the user
     @DeleteMapping("/{id}/admin")
     @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST')")
     public ResponseEntity<UserResponse> deleteUser(@PathVariable Long id){

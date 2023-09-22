@@ -11,7 +11,6 @@ import com.tpe.cookerytech.mapper.ModelMapper;
 import com.tpe.cookerytech.mapper.ProductMapper;
 import com.tpe.cookerytech.mapper.ShoppingCartItemMapper;
 import com.tpe.cookerytech.repository.ModelRepository;
-import com.tpe.cookerytech.repository.ProductRepository;
 import com.tpe.cookerytech.repository.ShoppingCartItemRepository;
 import com.tpe.cookerytech.repository.ShoppingCartRepository;
 import org.springframework.stereotype.Service;
@@ -24,22 +23,14 @@ import java.util.List;
 public class ShoppingCartService {
 
     private final ShoppingCartRepository shoppingCartRepository;
-
     private final UserService userService;
-
     private final ShoppingCartItemRepository shoppingCartItemRepository;
-
     private final ModelRepository modelRepository;
-
-    private final ProductRepository productRepository;
-
     private final ShoppingCartItemMapper shoppingCartItemMapper;
-
     private final ProductMapper productMapper;
-
     private final ModelMapper modelMapper;
 
-    public ShoppingCartService(ShoppingCartRepository shoppingCartRepository, UserService userService, ShoppingCartItemRepository shoppingCartItemRepository, ShoppingCartItemMapper shoppingCartItemMapper, ProductMapper productMapper, ModelMapper modelMapper, ModelRepository modelRepository, ProductRepository productRepository) {
+    public ShoppingCartService(ShoppingCartRepository shoppingCartRepository, UserService userService, ShoppingCartItemRepository shoppingCartItemRepository, ShoppingCartItemMapper shoppingCartItemMapper, ProductMapper productMapper, ModelMapper modelMapper, ModelRepository modelRepository) {
         this.shoppingCartRepository = shoppingCartRepository;
         this.userService = userService;
         this.shoppingCartItemRepository = shoppingCartItemRepository;
@@ -47,10 +38,10 @@ public class ShoppingCartService {
         this.productMapper = productMapper;
         this.modelMapper = modelMapper;
         this.modelRepository = modelRepository;
-        this.productRepository = productRepository;
     }
 
 
+    //D01
     public List<ShoppingCartItemResponse> getCartItemsAuthUser() {
         User user = userService.getCurrentUser();
 
@@ -69,10 +60,11 @@ public class ShoppingCartService {
             shoppingCartItemResponseList.add(shoppingCartItemResponse);
         }
         return shoppingCartItemResponseList;
-
     }
 
 
+
+    //D02
     public ShoppingCartItemResponse updateCartItems(CartItemUpdateRequest cartItemUpdateRequest) {
 
         User user = userService.getCurrentUser();
@@ -93,7 +85,6 @@ public class ShoppingCartService {
             shoppingCartItemRepository.save(shoppingCartItem);
         }
 
-
         ShoppingCart shoppingCart = shoppingCartRepository.findByUserId(user.getId()).orElseThrow(() ->
                 new ResourceNotFoundException(ErrorMessage.SHOPPING_CART_ITEMS_NOT_FOUND));
 
@@ -107,7 +98,6 @@ public class ShoppingCartService {
         if (modelIdList.contains(cartItemUpdateRequest.getModelId()) && cartItemUpdateRequest.getAmount()==0) {
             for (ShoppingCartItem shoppingCartItem : shoppingCartItemList) {
                 if (shoppingCartItem.getModel().equals(model)) {
-
 
                     ShoppingCartItemResponse shoppingCartItemResponse = shoppingCartItemMapper.ShoppingCartItemToShoppingCartItemResponse(shoppingCartItem);
 
@@ -130,6 +120,7 @@ public class ShoppingCartService {
                     return shoppingCartItemResponse;
                 }
             }
+
         } else if(modelIdList.contains(cartItemUpdateRequest.getModelId()) ) {
             for (ShoppingCartItem shoppingCartItem : shoppingCartItemList) {
                 if (shoppingCartItem.getModel().equals(model)) {
@@ -185,8 +176,4 @@ public class ShoppingCartService {
         }
         return null;
     }
-
-
-
-
 }

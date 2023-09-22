@@ -21,32 +21,16 @@ import javax.validation.Valid;
 
 @RestController
 public class UserJwtController {
-
     @Autowired
     private JwtUtils jwtUtils;
-
     @Autowired
     private UserService userService;
-
     @Autowired
     private AuthenticationManager authenticationManager;
 
-    @PostMapping("/register")
 
 
-    public ResponseEntity<UserResponse> registerUser(@Valid
-
-                                                     @RequestBody RegisterRequest registerRequest){
-
-        UserResponse userResponse =userService.saveUser(registerRequest);
-
-
-        return new ResponseEntity<>(userResponse, HttpStatus.CREATED);
-
-
-    }
-
-
+    //F01 -> It will authenticate the user    Page:67
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> authenticate(@Valid @RequestBody LoginRequest loginRequest) {
 
@@ -63,9 +47,18 @@ public class UserJwtController {
 
         LoginResponse loginResponse = new LoginResponse(jwtToken);
 
-
         return new ResponseEntity<>(loginResponse,HttpStatus.OK);
-
     }
 
+
+
+
+    //F02 -> It will create the user
+    @PostMapping("/register")
+    public ResponseEntity<UserResponse> registerUser(@Valid @RequestBody RegisterRequest registerRequest){
+
+        UserResponse userResponse =userService.saveUser(registerRequest);
+
+        return new ResponseEntity<>(userResponse, HttpStatus.CREATED);
+    }
 }

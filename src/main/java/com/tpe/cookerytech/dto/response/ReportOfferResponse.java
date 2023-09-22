@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class ReportOfferResponse {
 
-    private String dailyDate;
+    private String period;
 
     private int totalProduct;
 

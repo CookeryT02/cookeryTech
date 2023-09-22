@@ -1,19 +1,14 @@
 package com.tpe.cookerytech.mapper;
 
 import com.tpe.cookerytech.domain.Product;
-import com.tpe.cookerytech.domain.User;
 import com.tpe.cookerytech.dto.request.ProductRequest;
-import com.tpe.cookerytech.dto.response.ModelResponse;
 import com.tpe.cookerytech.dto.response.ProductObjectResponse;
 import com.tpe.cookerytech.dto.response.ProductResponse;
 import org.mapstruct.Mapper;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+
 
 @Mapper(componentModel = "spring")
 public interface ProductMapper{
@@ -47,35 +42,6 @@ public interface ProductMapper{
     }
 
 
-//    User productsToProductResponsePage(List<Product> productList);
     List<ProductObjectResponse> productsToProductObjectResponses(List<Product> productList);
 
-
-    default Page<ProductResponse> productsToProductResponseCustomer(List<Product> filteredProductsCustomer, Pageable pageable){
-
-        List<ProductResponse> productResponse = filteredProductsCustomer.stream().map(this::productToProductResponse).collect(Collectors.toList());
-
-        return new PageImpl<>(productResponse,pageable,productResponse.size());
-    }
-
-    default Page<ProductResponse> productsToProductResponseTrue(List<Product> filteredProductsTrue, Pageable pageable){
-
-        List<ProductResponse> productResponse = filteredProductsTrue.stream().map(this::productToProductResponse).collect(Collectors.toList());
-
-        return new PageImpl<>(productResponse,pageable,productResponse.size());
-    }
-
-    ProductObjectResponse productToProductObjectResponse(Product product);
-
-
-//    ProductObjectResponse productToProductObjectResponse(Product product);
-
-
-
-
-//    Page<ProductResponse> productsToProductResponseCustomer(List<Product> filteredProductsCustomer, Pageable pageable);
-//
-//    Page<ProductResponse> productsToProductResponseTrue(List<Product> filteredProducts, Pageable pageable);
-
-//    Page<ProductResponse> pageProductToResponsePageProduct(Page<Product> productPage);
 }

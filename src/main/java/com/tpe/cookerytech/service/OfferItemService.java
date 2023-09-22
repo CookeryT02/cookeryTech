@@ -12,19 +12,13 @@ import com.tpe.cookerytech.repository.OfferItemRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 public class OfferItemService {
 
     private final UserService userService;
-
     private final OfferItemRepository offerItemRepository;
-
     private final OfferItemMapper offerItemMapper;
-
     private final LogRepository logRepository;
 
     public OfferItemService(UserService userService, OfferItemRepository offerItemRepository, OfferItemMapper offerItemMapper, LogRepository logRepository) {
@@ -34,6 +28,9 @@ public class OfferItemService {
         this.logRepository = logRepository;
     }
 
+
+
+    //E08
     public OfferItemResponse updateOfferItemWithIdByAdmin(Long id, OfferItemUpdateRequest offerItemUpdateRequest) {
 
         OfferItem offerItem = offerItemRepository.findById(id).
@@ -73,6 +70,9 @@ public class OfferItemService {
     }
 
 
+
+
+    //E09
     public OfferItemResponse deleteOfferItemById(Long id) {
         User user = userService.getCurrentUser();
 
@@ -92,15 +92,4 @@ public class OfferItemService {
         offerItemRepository.deleteById(id);
         return offerItemMapper.offerItemToOfferItemResponse(offerItem);
     }
-
-    //--------------------------------------------------
-    public List<OfferItemResponse> getAllOfferItems() {
-
-        List<OfferItem> offerItemList= offerItemRepository.findAll();
-
-        return offerItemList.stream().map(offerItemMapper::offerItemToOfferItemResponse).collect(Collectors.toList());
-    }
-
-    //--------------------------------------------------
-
 }

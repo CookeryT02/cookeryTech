@@ -26,120 +26,18 @@ import java.time.LocalDateTime;
 @RequestMapping("/offers")
 public class OfferController {
 
-
     private final OfferService offerService;
-    private final OfferRepository offerRepository;
-
     private final EmailService emailService;
 
 
-    public OfferController(OfferService offerService, OfferRepository offerRepository, EmailService emailService) {
+    public OfferController(OfferService offerService, EmailService emailService) {
         this.offerService = offerService;
-        this.offerRepository = offerRepository;
         this.emailService = emailService;
     }
 
-    @PostMapping("/auth")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER') or hasRole('CUSTOMER')")
-    public ResponseEntity<OfferResponse> createOfferAuthUser(@RequestBody OfferCreateRequest offerCreateRequest) {
-
-        OfferResponse offerResponse = offerService.createOfferAuthUser(offerCreateRequest);
-
-        emailService.sendOfferEmail(offerResponse);
-
-        return ResponseEntity.ok(offerResponse);
-    }
 
 
-
-
-
-//    @GetMapping("/admin/user/{id}")
-//    @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST')")
-//    public ResponseEntity<Page<OfferResponse>> getUserOffers(
-//            @RequestParam("id") Long id,
-//            @RequestParam(value = "status") Byte status,
-//            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date1,
-//            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date2,
-//            @RequestParam(value = "page", defaultValue = "0") int page,
-//            @RequestParam(value = "size", defaultValue = "20") int size,
-//            @RequestParam(value = "sort", defaultValue = "createAt") String sort,
-//            @RequestParam(value = "type", defaultValue = "DESC") String type
-//    ) {
-//
-//
-//        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.valueOf(type), sort));
-//
-//        Page<OfferResponse> offerResponse = offerService.getUserOfferById(id,pageable,status,date1,date2);
-//
-//        return ResponseEntity.ok(offerResponse);
-//
-//
-//
-//    }
-
-
-
-
-
-
-    @GetMapping("/{id}/auth")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER') or hasRole('CUSTOMER')")
-    public ResponseEntity<OfferResponse> getOfferByAuthUser(@Valid @PathVariable Long id) {
-
-        OfferResponse offerResponse = offerService.getOfferByAuthUser(id);
-
-        return ResponseEntity.ok(offerResponse);
-    }
-
-
-
-    @GetMapping("/auth")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER') or hasRole('CUSTOMER')")
-    public ResponseEntity<Page<OfferResponseWithUser>> getOffersAccordingTimeAuthUser(
-            @RequestParam(required = false, defaultValue = "", name = "q") String q,
-            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date1,
-            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date2,
-            @RequestParam(required = false) Byte status,
-            @RequestParam(required = false, defaultValue = "0", name = "page") int page,
-            @RequestParam(required = false, defaultValue = "20", name = "size") int size,
-            @RequestParam(required = false, defaultValue = "createAt", name = "sort") String sort,
-            @RequestParam(required = false, defaultValue = "DESC", name = "type") String type) {
-
-
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.valueOf(type), sort));
-
-        Page<OfferResponseWithUser> offerResponses  = offerService.getOffersAccordingTimeAuthUser(q,pageable,date1,date2);
-
-        return ResponseEntity.ok(offerResponses);
-    }
-
-    @GetMapping("/admin/user/{id}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST')")
-    public ResponseEntity<Page<OfferResponseWithUser>> getUserOffers(
-            @PathVariable("id") Long id,
-            @RequestParam(required = false) Byte status,
-            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date1,
-            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date2,
-            @RequestParam(required = false, defaultValue = "0", name = "page") int page,
-            @RequestParam(required = false, defaultValue = "20", name = "size") int size,
-            @RequestParam(required = false, defaultValue = "createAt", name = "sort") String sort,
-            @RequestParam(required = false, defaultValue = "DESC", name = "type") String type) {
-
-
-
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.valueOf(type), sort));
-
-        Page<OfferResponseWithUser> offerResponseWithUser = offerService.getUserOfferById(id,pageable,status,date1,date2);
-
-        return ResponseEntity.ok(offerResponseWithUser);
-
-
-    }
-
-
-
-
+    //E01 -> It should return offers   Page : 57
     @GetMapping("/admin")
     @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST')")
     public ResponseEntity<Page<OfferResponseWithUser>> getOffers(@RequestParam("q") String q,
@@ -157,17 +55,10 @@ public class OfferController {
         return ResponseEntity.ok(offerResponseWithUsersPage);
     }
 
-    @PutMapping("/{id}/admin")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST')")
-    public ResponseEntity<OfferResponseWithUser> updateOfterByIdAuthorizedPeople(@PathVariable Long id, @Valid @RequestBody OfferUpdateRequest offerUpdateRequest) {
-
-        OfferResponseWithUser offerResponseWithUser = offerService.updateOfferByManagements(id, offerUpdateRequest);
-
-        return ResponseEntity.ok(offerResponseWithUser);
-
-    }
 
 
+
+    //E02 -> It will return details of an offer
     @GetMapping("/{id}/admin")
     @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST')")
     public ResponseEntity<OfferResponseWithUser> getOfferByAdmin(@Valid @PathVariable("id") Long offerId){
@@ -176,5 +67,90 @@ public class OfferController {
         return ResponseEntity.ok(offerResponse);
     }
 
+
+
+
+    //E03 -> It should return offers of a user
+    @GetMapping("/admin/user/{id}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST')")
+    public ResponseEntity<Page<OfferResponseWithUser>> getUserOffers(
+            @PathVariable("id") Long id,
+            @RequestParam(required = false) Byte status,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date1,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date2,
+            @RequestParam(required = false, defaultValue = "0", name = "page") int page,
+            @RequestParam(required = false, defaultValue = "20", name = "size") int size,
+            @RequestParam(required = false, defaultValue = "createAt", name = "sort") String sort,
+            @RequestParam(required = false, defaultValue = "DESC", name = "type") String type) {
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.valueOf(type), sort));
+
+        Page<OfferResponseWithUser> offerResponseWithUser = offerService.getUserOfferById(id,pageable,status,date1,date2);
+
+        return ResponseEntity.ok(offerResponseWithUser);
+    }
+
+
+
+
+    //E04 -> It will return offers of authenticated user
+    @GetMapping("/auth")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER') or hasRole('CUSTOMER')")
+    public ResponseEntity<Page<OfferResponseWithUser>> getOffersAccordingTimeAuthUser(
+            @RequestParam(required = false, defaultValue = "", name = "q") String q,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date1,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date2,
+            @RequestParam(required = false) Byte status,
+            @RequestParam(required = false, defaultValue = "0", name = "page") int page,
+            @RequestParam(required = false, defaultValue = "20", name = "size") int size,
+            @RequestParam(required = false, defaultValue = "createAt", name = "sort") String sort,
+            @RequestParam(required = false, defaultValue = "DESC", name = "type") String type) {
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.valueOf(type), sort));
+
+        Page<OfferResponseWithUser> offerResponses  = offerService.getOffersAccordingTimeAuthUser(q,pageable,date1,date2);
+
+        return ResponseEntity.ok(offerResponses);
+    }
+
+
+
+
+    //E05 -> It will return details of an offer of authenticated user
+    @GetMapping("/{id}/auth")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER') or hasRole('CUSTOMER')")
+    public ResponseEntity<OfferResponse> getOfferByAuthUser(@Valid @PathVariable Long id) {
+
+        OfferResponse offerResponse = offerService.getOfferByAuthUser(id);
+
+        return ResponseEntity.ok(offerResponse);
+    }
+
+
+
+
+    //E06 -> It will create an offer
+    @PostMapping("/auth")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER') or hasRole('CUSTOMER')")
+    public ResponseEntity<OfferResponse> createOfferAuthUser(@RequestBody OfferCreateRequest offerCreateRequest) {
+
+        OfferResponse offerResponse = offerService.createOfferAuthUser(offerCreateRequest);
+
+        emailService.sendOfferEmail(offerResponse);
+
+        return ResponseEntity.ok(offerResponse);
+    }
+
+
+
+    //E07 -> It will update the offer
+    @PutMapping("/{id}/admin")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST')")
+    public ResponseEntity<OfferResponseWithUser> updateOfterByIdAuthorizedPeople(@PathVariable Long id, @Valid @RequestBody OfferUpdateRequest offerUpdateRequest) {
+
+        OfferResponseWithUser offerResponseWithUser = offerService.updateOfferByManagements(id, offerUpdateRequest);
+
+        return ResponseEntity.ok(offerResponseWithUser);
+    }
 }
 

@@ -28,12 +28,16 @@ public class CurrencyService {
         this.currencyMapper = currencyMapper;
     }
 
-    public List<CurrencyResponse> getAllCurrencies() {
 
+    //L01
+    public List<CurrencyResponse> getAllCurrencies() {
         List<Currency> currencies = currencyRepository.findAll();
         return currencyMapper.currenciesToCurrencyResponseList(currencies);
     }
 
+
+
+    //L02
     public List<CurrencyResponse> getAllCurrenciesAdmin() {
 
         LocalDate lastUpdateDate = LocalDate.from(currencyRepository.findById(2L).orElseThrow(
@@ -48,15 +52,21 @@ public class CurrencyService {
         List<Currency> currencies = currencyRepository.findAll();
 
         return currencyMapper.currenciesToCurrencyResponseList(currencies);
-
     }
 
-    // *******************************  YARDIMCI METOT ***************************************
+
+
+
+
+
+
+    // *******************************  HELPER METHODS ***************************************
+
+
     private void updateCurrencies(List<Currency> currencies) {
         for (Currency currency : currencies) {
             currency.setValue(tcmbData.getExchangeRate(currency.getCode()));
             currencyRepository.save(currency);
         }
     }
-
 }

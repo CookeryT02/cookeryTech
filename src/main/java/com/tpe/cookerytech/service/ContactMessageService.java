@@ -24,8 +24,8 @@ public class ContactMessageService {
     private String email;
 
 
+    //J01
     public CkResponse createContactMessage(ContactMessageRequest contactMessageRequest) {
-
 
         try {
             // Creating an HTML email message
@@ -62,8 +62,6 @@ public class ContactMessageService {
 
             // Handle any exceptions that may occur during email sending
             return new CkResponse("Error sending contact message: " + e.getMessage(), false);
-
         }
-
     }
 }

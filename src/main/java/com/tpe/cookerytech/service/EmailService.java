@@ -10,6 +10,4 @@ public interface EmailService {
 
     void sendOfferEmail(OfferResponse offerResponse);
 
-
-    //String sendMailWithAttachment(EmailDetails details);
 }
