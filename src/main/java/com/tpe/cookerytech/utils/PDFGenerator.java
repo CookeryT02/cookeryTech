@@ -4,6 +4,7 @@ import com.lowagie.text.*;
 import com.lowagie.text.pdf.*;
 import com.tpe.cookerytech.dto.response.ProductResponse;
 import com.tpe.cookerytech.dto.response.ProductResponsePDF;
+import com.tpe.cookerytech.dto.response.ReportOfferResponse;
 import com.tpe.cookerytech.mapper.ProductMapper;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -28,6 +29,7 @@ public class PDFGenerator {
     private List<ProductResponse> productList;
 
     private List<ProductResponsePDF> productResponsePDFS;
+
 
     public void generate(HttpServletResponse response,String title, int count,int a) throws DocumentException, IOException{
 

@@ -2,19 +2,21 @@ package com.tpe.cookerytech.controller;
 
 import com.tpe.cookerytech.dto.response.*;
 import com.tpe.cookerytech.dto.response.ReportOfferResponse;
-import com.tpe.cookerytech.dto.response.ReportResponse;
 import com.lowagie.text.DocumentException;
 import com.tpe.cookerytech.dto.response.ProductResponse;
 import com.tpe.cookerytech.utils.PDFGenerator;
 import com.tpe.cookerytech.service.ReportService;
+import com.tpe.cookerytech.utils.PDFGeneratorReportSummery;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.*;
-import org.springframework.web.bind.annotation.*;
-
 import java.time.LocalDate;
+import java.util.*;
+
+
+
 import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
@@ -48,15 +50,43 @@ public class ReportController {
 
 
     //G02 -> It will get reports
+    @GetMapping("/offers")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER')")
+    public ResponseEntity<List<ReportOfferResponse>> getOffersSummaries(
+            @RequestParam("startDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+            @RequestParam("endDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
+            @RequestParam("type") String type) {
+
+        return ResponseEntity.ok(reportService.getOffersSummaries(startDate, endDate, type));
+    }
 
 
 
+    //G02
+    @GetMapping("/pdf/offerSummery")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER')")
+    public ResponseEntity<List<ReportOfferResponse>> generateOfferSummeryPdf(HttpServletResponse response,
+                                                                             @RequestParam("startDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+                                                                             @RequestParam("endDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
+                                                                             @RequestParam("type") String type) throws DocumentException, IOException {
 
+        response.setContentType("application/pdf");
+        DateFormat dateFormat = new SimpleDateFormat("YYYY-MM-DD:HH:MM:SS");
+        String currentDateTime = dateFormat.format(new Date());
+        String headerkey = "Content-Disposition";
+        String headervalue = "attachment; filename=pdf_" + currentDateTime + ".pdf";
+        response.setHeader(headerkey, headervalue);
 
+        List<ReportOfferResponse> reportOfferResponseList = reportService.getOffersSummaries(startDate, endDate, type);
 
+        PDFGeneratorReportSummery pdfGeneratorReportSummery = new PDFGeneratorReportSummery();
+        pdfGeneratorReportSummery.setReportOfferResponseList(reportOfferResponseList);
+        int count =0;
+        String title = "List of Offer Summery";
+        pdfGeneratorReportSummery.generate(response,title,count);
 
-
-
+        return ResponseEntity.ok(reportOfferResponseList);
+    }
 
 
 
@@ -130,17 +160,6 @@ public class ReportController {
     }
 
 
-//    @GetMapping("/offers")
-//    @PreAuthorize("hasRole('ADMIN')")
-//    public List<ReportOfferResponse> getOffersSummaries(
-//            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
-//            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
-//            @RequestParam String type) {
-//
-//        return reportService.getOffersSummaries(startDate, endDate, type);
-//
-//
-//    }
 
 
     //G04 - PDF

@@ -4,12 +4,17 @@ import com.tpe.cookerytech.domain.OfferItem;
 import com.tpe.cookerytech.domain.Product;
 import com.tpe.cookerytech.domain.User;
 import com.tpe.cookerytech.dto.response.ProductResponse;
+import com.tpe.cookerytech.dto.response.ReportOfferResponse;
 import com.tpe.cookerytech.dto.response.ReportResponse;
 import com.tpe.cookerytech.mapper.ProductMapper;
 import com.tpe.cookerytech.repository.*;
 import org.springframework.stereotype.Service;
 
+
 import java.math.BigInteger;
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -57,36 +62,31 @@ public class ReportService {
 
 
     //G02
+    public List<ReportOfferResponse> getOffersSummaries(LocalDate startDate, LocalDate endDate, String type) {
+
+        LocalDateTime D1 = startDate.atStartOfDay();
+        LocalDateTime D2 = LocalDateTime.of(endDate.getYear(), endDate.getMonth(), endDate.getDayOfMonth(), 23, 59, 59, 999999);
+
+        List<Object[]> allOffersSummaries = offerItemRepository.findAllOffersBetweenD1ToD2(D1, D2, type);
+
+        List<ReportOfferResponse> reportList = new ArrayList<>();
+
+        for (Object[] row : allOffersSummaries) {
+            Timestamp timestamp = (Timestamp) row[0];
+            LocalDateTime dailyDate = timestamp.toLocalDateTime();
+            Long totalProduct = ((BigInteger) row[1]).longValue();
+            Double totalAmount = (Double) row[2];
 
 
+            ReportOfferResponse report = new ReportOfferResponse();
+            report.setPeriod(dailyDate.toString());
+            report.setTotalProduct(totalProduct);
+            report.setTotalAmount(totalAmount);
+            reportList.add(report);
+        }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        return reportList;
+    }
 
 
 
