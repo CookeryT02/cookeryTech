@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 
 
 @Data
@@ -13,8 +15,8 @@ public class ReportOfferResponse {
 
     private String period;
 
-    private int totalProduct;
+    private Long totalProduct;
 
-    private double totalAmount;
+    private Double totalAmount;
 
 }

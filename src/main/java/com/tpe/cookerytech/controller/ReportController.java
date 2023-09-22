@@ -5,10 +5,12 @@ import com.lowagie.text.DocumentException;
 import com.tpe.cookerytech.dto.response.ProductResponse;
 import com.tpe.cookerytech.utils.PDFGenerator;
 import com.tpe.cookerytech.service.ReportService;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.*;
 
 import javax.servlet.http.HttpServletResponse;
@@ -42,15 +44,15 @@ public class ReportController {
 
 
     //G02 -> It will get reports
+    @GetMapping("/offers")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER')")
+    public ResponseEntity<List<ReportOfferResponse>> getOffersSummaries(
+            @RequestParam("startDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+            @RequestParam("endDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
+            @RequestParam("type") String type) {
 
-
-
-
-
-
-
-
-
+        return ResponseEntity.ok(reportService.getOffersSummaries(startDate, endDate, type));
+    }
 
 
 
