@@ -92,7 +92,7 @@ public class ProductController {
 
 
     //A05 -> It should update a product
-    @PutMapping("/{id}/admin")
+    @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('PRODUCT_MANAGER')")
     public ResponseEntity<ProductResponse> updateProduct(@PathVariable Long id,
                                                          @Valid @RequestBody ProductRequest productRequest) {
@@ -105,7 +105,7 @@ public class ProductController {
 
 
     //A06 -> It should delete a product
-    @DeleteMapping("/{id}/admin")
+    @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('PRODUCT_MANAGER')")
     public ResponseEntity<ProductResponse> deleteProductById(@PathVariable Long id){
 
