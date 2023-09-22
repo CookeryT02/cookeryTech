@@ -44,17 +44,6 @@ public class OfferItemController {
         return ResponseEntity.ok(offerItemResponse);
     }
 
-    //--------------------------------------------------------------------------------
-    @GetMapping
-    @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST')")
-    public ResponseEntity<List<OfferItemResponse>> getAllOfferItems(){
 
-        List<OfferItemResponse> offerItemResponseList= offerItemService.getAllOfferItems();
-
-        return ResponseEntity.ok(offerItemResponseList);
-
-    }
-
-    //---------------------------------------------------------------------------------
 
 }
