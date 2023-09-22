@@ -286,7 +286,7 @@ public class ProductService {
             throw new BadRequestException(String.format(ErrorMessage.PRODUCT_CANNOT_DELETE_EXCEPTION, id));
         }
 
-        if (offerItemRepository.findByProductId(id).size()!=0) {
+        if (!offerItemRepository.findByProductId(id).isEmpty()) {
             throw new BadRequestException(String.format(ErrorMessage.PRODUCT_CANNOT_DELETE_EXCEPTION, id));
         }
 

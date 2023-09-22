@@ -27,9 +27,6 @@ public interface ProductRepository extends JpaRepository<Product,Long> {
             + "AND (p.isActive = false)")
     Page<Product> getAllProductsIsActiveFalse( @Param("q") String query, Pageable pageable);
 
-
-
-
     List<Product> findByCategoryId(Long id);
 
     List<Product> findByBrandId(Long id);

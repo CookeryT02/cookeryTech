@@ -105,7 +105,7 @@ public class BrandService {
             throw  new BadRequestException(String.format(ErrorMessage.BRAND_CANNOT_DELETE_EXCEPTION,id));
         }
 
-         if(productRepository.findByBrandId(id).size()!=0){
+         if(!productRepository.findByBrandId(id).isEmpty()){
              throw new BadRequestException(String.format(ErrorMessage.BRAND_CANNOT_DELETE_EXCEPTION,id));
          }
 

@@ -139,7 +139,7 @@ public class CategoryService {
             throw new ResourceNotFoundException(String.format(ErrorMessage.CATEGORY_NOT_FOUND_EXCEPTION, id));
         }
 
-        if(productRepository.findByCategoryId(id).size()!=0){
+        if(!productRepository.findByCategoryId(id).isEmpty()){
             throw new BadRequestException(String.format(ErrorMessage.CATEGORY_CANNOT_DELETE_EXCEPTION, id));
         }
         categoryRepository.delete(category);
