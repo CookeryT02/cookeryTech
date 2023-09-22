@@ -10,7 +10,7 @@ import com.tpe.cookerytech.mapper.ProductMapper;
 import com.tpe.cookerytech.repository.*;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
+
 import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.time.LocalDate;
@@ -75,11 +75,11 @@ public class ReportService {
             Timestamp timestamp = (Timestamp) row[0];
             LocalDateTime dailyDate = timestamp.toLocalDateTime();
             Long totalProduct = ((BigInteger) row[1]).longValue();
-            Double totalAmount = (Double) row[2]; // Değişiklik burada
+            Double totalAmount = (Double) row[2];
 
-            // Her döngü adımında yeni bir ReportOfferResponse nesnesi oluşturun ve listeye ekleyin.
+
             ReportOfferResponse report = new ReportOfferResponse();
-            report.setPeriod(dailyDate.toString()); // Varsayılan olarak LocalDateTime'ı string olarak ayarladık.
+            report.setPeriod(dailyDate.toString());
             report.setTotalProduct(totalProduct);
             report.setTotalAmount(totalAmount);
             reportList.add(report);
