@@ -3,7 +3,6 @@ package com.tpe.cookerytech.dto.request;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
@@ -25,6 +24,5 @@ public class AdminUserUpdateRequest extends UserUpdateRequest{
     private String password;
 
     private Set<String> roles;
-
 
 }
