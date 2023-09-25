@@ -6,6 +6,7 @@ import com.tpe.cookerytech.dto.response.CategoryResponse;
 import com.tpe.cookerytech.dto.response.ProductResponse;
 import com.tpe.cookerytech.service.CategoryService;
 import com.tpe.cookerytech.service.ProductService;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -25,30 +26,27 @@ public class CategoryController {
     }
 
 
-
     //B01 -> It should return categories  Page:41
     @GetMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('PRODUCT_MANAGER')")
-    public ResponseEntity<List<CategoryResponse>> getAllCategories(){
+    public ResponseEntity<List<CategoryResponse>> getAllCategories(@RequestParam(required = false,defaultValue = "seq") String sortField,@RequestParam(required = false,defaultValue = "ASC") String sortOder) {
 
-        List<CategoryResponse> categoryResponses = categoryService.getAllCategory();
+        Sort sort=Sort.by(Sort.Direction.fromString(sortOder),sortField);
+        List<CategoryResponse> categoryResponses = categoryService.getAllCategory(sort);
 
         return ResponseEntity.ok(categoryResponses);
     }
 
 
-
-
     //B02 -> It will return a category
     @GetMapping("{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('PRODUCT_MANAGER')")
-    public ResponseEntity<CategoryResponse> getOneCategory(@PathVariable Long id){
+    public ResponseEntity<CategoryResponse> getOneCategory(@PathVariable Long id) {
 
-        CategoryResponse  Category = categoryService.getOneCategory(id);
+        CategoryResponse Category = categoryService.getOneCategory(id);
 
         return ResponseEntity.ok(Category);
     }
-
 
 
     //B03 -> It will create a category
@@ -62,18 +60,16 @@ public class CategoryController {
     }
 
 
-
     //B04 -> It will update the category
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('PRODUCT_MANAGER')")
-    public ResponseEntity<CategoryResponse> updateCategory( @PathVariable Long id,
-                                                            @Valid @RequestBody CategoryRequest categoryRequest ){
+    public ResponseEntity<CategoryResponse> updateCategory(@PathVariable Long id,
+                                                           @Valid @RequestBody CategoryRequest categoryRequest) {
 
-        CategoryResponse categoryResponse = categoryService.updateCategory( id, categoryRequest);
+        CategoryResponse categoryResponse = categoryService.updateCategory(id, categoryRequest);
 
-        return  ResponseEntity.ok(categoryResponse);
+        return ResponseEntity.ok(categoryResponse);
     }
-
 
 
     //B05 -> It will delete the category
@@ -87,8 +83,6 @@ public class CategoryController {
     }
 
 
-
-
     //B06
     @GetMapping("/{id}/products")
     @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER') or hasRole('CUSTOMER')")
@@ -96,32 +90,6 @@ public class CategoryController {
         List<ProductResponse> activeProducts = categoryService.getActiveProductsByCategoryId(id);
         return ResponseEntity.ok(activeProducts);
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 }

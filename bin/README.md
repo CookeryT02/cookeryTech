@@ -1,2 +1,1 @@
 # cookeryTech
-# zekai kanca oldu

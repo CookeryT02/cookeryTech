@@ -34,7 +34,7 @@ public class ProductObjectResponse {
 
 //    private Set<ImageFile> image;
 
-    private int sequence = 0;
+    private int Sequence = 0;
 
     private LocalDateTime createdAt;
 

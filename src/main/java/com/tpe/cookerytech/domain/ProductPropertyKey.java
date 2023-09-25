@@ -12,7 +12,7 @@ import javax.validation.constraints.Size;
 @NoArgsConstructor
 
 @Entity
-@Table(name="t_product_property_key")
+@Table(name = "t_product_property_key")
 public class ProductPropertyKey {
 
     @Id
@@ -28,7 +28,7 @@ public class ProductPropertyKey {
     @SequenceGenerator(name = "seq_generator", sequenceName = "product_property_seq", allocationSize = 1)
     private int seq;
 
-    private Boolean builtIn= false;
+    private Boolean builtIn = false;
 
     @ManyToOne
     @JoinColumn(name = "product_id", referencedColumnName = "id")

@@ -58,8 +58,9 @@ public class ProductController {
     //A02 -> It should return categories and products whose “featured” field has a value of 1.
     @GetMapping("/featured")
     @PreAuthorize("hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER') or hasRole('CUSTOMER')")
-    public ResponseEntity<List<ProductObjectResponse>> getAllProducts() {
-        List<ProductObjectResponse> allProducts = productService.getAllProducts();
+    public ResponseEntity<List<ProductObjectResponse>> getAllProducts(@RequestParam(required = false,defaultValue = "sequence")String sortFelid,@RequestParam(required = false,defaultValue = "ASC")String sortOrder) {
+        Sort sort=Sort.by(Sort.Direction.fromString(sortOrder),sortFelid);
+        List<ProductObjectResponse> allProducts = productService.getAllProducts(sort);
         return ResponseEntity.ok(allProducts);
     }
 
@@ -174,10 +175,10 @@ public class ProductController {
     //A11 -> It should return models for given products
     @GetMapping("/{id}/get/models")
     @PreAuthorize("hasRole('CUSTOMER') or hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER')")
-    public ResponseEntity<List<ModelResponse>> getProductsByIdModels(@PathVariable Long id) {
+    public ResponseEntity<List<ModelResponse>> getProductsByIdModels(@PathVariable Long id,@RequestParam(required = false,defaultValue = "seq") String sortField,@RequestParam(required = false,defaultValue = "ASC") String sortOder) {
 
-
-        List<ModelResponse> modelResponseList  = productService.getProductsByIdModels(id);
+        Sort sort=Sort.by(Sort.Direction.fromString(sortOder),sortField);
+        List<ModelResponse> modelResponseList  = productService.getProductsByIdModels(id,sort);
 
         return ResponseEntity.ok(modelResponseList);
 

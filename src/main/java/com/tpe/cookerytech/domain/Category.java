@@ -33,9 +33,9 @@ public class Category {
     @Column(nullable = false)
     private String description;
 
-    private Boolean built_in=false;
+    private Boolean built_in = false;
 
-    @Column(nullable = false)
+    @Column(name = "seq", nullable = false, columnDefinition = "int default 0")
     private int seq;
 
     @Column(nullable = false)
@@ -43,7 +43,7 @@ public class Category {
     private String slug;
 
     @Column(nullable = false)
-    private  Boolean isActive = true;
+    private Boolean isActive = true;
 
     @Column(nullable = false)
     private LocalDateTime createAt;
