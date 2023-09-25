@@ -532,6 +532,7 @@ public class ProductService {
         modelRepository.save(model);
 
         ModelCreateResponse modelResponse = modelMapper.modelToModelCreateResponse(model);
+        modelResponse.setCreate_at(model.getCreateAt());
         modelResponse.setProductId(product.getId());
         modelResponse.setCurrencyId(currency.getId());
         modelResponse.setImage(imageFileResponses);
