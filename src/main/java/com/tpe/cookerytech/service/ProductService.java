@@ -436,9 +436,9 @@ public class ProductService {
                     new ResourceNotFoundException(String.format(ErrorMessage.MODEL_NOT_FOUND_BY_PRODUCT_ID_EXCEPTION,id)));
 
 
-            List<Model> sortedModelList = modelLists.stream()
-                    .sorted(Comparator.comparingInt(Model::getSeq).thenComparing(Model::getTitle))
-                    .collect(Collectors.toList());
+//            List<Model> sortedModelList = modelLists.stream()
+//                    .sorted(Comparator.comparingInt(Model::getSeq).thenComparing(Model::getTitle))
+//                    .collect(Collectors.toList());
 
             return modelMapper.modelListToModelResponseList(modelLists);
 
@@ -467,9 +467,9 @@ public class ProductService {
             List<Model> modelLists = modelRepository.findByProductId(id).orElseThrow(()->
                     new ResourceNotFoundException(String.format(ErrorMessage.MODEL_NOT_FOUND_BY_PRODUCT_ID_EXCEPTION,id)));
 
-            List<Model> sortedModelList = modelLists.stream()
-                    .sorted(Comparator.comparingInt(Model::getSeq).thenComparing(Model::getTitle))
-                    .collect(Collectors.toList());
+//            List<Model> sortedModelList = modelLists.stream()
+//                    .sorted(Comparator.comparingInt(Model::getSeq).thenComparing(Model::getTitle))
+//                    .collect(Collectors.toList());
 
             return modelMapper.modelListToModelResponseList(modelLists);
         }
