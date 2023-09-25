@@ -3,6 +3,7 @@ package com.tpe.cookerytech.mapper;
 
 import com.tpe.cookerytech.domain.Model;
 import com.tpe.cookerytech.dto.request.ModelRequest;
+import com.tpe.cookerytech.dto.response.ModelCreateResponse;
 import com.tpe.cookerytech.dto.response.ModelResponse;
 import org.mapstruct.Mapper;
 
@@ -28,4 +29,5 @@ public interface ModelMapper {
         return modelResponseList;
     }
 
+    ModelCreateResponse modelToModelCreateResponse(Model model);
 }

@@ -1,15 +1,18 @@
 package com.tpe.cookerytech.dto.response;
 
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.Set;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ModelResponse {
+public class ModelCreateResponse {
 
     private Long id;
 
@@ -25,13 +28,13 @@ public class ModelResponse {
 
     private Set<ImageFileResponse> image;
 
-    private double buying_price; //decimal
+    private double buying_price;
 
-    private double tax_rate=0; //decimal
+    private double tax_rate=0;
 
     private Boolean isActive=true;
 
-    private Boolean built_in=false;  //default 0 diyor
+    private Boolean built_in=false;
 
     private Long currencyId;
 
@@ -40,5 +43,7 @@ public class ModelResponse {
     private LocalDateTime create_at;
 
     private LocalDateTime update_at;
+
+    private Map<String,String> properties;
 
 }

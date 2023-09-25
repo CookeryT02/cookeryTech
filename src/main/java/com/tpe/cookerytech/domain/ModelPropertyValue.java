@@ -19,7 +19,7 @@ public class ModelPropertyValue {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+
     @Size(max = 100, message = "Name must be maximum 100 characters")
     private String value;
 

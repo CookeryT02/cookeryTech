@@ -257,10 +257,10 @@ public class OfferService {
         for (ShoppingCartItem shoppingCartItem : shoppingCartItemList) {
             OfferItem offerItem = new OfferItem();
             offerItem.setSku(shoppingCartItem.getModel().getSku());
-            offerItem.setQuantity(shoppingCartItem.getModel().getIn_box_quantity());
-            offerItem.setSelling_price(shoppingCartItem.getModel().getBuying_price() + (shoppingCartItem.getModel().getBuying_price() *
+            offerItem.setQuantity(shoppingCartItem.getModel().getInBoxQuantity());
+            offerItem.setSelling_price(shoppingCartItem.getModel().getBuyingPrice() + (shoppingCartItem.getModel().getBuyingPrice() *
                     shoppingCartItem.getModel().getProduct().getBrand().getProfitRate()));
-            offerItem.setTax(shoppingCartItem.getModel().getTax_rate());
+            offerItem.setTax(shoppingCartItem.getModel().getTaxRate());
             offerItem.setProduct(shoppingCartItem.getProduct());
             offerItem.setCreateAt(LocalDateTime.now());
             offerItem.setOffer(offer);

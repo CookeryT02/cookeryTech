@@ -1,13 +1,8 @@
 package com.tpe.cookerytech.dto.response;
 
-import com.tpe.cookerytech.domain.Model;
-import com.tpe.cookerytech.domain.Product;
-import com.tpe.cookerytech.domain.ShoppingCart;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Data
