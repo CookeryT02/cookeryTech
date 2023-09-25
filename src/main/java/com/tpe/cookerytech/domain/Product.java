@@ -3,15 +3,10 @@ package com.tpe.cookerytech.domain;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.jpa.domain.Specification;
 
 import javax.persistence.*;
-import javax.persistence.criteria.Predicate;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -38,8 +33,8 @@ public class Product {
     @Size
     private String slug;
 
-    @Column(name = "seq", nullable = false)
-    private int sequence = 0;
+    @Column(name = "seq", nullable = false,columnDefinition = "int default 0")
+    private int sequence;
 
     @Column(name = "is_new", nullable = false)
     private Boolean isNew = false;

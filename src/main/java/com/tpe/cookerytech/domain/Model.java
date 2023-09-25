@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
@@ -18,7 +19,7 @@ import java.util.Set;
 @NoArgsConstructor
 
 @Entity
-@Table(name="t_model")
+@Table(name = "t_model")
 public class Model {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -28,7 +29,7 @@ public class Model {
     @Size(min = 5, max = 150, message = "Title must be between 5 and 150 characters")
     private String title;
 
-    @Column(nullable = false,unique = true)
+    @Column(nullable = false, unique = true)
     @Size(min = 10, max = 100, message = "sku must be between 10 and 100 characters")
     private String sku;
 
@@ -36,35 +37,35 @@ public class Model {
     private int stock_amount;
 
     @Column(nullable = false)
-    private int in_box_quantity=1;
+    private int in_box_quantity = 1;
 
-    @Column(nullable = false)
-    private int seq=0;
+    @Column(name = "seq", nullable = false, columnDefinition = "int default 0")
+    private int seq;
 
-    @OneToMany(mappedBy="model", cascade={CascadeType.ALL})
+    @OneToMany(mappedBy = "model", cascade = {CascadeType.ALL})
     private Set<ImageFile> image;
 
     @Column(nullable = false)
     private double buying_price; //decimal
 
     @Column(nullable = false)
-    private double tax_rate=0; //decimal
+    private double tax_rate = 0; //decimal
 
     @Column(nullable = false)
-    private Boolean isActive=true;
+    private Boolean isActive = true;
 
     @Column(nullable = false)
-    private Boolean built_in=false;  //default 0 diyor
+    private Boolean built_in = false;  //default 0 diyor
 
     @OneToOne
     @JoinColumn(name = "currency_id", referencedColumnName = "id")
     private Currency currency;
 
     @ManyToOne
-    @JoinColumn(name = "product_id",referencedColumnName = "id")
+    @JoinColumn(name = "product_id", referencedColumnName = "id")
     private Product product;
 
-   // @Column(nullable = false)
+    // @Column(nullable = false)
     private LocalDateTime create_at;
 
     @Column(nullable = true)

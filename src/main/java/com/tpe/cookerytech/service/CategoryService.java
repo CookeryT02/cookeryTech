@@ -12,10 +12,13 @@ import com.tpe.cookerytech.mapper.CategoryMapper;
 import com.tpe.cookerytech.mapper.ProductMapper;
 import com.tpe.cookerytech.repository.CategoryRepository;
 import com.tpe.cookerytech.repository.ProductRepository;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 
 
@@ -27,7 +30,6 @@ public class CategoryService {
     private final ProductRepository productRepository;
 
 
-
     public CategoryService(CategoryMapper categoryMapper, CategoryRepository categoryRepository, ProductMapper productMapper, ProductRepository productRepository) {
         this.categoryMapper = categoryMapper;
         this.categoryRepository = categoryRepository;
@@ -36,15 +38,14 @@ public class CategoryService {
     }
 
 
-
     //B01
-    public List<CategoryResponse> getAllCategory() {
+    public List<CategoryResponse> getAllCategory(Sort sort) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication != null && authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
 
-            List<Category> categories = categoryRepository.findAll();
+            List<Category> categories = categoryRepository.findAll(sort);
 
             List<CategoryResponse> categoryResponses = categoryMapper.map(categories);
 
@@ -52,14 +53,13 @@ public class CategoryService {
 
         } else {
 
-            List<Category> categories = categoryRepository.findByIsActive(true);
+            List<Category> categories = categoryRepository.findByIsActive(true,sort);
 
             List<CategoryResponse> categoryResponses = categoryMapper.map(categories);
 
             return categoryResponses;
         }
     }
-
 
 
     //B02
@@ -80,19 +80,17 @@ public class CategoryService {
     }
 
 
-
-
     //B03
     public CategoryResponse createCategory(CategoryRequest categoryRequest) {
 
         Category category = categoryMapper.categoryRequestToCategory(categoryRequest);
 
-        if(isTitleUnique(category.getTitle())){
+        if (isTitleUnique(category.getTitle())) {
             throw new ConflictException(String.format(ErrorMessage.CATEGORY_ALREADY_EXIST_EXCEPTION, category.getTitle()));
         }
 
-        String title=category.getTitle();
-        String slug=  generateSlugFromTitle(title);
+        String title = category.getTitle();
+        String slug = generateSlugFromTitle(title);
         category.setSlug(slug);
         category.setCreateAt(LocalDateTime.now());
         category.setUpdateAt(null);
@@ -102,13 +100,12 @@ public class CategoryService {
     }
 
 
-
     //B04
     public CategoryResponse updateCategory(Long id, CategoryRequest categoryRequest) {
 
         Category category = getCategory(id);
 
-        if(category.getBuilt_in()){
+        if (category.getBuilt_in()) {
             throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
         }
 
@@ -127,7 +124,6 @@ public class CategoryService {
     }
 
 
-
     //B05
     public CategoryResponse removeCategoryById(Long id) {
 
@@ -139,7 +135,7 @@ public class CategoryService {
             throw new ResourceNotFoundException(String.format(ErrorMessage.CATEGORY_NOT_FOUND_EXCEPTION, id));
         }
 
-        if(!productRepository.findByCategoryId(id).isEmpty()){
+        if (!productRepository.findByCategoryId(id).isEmpty()) {
             throw new BadRequestException(String.format(ErrorMessage.CATEGORY_CANNOT_DELETE_EXCEPTION, id));
         }
         categoryRepository.delete(category);
@@ -148,17 +144,13 @@ public class CategoryService {
     }
 
 
-
-
     //B06
     public List<ProductResponse> getActiveProductsByCategoryId(Long id) {
 
         List<Product> productIdCategory = productRepository.findByCategoryIdAndIsActiveTrue(id);
-
+        productIdCategory.sort(Comparator.comparing(Product::getSequence));
         return productMapper.productsToProductResponses(productIdCategory);
     }
-
-
 
 
     //************************************* Helper Methods **********************************************
@@ -183,15 +175,20 @@ public class CategoryService {
     private Category getCategory(Long id) {
 
         Category category = categoryRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException(String.format(ErrorMessage.RESOURCE_NOT_FOUND_EXCEPTION,id)));
+                () -> new ResourceNotFoundException(String.format(ErrorMessage.RESOURCE_NOT_FOUND_EXCEPTION, id)));
 
         return category;
 
     }
+//    private boolean isCategoryExist(String categoryName) {
+//
+//        return categoryRepository.existsBy(categoryName);
+//
+//    }
 
     public Category findCategoryById(Long categoryId) {
 
-        Category category = categoryRepository.findById(categoryId).orElseThrow(()->
+        Category category = categoryRepository.findById(categoryId).orElseThrow(() ->
                 new ResourceNotFoundException(ErrorMessage.CATEGORY_NOT_FOUND_EXCEPTION));
 
         return category;
@@ -211,5 +208,7 @@ public class CategoryService {
 
         return input;
     }
+
+
 }
 

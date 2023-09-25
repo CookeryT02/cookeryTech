@@ -40,7 +40,7 @@ public class ProductResponse {
 
     private ImageFileResponse image;
 
-    private int sequence = 0;
+    private int Sequence = 0;
 
     private LocalDateTime createdAt;
 

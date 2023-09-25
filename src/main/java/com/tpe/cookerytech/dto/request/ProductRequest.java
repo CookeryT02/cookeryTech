@@ -35,7 +35,7 @@ public class ProductRequest {
     private Long categoryId;
 
     @NotNull(message = "Please provide product sequence")
-    private int sequence = 0;
+    private int Sequence = 0;
 
     private Boolean builtIn = false;
 

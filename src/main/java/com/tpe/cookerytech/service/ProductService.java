@@ -1,6 +1,7 @@
 package com.tpe.cookerytech.service;
 
 import com.tpe.cookerytech.domain.*;
+import com.tpe.cookerytech.domain.Currency;
 import com.tpe.cookerytech.dto.request.ModelRequest;
 import com.tpe.cookerytech.dto.request.ProductPropertyKeyRequest;
 import com.tpe.cookerytech.dto.request.ProductRequest;
@@ -21,10 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.transaction.Transactional;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -71,6 +69,7 @@ public class ProductService {
 
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Sort sort =pageable.getSort();
 
         if (authentication != null || authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_CUSTOMER"))
                 || authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_PRODUCT_MANAGER"))
@@ -80,7 +79,7 @@ public class ProductService {
         ) {
 
 
-            List<Product> productList = (productRepository.findByIsActive(true));
+            List<Product> productList = (productRepository.findByIsActive(true,sort));
             List<Product> filteredProductsCustomer =productList.stream()
                     .filter(p -> {
                         Brand brand = p.getBrand();
@@ -118,7 +117,7 @@ public class ProductService {
 
 
 
-            List<Product> productList = (productRepository.findByIsActive(false));
+            List<Product> productList = (productRepository.findByIsActive(false,sort));
             List<Product> filteredProducts =productList.stream()
                     .filter(p -> {
                         Brand brand = p.getBrand();
@@ -129,7 +128,6 @@ public class ProductService {
 
             Page<Product> p = new PageImpl<Product>(productList);
             Page<Product> f = new PageImpl<Product>(filteredProducts);
-
 
             Page<Product> productPages = productRepository.getAllProductsIsActiveFalse(q, pageable);
 
@@ -161,28 +159,26 @@ public class ProductService {
 
 
     //A02
-    public List<ProductObjectResponse> getAllProducts() {
+    public List<ProductObjectResponse> getAllProducts(Sort sort) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication != null && authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
 
-            List<Product> productList = productRepository.findAll();
+            List<Product> productList = productRepository.findAll(sort);
 
             List<ProductObjectResponse> listObjectResponse=productMapper.productsToProductObjectResponses(productList);
-
             return listObjectResponse;
 
         } else {
-            List<Product> productList = (productRepository.findByIsActive(true));
+            List<Product> productList = (productRepository.findByIsActive(true,sort));
             List<Product> filteredProducts =productList.stream()
                     .filter(p -> {
                         Brand brand = p.getBrand();
                         Category category = p.getCategory();
                         System.out.println(p.getCategory().getIsActive());
                         return p.getIsFeatured() && brand != null && category != null && brand.getIsActive() && category.getIsActive();
-                    })
-                    .collect(Collectors.toList());
+                    }).collect(Collectors.toList());
             return productMapper.productsToProductObjectResponses(filteredProducts);
         }
     }
@@ -306,9 +302,10 @@ public class ProductService {
         productRepository.findById(id).orElseThrow(() ->
                 new ResourceNotFoundException(String.format(ErrorMessage.PRODUCT_NOT_FOUND_EXCEPTION,id)));
 
+            List<ProductPropertyKey> productPropertyKeys= productPropertyKeyRepository.findByProductId(id);
+            productPropertyKeys.sort(Comparator.comparingInt(ProductPropertyKey::getSeq));
 
-        return productPropertyKeyMapper.ppkListToPPKResponseList(
-                productPropertyKeyRepository.findByProductId(id));
+        return productPropertyKeyMapper.ppkListToPPKResponseList(productPropertyKeys);
     }
 
 
@@ -399,13 +396,13 @@ public class ProductService {
 
 
     //A11
-    public List<ModelResponse> getProductsByIdModels(Long id) {
+    public List<ModelResponse> getProductsByIdModels(Long id,Sort sort) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication != null && authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_CUSTOMER"))) {
 
-            List<Product> productList = (productRepository.findByIsActive(false));
+            List<Product> productList = (productRepository.findByIsActive(false,sort));
             List<Product> filteredProductsCustomer =productList.stream()
                     .filter(p -> {
                         Brand brand = p.getBrand();
@@ -420,7 +417,9 @@ public class ProductService {
                     .filter(m -> {
                         Product product = m.getProduct();
                         return product != null && product.getIsActive();
-                    }).collect(Collectors.toList());
+                    })
+                    .collect(Collectors.toList());
+
 
             productRepository.findById(id).orElseThrow(() ->
                     new ResourceNotFoundException(String.format(ErrorMessage.PRODUCT_NOT_FOUND_EXCEPTION,id)));
@@ -428,21 +427,22 @@ public class ProductService {
             List<Model> modelLists = modelRepository.findByProductId(id).orElseThrow(()->
                     new ResourceNotFoundException(String.format(ErrorMessage.MODEL_NOT_FOUND_BY_PRODUCT_ID_EXCEPTION,id)));
 
+
             return modelMapper.modelListToModelResponseList(modelLists);
 
         } else {
 
-            List<Product> productList = (productRepository.findByIsActive(true));
+            List<Product> productList = (productRepository.findByIsActive(true,sort));
             List<Product> filteredProducts =productList.stream()
                     .filter(p -> {
                         Brand brand = p.getBrand();
                         Category category = p.getCategory();
                         System.out.println(p.getCategory().getIsActive());
                         return p.getIsFeatured() && brand != null && category != null && brand.getIsActive() && category.getIsActive();
-                    })
-                    .collect(Collectors.toList());
+                    }).collect(Collectors.toList());
 
             List<Model> modelList = (modelRepository.findByIsActive(false));
+
             List<Model> filteredModelsCustomer = modelList.stream()
                     .filter(m -> {
                         Product product = m.getProduct();
@@ -454,7 +454,6 @@ public class ProductService {
 
             List<Model> modelLists = modelRepository.findByProductId(id).orElseThrow(()->
                     new ResourceNotFoundException(String.format(ErrorMessage.MODEL_NOT_FOUND_BY_PRODUCT_ID_EXCEPTION,id)));
-
             return modelMapper.modelListToModelResponseList(modelLists);
         }
     }
@@ -602,6 +601,8 @@ public class ProductService {
 
         List<Model> modelList = modelRepository.findByProductId(id).orElseThrow(()->
                 new ResourceNotFoundException(String.format(ErrorMessage.MODEL_NOT_FOUND_BY_PRODUCT_ID_EXCEPTION,id)));
+//        sort by seq and title
+        modelList.sort(Comparator.comparingInt(Model::getSeq).thenComparing(Model::getTitle));
 
         return modelMapper.modelListToModelResponseList(modelList);
     }
