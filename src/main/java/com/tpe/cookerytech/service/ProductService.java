@@ -1,6 +1,7 @@
 package com.tpe.cookerytech.service;
 
 import com.tpe.cookerytech.domain.*;
+import com.tpe.cookerytech.domain.Currency;
 import com.tpe.cookerytech.dto.request.ModelRequest;
 import com.tpe.cookerytech.dto.request.ProductPropertyKeyRequest;
 import com.tpe.cookerytech.dto.request.ProductRequest;
@@ -21,10 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.transaction.Transactional;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -428,6 +426,10 @@ public class ProductService {
             List<Model> modelLists = modelRepository.findByProductId(id).orElseThrow(()->
                     new ResourceNotFoundException(String.format(ErrorMessage.MODEL_NOT_FOUND_BY_PRODUCT_ID_EXCEPTION,id)));
 
+            List<Model> sortedModelList = modelLists.stream()
+                    .sorted(Comparator.comparingInt(Model::getSeq).thenComparing(Model::getTitle))
+                    .collect(Collectors.toList());
+
             return modelMapper.modelListToModelResponseList(modelLists);
 
         } else {
@@ -454,6 +456,10 @@ public class ProductService {
 
             List<Model> modelLists = modelRepository.findByProductId(id).orElseThrow(()->
                     new ResourceNotFoundException(String.format(ErrorMessage.MODEL_NOT_FOUND_BY_PRODUCT_ID_EXCEPTION,id)));
+
+            List<Model> sortedModelList = modelLists.stream()
+                    .sorted(Comparator.comparingInt(Model::getSeq).thenComparing(Model::getTitle))
+                    .collect(Collectors.toList());
 
             return modelMapper.modelListToModelResponseList(modelLists);
         }

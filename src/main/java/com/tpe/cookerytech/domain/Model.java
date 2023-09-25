@@ -64,7 +64,6 @@ public class Model {
     @JoinColumn(name = "product_id",referencedColumnName = "id")
     private Product product;
 
-   // @Column(nullable = false)
     private LocalDateTime create_at;
 
     @Column(nullable = true)
