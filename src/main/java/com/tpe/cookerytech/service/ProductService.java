@@ -386,12 +386,13 @@ public class ProductService {
         ProductPropertyKey productPropertyKey = productPropertyKeyRepository.findById(id).orElseThrow(()->
                 new ResourceNotFoundException(String.format(ErrorMessage.PRODUCT_PROPERTY_KEY_NOT_FOUND,id)));
 
+        ModelPropertyValue modelPropertyValue = modelPropertyValueRepository.findByProductPropertyKey(productPropertyKey);
+
         if (productPropertyKey.getBuiltIn()){
             throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
-        } //else if () {
-        //model value degeri varsa silinemez eklenecek
-        //  }
-        else {
+        }else if (!(modelPropertyValue==null)) {
+            throw new BadRequestException(ErrorMessage.MODEL_PROPERY_VALUE_CAN_NOT_DELETE);
+        }else {
             productPropertyKeyRepository.deleteById(id);
         }
         ProductPropertyKeyResponse productPropertyKeyResponse = productPropertyKeyMapper.productPropertyKeyToProductPropertyKeyResponse(productPropertyKey);
