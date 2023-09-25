@@ -3,12 +3,9 @@ package com.tpe.cookerytech.dto.request;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.w3c.dom.Text;
-
 import javax.persistence.Column;
 import javax.validation.constraints.Email;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+
 
 @Data
 @AllArgsConstructor
@@ -27,6 +24,5 @@ public class ContactMessageRequest {
     private String phone;
 
     private String message;
-
 
 }

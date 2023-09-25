@@ -190,10 +190,10 @@ public class ProductController {
     //A12 -> It should create a model
     @PostMapping("/models")
     @PreAuthorize("hasRole('ADMIN') or hasRole('PRODUCT_MANAGER')")
-    public ResponseEntity<ModelResponse> createProductModel(@RequestPart("file") MultipartFile file,
+    public ResponseEntity<ModelCreateResponse> createProductModel(@RequestPart("file") MultipartFile file,
                                                             @RequestPart("modelRequest") ModelRequest modelRequest) {
 
-        ModelResponse modelResponse = productService.createProductModels(modelRequest,file);
+        ModelCreateResponse modelResponse = productService.createProductModels(modelRequest,file);
 
         return ResponseEntity.ok(modelResponse);
     }

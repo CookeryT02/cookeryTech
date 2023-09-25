@@ -91,7 +91,6 @@ public class ReportService {
             report.setTotalAmount(totalAmount);
             reportList.add(report);
         }
-
         return reportList;
     }
 
