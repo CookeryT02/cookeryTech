@@ -538,7 +538,7 @@ public class ProductService {
         Currency currency = currencyRepository.findById(modelRequest.getCurrencyId()).orElseThrow(() ->
                 new ResourceNotFoundException(ErrorMessage.CURRENCY_NOT_FOUND_EXCEPTION));
 
-        if (model.getBuilt_in()) {
+        if (model.getBuiltIn()) {
             throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
         }
 
@@ -546,12 +546,12 @@ public class ProductService {
 
         model.setSku(modelRequest.getSku());
         model.setTitle(modelRequest.getTitle());
-        model.setStock_amount(modelRequest.getStock_amount());
-        model.setIn_box_quantity(modelRequest.getIn_box_quantity());
+        model.setStockAmount(modelRequest.getStock_amount());
+        model.setInBoxQuantity(modelRequest.getIn_box_quantity());
         model.setSeq(modelRequest.getSeq());
-        model.setBuying_price(modelRequest.getBuying_price());
+        model.setBuyingPrice(modelRequest.getBuying_price());
         model.setIsActive(modelRequest.getIsActive());
-        model.setTax_rate(modelRequest.getTax_rate());
+        model.setTaxRate(modelRequest.getTax_rate());
         model.setProduct(product);
         model.setCurrency(currency);
         model.setUpdateAt(LocalDateTime.now());
@@ -572,7 +572,7 @@ public class ProductService {
 
         Model model = modelRepository.findById(id).orElseThrow(() ->
                 new ResourceNotFoundException(String.format(ErrorMessage.MODEL_NOT_FOUND_EXCEPTION,id)));
-        if (model.getBuilt_in()) {
+        if (model.getBuiltIn()) {
             throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
         } //else if () {
         //If any model is deleted, related records in model_property_values, cart_items should be deleted
