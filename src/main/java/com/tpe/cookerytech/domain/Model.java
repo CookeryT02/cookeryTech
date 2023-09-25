@@ -64,8 +64,8 @@ public class Model {
     @JoinColumn(name = "product_id",referencedColumnName = "id")
     private Product product;
 
-    private LocalDateTime create_at;
+    private LocalDateTime createAt;
 
-    private LocalDateTime update_at;
+    private LocalDateTime updateAt;
 
 }

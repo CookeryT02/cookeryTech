@@ -513,7 +513,7 @@ public class ProductService {
         model.setProduct(product);
         model.setCurrency(currency);
         model.setImage(imageFiles);
-        model.setCreate_at(LocalDateTime.now());
+        model.setCreateAt(LocalDateTime.now());
         modelRepository.save(model);
 
         ModelResponse modelResponse = modelMapper.modelToModelResponse(model);
@@ -554,7 +554,7 @@ public class ProductService {
         model.setTax_rate(modelRequest.getTax_rate());
         model.setProduct(product);
         model.setCurrency(currency);
-        model.setUpdate_at(LocalDateTime.now());
+        model.setUpdateAt(LocalDateTime.now());
 
         modelRepository.save(model);
 
