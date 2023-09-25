@@ -1,6 +1,7 @@
 package com.tpe.cookerytech.service;
 
 import com.tpe.cookerytech.domain.*;
+import com.tpe.cookerytech.domain.Currency;
 import com.tpe.cookerytech.dto.request.ModelRequest;
 import com.tpe.cookerytech.dto.request.ProductPropertyKeyRequest;
 import com.tpe.cookerytech.dto.request.ProductRequest;
@@ -18,13 +19,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.transaction.Transactional;
+
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -46,9 +44,11 @@ public class ProductService {
     private final BrandMapper brandMapper;
     private final CategoryMapper categoryMapper;
 
+    private final ModelPropertyValueRepository modelPropertyValueRepository;
 
 
-    public ProductService(ProductRepository productRepository, ProductMapper productMapper, BrandService brandService, CategoryService categoryService, CurrencyRepository currencyRepository, ModelMapper modelMapper, ProductPropertyKeyMapper productPropertyKeyMapper, ProductPropertyKeyRepository productPropertyKeyRepository, OfferItemRepository offerItemRepository, ModelRepository modelRepository, ShoppingCartItemRepository shoppingCartItemRepository, ImageFileRepository imageFileRepository, BrandMapper brandMapper, CategoryMapper categoryMapper) {
+
+    public ProductService(ProductRepository productRepository, ProductMapper productMapper, BrandService brandService, CategoryService categoryService, CurrencyRepository currencyRepository, ModelMapper modelMapper, ProductPropertyKeyMapper productPropertyKeyMapper, ProductPropertyKeyRepository productPropertyKeyRepository, OfferItemRepository offerItemRepository, ModelRepository modelRepository, ShoppingCartItemRepository shoppingCartItemRepository, ImageFileRepository imageFileRepository, BrandMapper brandMapper, CategoryMapper categoryMapper, ModelPropertyValueRepository modelPropertyValueRepository) {
         this.productRepository = productRepository;
         this.productMapper = productMapper;
         this.brandService = brandService;
@@ -63,6 +63,7 @@ public class ProductService {
         this.imageFileRepository = imageFileRepository;
         this.brandMapper = brandMapper;
         this.categoryMapper = categoryMapper;
+        this.modelPropertyValueRepository = modelPropertyValueRepository;
     }
 
 
@@ -342,7 +343,11 @@ public class ProductService {
            }
         }
 
+
         productPropertyKeyRepository.save(productPropertyKey);
+        ModelPropertyValue modelPropertyValue = new ModelPropertyValue();
+        modelPropertyValue.setProductPropertyKey(productPropertyKey);
+        modelPropertyValueRepository.save(modelPropertyValue);
 
         ProductPropertyKeyResponse productPropertyKeyResponse = productPropertyKeyMapper.productPropertyKeyToProductPropertyKeyResponse(productPropertyKey);
         productPropertyKeyResponse.setProductId(product.getId());
@@ -463,7 +468,7 @@ public class ProductService {
 
 
     //A12
-    public ModelResponse createProductModels(ModelRequest modelRequest, MultipartFile file) {
+    public ModelCreateResponse createProductModels(ModelRequest modelRequest, MultipartFile file) {
         isSkuUnique(modelRequest.getSku());
 
         ImageFile imageFile = null;
@@ -493,18 +498,42 @@ public class ProductService {
         Set<ImageFileResponse> imageFileResponses =new HashSet<>();
         imageFileResponses.add(ImageFileService.convertToResponse(imageFile));
 
-
         model.setSku(modelRequest.getSku());
         model.setProduct(product);
         model.setCurrency(currency);
         model.setImage(imageFiles);
         model.setCreate_at(LocalDateTime.now());
+
+        List<ProductPropertyKey> productPropertyKeyList = productPropertyKeyRepository.findByProductId(modelRequest.getProductId());
+
+        if (!productPropertyKeyList.isEmpty()) {
+            Map<String,String> modelProperties = new HashMap<>();
+            int i=0;
+            for (ProductPropertyKey propertyKey : productPropertyKeyList) {
+                ModelPropertyValue modelPropertyValue = modelPropertyValueRepository.findByProductPropertyKey(propertyKey);
+                modelPropertyValue.setModel(model);
+                List<String> modelPropertyValues = modelRequest.getModelPropertyValue();
+
+                if (!modelPropertyValues.isEmpty() && modelPropertyValue != null) {
+                    if (i <= modelPropertyValues.size()) {
+                        modelPropertyValue.setValue(modelPropertyValues.get(i));
+                    }
+                    modelPropertyValueRepository.save(modelPropertyValue);
+                    modelProperties.put(propertyKey.getName(),modelPropertyValue.getValue());
+                    model.setProperties(modelProperties);
+                }
+                i++;
+            }
+        }
+
+
         modelRepository.save(model);
 
-        ModelResponse modelResponse = modelMapper.modelToModelResponse(model);
+        ModelCreateResponse modelResponse = modelMapper.modelToModelCreateResponse(model);
         modelResponse.setProductId(product.getId());
         modelResponse.setCurrencyId(currency.getId());
         modelResponse.setImage(imageFileResponses);
+        modelResponse.setProperties(model.getProperties());
         return modelResponse;
     }
 

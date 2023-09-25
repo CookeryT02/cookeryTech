@@ -9,6 +9,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.Set;
 
 
@@ -64,10 +65,15 @@ public class Model {
     @JoinColumn(name = "product_id",referencedColumnName = "id")
     private Product product;
 
-   // @Column(nullable = false)
+
     private LocalDateTime create_at;
 
-    @Column(nullable = true)
     private LocalDateTime update_at;
+
+    @ElementCollection
+    @MapKeyColumn(name = "property_key")
+    @Column(name = "property_value")
+    @CollectionTable(name = "model_properties", joinColumns = @JoinColumn(name = "model_id"))
+    private Map<String,String> properties;
 
 }
