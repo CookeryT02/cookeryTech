@@ -24,6 +24,4 @@ public class ProductPropertyKeyResponse {
 
     private Long productId;
 
-
-
 }

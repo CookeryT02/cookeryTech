@@ -34,10 +34,10 @@ public class Model {
     private String sku;
 
     @Column(nullable = false)
-    private int stock_amount;
+    private int stockAmount;
 
     @Column(nullable = false)
-    private int in_box_quantity=1;
+    private int inBoxQuantity=1;
 
     @Column(nullable = false)
     private int seq=0;
@@ -46,16 +46,16 @@ public class Model {
     private Set<ImageFile> image;
 
     @Column(nullable = false)
-    private double buying_price; //decimal
+    private double buyingPrice; //decimal
 
     @Column(nullable = false)
-    private double tax_rate=0; //decimal
+    private double taxRate=0; //decimal
 
     @Column(nullable = false)
     private Boolean isActive=true;
 
     @Column(nullable = false)
-    private Boolean built_in=false;  //default 0 diyor
+    private Boolean builtIn=false;  //default 0 diyor
 
     @OneToOne
     @JoinColumn(name = "currency_id", referencedColumnName = "id")
@@ -65,10 +65,9 @@ public class Model {
     @JoinColumn(name = "product_id",referencedColumnName = "id")
     private Product product;
 
+    private LocalDateTime createAt;
 
-    private LocalDateTime create_at;
-
-    private LocalDateTime update_at;
+    private LocalDateTime updateAt;
 
     @ElementCollection
     @MapKeyColumn(name = "property_key")

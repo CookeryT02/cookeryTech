@@ -1,8 +1,6 @@
 package com.tpe.cookerytech.dto.request;
 
 import lombok.AllArgsConstructor;
-
-
 import lombok.NoArgsConstructor;
 import lombok.Data;
 import javax.validation.constraints.Email;
