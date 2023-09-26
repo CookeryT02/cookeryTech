@@ -1,6 +1,7 @@
 package com.tpe.cookerytech.repository;
 
 import com.tpe.cookerytech.domain.Model;
+import com.tpe.cookerytech.domain.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -20,4 +21,5 @@ public interface ModelRepository extends JpaRepository <Model, Long> {
     void deleteByProductId(Long productId);
 
 
+    List<Model> findByProduct(Product product);
 }

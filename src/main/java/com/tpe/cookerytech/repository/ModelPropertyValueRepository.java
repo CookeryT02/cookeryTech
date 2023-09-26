@@ -11,4 +11,6 @@ public interface ModelPropertyValueRepository extends JpaRepository<ModelPropert
 
     @Query("SELECT mv FROM ModelPropertyValue mv WHERE mv.productPropertyKey = :propertyKey")
     ModelPropertyValue findByProductPropertyKey(ProductPropertyKey propertyKey);
+
+    void deleteByModelId(Long id);
 }
