@@ -16,6 +16,7 @@ import org.springframework.data.domain.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -46,9 +47,12 @@ public class ProductService {
 
     private final ModelPropertyValueRepository modelPropertyValueRepository;
 
+    private final FavoritesRepository favoritesRepository;
 
 
-    public ProductService(ProductRepository productRepository, ProductMapper productMapper, BrandService brandService, CategoryService categoryService, CurrencyRepository currencyRepository, ModelMapper modelMapper, ProductPropertyKeyMapper productPropertyKeyMapper, ProductPropertyKeyRepository productPropertyKeyRepository, OfferItemRepository offerItemRepository, ModelRepository modelRepository, ShoppingCartItemRepository shoppingCartItemRepository, ImageFileRepository imageFileRepository, BrandMapper brandMapper, CategoryMapper categoryMapper, ModelPropertyValueRepository modelPropertyValueRepository) {
+
+
+    public ProductService(ProductRepository productRepository, ProductMapper productMapper, BrandService brandService, CategoryService categoryService, CurrencyRepository currencyRepository, ModelMapper modelMapper, ProductPropertyKeyMapper productPropertyKeyMapper, ProductPropertyKeyRepository productPropertyKeyRepository, OfferItemRepository offerItemRepository, ModelRepository modelRepository, ShoppingCartItemRepository shoppingCartItemRepository, ImageFileRepository imageFileRepository, BrandMapper brandMapper, CategoryMapper categoryMapper, ModelPropertyValueRepository modelPropertyValueRepository, FavoritesRepository favoritesRepository) {
         this.productRepository = productRepository;
         this.productMapper = productMapper;
         this.brandService = brandService;
@@ -64,6 +68,7 @@ public class ProductService {
         this.brandMapper = brandMapper;
         this.categoryMapper = categoryMapper;
         this.modelPropertyValueRepository = modelPropertyValueRepository;
+        this.favoritesRepository = favoritesRepository;
     }
 
 
@@ -275,11 +280,11 @@ public class ProductService {
 
 
     //A06
+    @Transactional
     public ProductResponse deleteProductById (Long id){
 
         Product product = productRepository.findById(id).orElseThrow(() ->
                 new ResourceNotFoundException(String.format(ErrorMessage.PRODUCT_NOT_FOUND_EXCEPTION,id)));
-
 
         if (product.getBuiltIn()) {
             throw new BadRequestException(String.format(ErrorMessage.PRODUCT_CANNOT_DELETE_EXCEPTION, id));
@@ -289,12 +294,27 @@ public class ProductService {
             throw new BadRequestException(String.format(ErrorMessage.PRODUCT_CANNOT_DELETE_EXCEPTION, id));
         }
 
-        deleteRelatedRecords(id);
+        List<Model> modelList = modelRepository.findByProduct(product);
+
+        productPropertyKeyRepository.deleteByProductId(product.getId());
+
+        for (Model model: modelList) {
+            favoritesRepository.deleteByModelId(model.getId());
+            modelPropertyValueRepository.deleteByModelId(model.getId());
+            shoppingCartItemRepository.deleteByModelId(model.getId());
+            modelRepository.delete(model);
+        }
+
+        Set<ImageFile> modelImages = modelList.get(0).getImage();
+        ImageFile imageFile = modelImages.iterator().next();
 
         productRepository.deleteById(id);
+        ProductResponse productResponse = productMapper.productToProductResponse(product);
+        productResponse.setBrandId(product.getBrand().getId());
+        productResponse.setCategoryId(product.getCategory().getId());
+        productResponse.setImage(ImageFileService.convertToResponse(imageFile));
 
-        return productMapper.productToProductResponse(product);
-
+        return productResponse;
     }
 
 
@@ -615,13 +635,6 @@ public class ProductService {
 
     //************************************* Helper Methods **********************************************
 
-    private void deleteRelatedRecords(Long productId) {
-
-        modelRepository.deleteByProductId(productId);
-
-        shoppingCartItemRepository.deleteByProductId(productId);
-
-    }
 
     private void isSkuUniqueWithId(String sku, Long id) {
         if (sku != null && id != null) {

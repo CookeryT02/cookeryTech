@@ -15,5 +15,5 @@ public interface ProductPropertyKeyRepository extends JpaRepository<ProductPrope
     List<ProductPropertyKey> findByProductId(Long product_id);
 
 
-
+    void deleteByProductId(Long id);
 }
