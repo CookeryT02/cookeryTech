@@ -185,8 +185,6 @@ public class ProductController {
     }
 
 
-
-
     //A12 -> It should create a model
     @PostMapping("/models")
     @PreAuthorize("hasRole('ADMIN') or hasRole('PRODUCT_MANAGER')")

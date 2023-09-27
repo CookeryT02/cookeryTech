@@ -1,5 +1,6 @@
 package com.tpe.cookerytech.repository;
 
+import com.tpe.cookerytech.domain.ModelPropertyValue;
 import com.tpe.cookerytech.domain.ProductPropertyKey;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
