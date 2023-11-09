@@ -4,6 +4,7 @@ package com.tpe.cookerytech.mapper;
 import com.tpe.cookerytech.domain.Model;
 import com.tpe.cookerytech.dto.request.ModelRequest;
 import com.tpe.cookerytech.dto.response.ModelCreateResponse;
+import com.tpe.cookerytech.dto.response.ModelGenereteResponse;
 import com.tpe.cookerytech.dto.response.ModelResponse;
 import org.mapstruct.Mapper;
 
@@ -30,4 +31,17 @@ public interface ModelMapper {
     }
 
     ModelCreateResponse modelToModelCreateResponse(Model model);
+    ModelGenereteResponse modelToModelGenereteResponse(Model model);
+    default List<ModelGenereteResponse> modelListToModelGenereteResponseList(List<Model> modelLists){
+        List<ModelGenereteResponse> modelGenereteResponseList = new ArrayList<>();
+        for (Model model:modelLists){
+            ModelGenereteResponse modelGenereteResponse = modelToModelGenereteResponse(model);
+            modelGenereteResponse.setCurrencyCode(model.getCurrency().getCode());
+            modelGenereteResponse.setProductId(model.getProduct().getId());
+            modelGenereteResponseList.add(modelGenereteResponse);
+        }
+        return modelGenereteResponseList;
+    }
+
+
 }

@@ -13,4 +13,6 @@ public class CkResponse {
 
     private boolean success;
 
+
+
 }

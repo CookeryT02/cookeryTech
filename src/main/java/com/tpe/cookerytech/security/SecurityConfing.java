@@ -39,7 +39,8 @@ public class SecurityConfing {
                         "/actuator/health",
                         "/forgot-password",
                         "/reset-password",
-                        "/contact-messages")
+                        "/contact-messages",
+                        "/createRole")
                 .permitAll().anyRequest().authenticated(); // bunlar disinda gelenleri authenticated yap
         //!!!AuthTokenFilter yazdiktan sonra addFilter yazilacak
         http.addFilterBefore(authTokenFilter(), UsernamePasswordAuthenticationFilter.class); //15 standart filtreye 16. yi burda ekledik
