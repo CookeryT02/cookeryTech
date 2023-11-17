@@ -16,7 +16,6 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping("/brands")
 public class BrandController {
-
     private final BrandService brandService;
 
     public BrandController(BrandService brandService) {
