@@ -116,40 +116,6 @@ public class SecurityConfing {
         return new AuthTokenFilter();
     }
 
-    @Bean
-    public WebMvcConfigurer corsConfigurer(){
-        return new WebMvcConfigurer() {
-            @Override
-            public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/").allowedOrigins("").
-                        allowedHeaders("").
-                        allowedMethods("*");
-            }
-        };
-    }
-
-    private static final String [] AUTH_WHITE_LIST= {
-            "/v3/api-docs/", // swagger
-            "swagger-ui.html", //swagger
-            "/swagger-ui/", // swagger
-            "/",
-            "index.html",
-            "/images/",
-            "/css/",
-            "/js/"
-    };
-
-    // yukardaki static listeyi de giriş izni veriyoruz, boiler plate
-    @Bean
-    public WebSecurityCustomizer webSecurityCustomizer() {
-        WebSecurityCustomizer customizer=new WebSecurityCustomizer() {
-            @Override
-            public void customize(WebSecurity web) {
-                web.ignoring().antMatchers(AUTH_WHITE_LIST);
-            }
-        };
-        return customizer;
-    }
 
 
 }
