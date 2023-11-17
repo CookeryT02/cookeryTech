@@ -1,5 +1,6 @@
 package com.tpe.cookerytech.repository;
 
+import com.tpe.cookerytech.domain.Model;
 import com.tpe.cookerytech.domain.ShoppingCartItem;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,4 +17,6 @@ public interface ShoppingCartItemRepository extends JpaRepository<ShoppingCartIt
     void deleteByProductId(Long productId);
 
     void deleteByModelId(Long id);
+
+    List<ShoppingCartItem> findByModel(Model model);
 }

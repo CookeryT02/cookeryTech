@@ -1,6 +1,7 @@
 package com.tpe.cookerytech.repository;
 
 import com.tpe.cookerytech.domain.Favorites;
+import com.tpe.cookerytech.domain.Model;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -14,4 +15,6 @@ public interface FavoritesRepository  extends JpaRepository<Favorites, Long > {
 
 
     void deleteByModelId(Long id);
+
+    List<Favorites> findByModel(Model model);
 }

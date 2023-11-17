@@ -41,12 +41,48 @@ public class SecurityConfing {
                         "/actuator/health",
                         "/forgot-password",
                         "/reset-password",
-                        "/contact-messages")
+                        "/contact-messages",
+                        "/createRole")
                 .permitAll().anyRequest().authenticated(); // bunlar disinda gelenleri authenticated yap
         //!!!AuthTokenFilter yazdiktan sonra addFilter yazilacak
         http.addFilterBefore(authTokenFilter(), UsernamePasswordAuthenticationFilter.class); //15 standart filtreye 16. yi burda ekledik
 
         return http.build();
+    }
+
+    @Bean
+    public WebMvcConfigurer corsConfigurer() {
+        return new WebMvcConfigurer() {
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+                registry.addMapping("/**").allowedOrigins("*"). //"http:127.0.0.1/8080 diye spesific adresden gelenleri kabul et diye de diyebiliriz
+                        allowedHeaders("*").
+                        allowedMethods("*");
+            }
+        };
+    }
+
+    private static final String [] AUTH_WHITE_LIST= {
+            "/v3/api-docs/**", // swagger
+            "swagger-ui.html", //swagger
+            "/swagger-ui/**", // swagger
+            "/",
+            "index.html",
+            "/images/**",
+            "/css/**",
+            "/js/**"
+    };
+
+    // yukardaki static listeyi de giriş izni veriyoruz, boiler plate
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        WebSecurityCustomizer customizer=new WebSecurityCustomizer() {
+            @Override
+            public void customize(WebSecurity web) {
+                web.ignoring().antMatchers(AUTH_WHITE_LIST);
+            }
+        };
+        return customizer;
     }
 
     //!!!Encoder

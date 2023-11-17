@@ -173,12 +173,12 @@ public class ProductController {
 
 
     //A11 -> It should return models for given products
-    @GetMapping("/{id}/get/models")
+    @GetMapping("/{id}/models")
     @PreAuthorize("hasRole('CUSTOMER') or hasRole('ADMIN') or hasRole('SALES_MANAGER') or hasRole('SALES_SPECIALIST') or hasRole('PRODUCT_MANAGER')")
-    public ResponseEntity<List<ModelResponse>> getProductsByIdModels(@PathVariable Long id,@RequestParam(required = false,defaultValue = "seq") String sortField,@RequestParam(required = false,defaultValue = "ASC") String sortOder) {
+    public ResponseEntity<List<ModelGenereteResponse>> getModelsByProductId(@PathVariable Long id,@RequestParam(required = false,defaultValue = "seq") String sortField,@RequestParam(required = false,defaultValue = "ASC") String sortOder) {
 
         Sort sort=Sort.by(Sort.Direction.fromString(sortOder),sortField);
-        List<ModelResponse> modelResponseList  = productService.getProductsByIdModels(id,sort);
+        List<ModelGenereteResponse> modelResponseList  = productService.getProductsByIdModels(id,sort);
 
         return ResponseEntity.ok(modelResponseList);
 
@@ -232,9 +232,9 @@ public class ProductController {
 
     //************************************* Helper Methods **********************************************
 
-    @GetMapping("/{id}/models")
+    @GetMapping("/{id}/get/models")
     @PreAuthorize("hasRole('ADMIN') or hasRole('PRODUCT_MANAGER')")
-    public ResponseEntity<List<ModelResponse>> getModelsByProductId(@PathVariable Long id){
+    public ResponseEntity<List<ModelResponse>> getModelsByProductIdHelper(@PathVariable Long id){
 
 
         List<ModelResponse> modelResponseList = productService.getModelsByProductId(id);

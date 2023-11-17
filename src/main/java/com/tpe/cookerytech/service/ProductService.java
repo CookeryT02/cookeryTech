@@ -424,74 +424,52 @@ public class ProductService {
 
 
     //A11
-    public List<ModelResponse> getProductsByIdModels(Long id,Sort sort) {
+    public List<ModelGenereteResponse> getProductsByIdModels(Long id,Sort sort) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        if (authentication != null && authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_CUSTOMER"))) {
+        Product product = productRepository.findById(id).orElseThrow(() ->
+                new ResourceNotFoundException(String.format(ErrorMessage.PRODUCT_NOT_FOUND_EXCEPTION,id)));
 
-            List<Product> productList = (productRepository.findByIsActive(false,sort));
-            List<Product> filteredProductsCustomer =productList.stream()
-                    .filter(p -> {
-                        Brand brand = p.getBrand();
-                        Category category = p.getCategory();
-                        System.out.println(p.getCategory().getIsActive());
-                        return p.getIsFeatured() && brand != null && category != null && brand.getIsActive() && category.getIsActive();
-                    })
-                    .collect(Collectors.toList());
-
-            List<Model> modelList = (modelRepository.findByIsActive(false));
-            List<Model> filteredModelsCustomer = modelList.stream()
-                    .filter(m -> {
-                        Product product = m.getProduct();
-                        return product != null && product.getIsActive();
-                    })
-                    .collect(Collectors.toList());
-
-
-            productRepository.findById(id).orElseThrow(() ->
-                    new ResourceNotFoundException(String.format(ErrorMessage.PRODUCT_NOT_FOUND_EXCEPTION,id)));
+        if (authentication != null && authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
 
             List<Model> modelLists = modelRepository.findByProductId(id).orElseThrow(()->
-                    new ResourceNotFoundException(String.format(ErrorMessage.MODEL_NOT_FOUND_BY_PRODUCT_ID_EXCEPTION,id)));
+                    new ResourceNotFoundException(String.format(ErrorMessage.MODEL_NOT_FOUND_EXCEPTION,product)));
 
-
-//            List<Model> sortedModelList = modelLists.stream()
-//                    .sorted(Comparator.comparingInt(Model::getSeq).thenComparing(Model::getTitle))
-//                    .collect(Collectors.toList());
-
-            return modelMapper.modelListToModelResponseList(modelLists);
-
+            List<ModelGenereteResponse> modelGenereteResponseList = modelMapper.modelListToModelGenereteResponseList(modelLists);
+            for (ModelGenereteResponse mGr : modelGenereteResponseList) {
+                for (Model model:modelLists){
+                    if(Objects.equals(mGr.getId(), model.getId())) {
+                        List<ShoppingCartItem> shoppingCartItem = shoppingCartItemRepository.findByModel(model);
+                        List<Favorites> favorites = favoritesRepository.findByModel(model);
+                        if (!shoppingCartItem.isEmpty()) {
+                            mGr.setCartItemAmount(shoppingCartItem.size());
+                        } else {
+                            mGr.setCartItemAmount(0);
+                        }
+                        if (!favorites.isEmpty()) {
+                            mGr.setFavorite(true);
+                        } else {
+                            mGr.setFavorite(false);
+                        }
+                    }
+                }
+            }
+            return modelGenereteResponseList;
         } else {
+            List<Model> modelLists = modelRepository.findByProductId(product.getId()).orElseThrow(()->
+                    new ResourceNotFoundException(String.format(ErrorMessage.MODEL_NOT_FOUND_EXCEPTION,product)));
 
-            List<Product> productList = (productRepository.findByIsActive(true,sort));
-            List<Product> filteredProducts =productList.stream()
-                    .filter(p -> {
-                        Brand brand = p.getBrand();
-                        Category category = p.getCategory();
-                        System.out.println(p.getCategory().getIsActive());
-                        return p.getIsFeatured() && brand != null && category != null && brand.getIsActive() && category.getIsActive();
-                    }).collect(Collectors.toList());
-
-            List<Model> modelList = (modelRepository.findByIsActive(false));
-
-            List<Model> filteredModelsCustomer = modelList.stream()
+            List<Model> filteredModelsCustomer = modelLists.stream()
                     .filter(m -> {
-                        Product product = m.getProduct();
-                        return product != null && product.getIsActive();
+                        Product product1 = m.getProduct();
+                        Category category = product1.getCategory();
+                        Brand brand = product1.getBrand();
+                        return product1.getIsActive() && m.getIsActive() && brand != null && category != null && brand.getIsActive() && category.getIsActive();
                     }).collect(Collectors.toList());
 
-            productRepository.findById(id).orElseThrow(() ->
-                    new ResourceNotFoundException(String.format(ErrorMessage.PRODUCT_NOT_FOUND_EXCEPTION,id)));
 
-            List<Model> modelLists = modelRepository.findByProductId(id).orElseThrow(()->
-                    new ResourceNotFoundException(String.format(ErrorMessage.MODEL_NOT_FOUND_BY_PRODUCT_ID_EXCEPTION,id)));
-
-//            List<Model> sortedModelList = modelLists.stream()
-//                    .sorted(Comparator.comparingInt(Model::getSeq).thenComparing(Model::getTitle))
-//                    .collect(Collectors.toList());
-
-            return modelMapper.modelListToModelResponseList(modelLists);
+           return modelMapper.modelListToModelGenereteResponseList(filteredModelsCustomer);
         }
     }
 
